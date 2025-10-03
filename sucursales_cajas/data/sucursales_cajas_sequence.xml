@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- Secuencia para Operaciones -->
+        <record id="sequence_sucursales_cajas_operation" model="ir.sequence">
+            <field name="name">Operaciones de Caja</field>
+            <field name="code">sucursales_cajas.operation</field>
+            <field name="prefix">OP/</field>
+            <field name="padding">6</field>
+            <field name="company_id" eval="False"/>
+        </record>
+        
+        <!-- Secuencia para Sesiones -->
+        <record id="sequence_sucursales_cajas_session" model="ir.sequence">
+            <field name="name">Sesiones de Caja</field>
+            <field name="code">sucursales_cajas.session</field>
+            <field name="prefix">SES/</field>
+            <field name="padding">6</field>
+            <field name="company_id" eval="False"/>
+        </record>
+    </data>
+</odoo>

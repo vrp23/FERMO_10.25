@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Vista Form del Wizard Conteo de Efectivo -->
+    <record id="view_cash_count_wizard_form" model="ir.ui.view">
+        <field name="name">sucursales_cajas.cash_count_wizard.form</field>
+        <field name="model">sucursales_cajas.cash_count_wizard</field>
+        <field name="arch" type="xml">
+            <form string="Conteo de Efectivo">
+                <sheet>
+                    <group>
+                        <field name="balance_id" invisible="1"/>
+                        <field name="currency_type" readonly="1" widget="badge"/>
+                        <field name="current_amount" readonly="1" widget="monetary" invisible="current_amount == 0"/>
+                    </group>
+                    
+                    <separator string="Detalle de Billetes y Monedas"/>
+                    
+                    <field name="denomination_ids" nolabel="1">
+                        <tree editable="bottom" create="false" delete="false">
+                            <field name="denomination_display" string="Denominación" readonly="1"/>
+                            <field name="quantity" string="Cantidad"/>
+                            <field name="subtotal" string="Subtotal" readonly="1" widget="monetary" sum="Total"/>
+                            <field name="is_bill" invisible="1"/>
+                            <field name="denomination" invisible="1"/>
+                        </tree>
+                    </field>
+                    
+                    <group>
+                        <group>
+                            <field name="total_amount" readonly="1" widget="monetary" 
+                                   class="oe_subtotal_footer_separator"/>
+                        </group>
+                        <group invisible="current_amount == 0">
+                            <field name="difference" readonly="1" widget="monetary"
+                                   decoration-danger="difference &lt; 0"
+                                   decoration-success="difference &gt; 0"
+                                   decoration-muted="difference == 0"/>
+                        </group>
+                    </group>
+                    
+                    <separator string="Resumen" invisible="not summary_html"/>
+                    <div class="row">
+                        <div class="col-12">
+                            <field name="summary_html" readonly="1" nolabel="1"/>
+                        </div>
+                    </div>
+                </sheet>
+                <footer>
+                    <button name="action_confirm" 
+                            string="Confirmar Conteo" 
+                            type="object" 
+                            class="btn-primary"/>
+                    <button name="action_quick_count" 
+                            string="Conteo Rápido" 
+                            type="object" 
+                            class="btn-secondary"/>
+                    <button name="action_print_count" 
+                            string="Imprimir" 
+                            type="object" 
+                            class="btn-secondary"
+                            invisible="total_amount == 0"/>
+                    <button string="Cancelar" 
+                            class="btn-secondary" 
+                            special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>

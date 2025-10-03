@@ -1,0 +1,427 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Vista de formulario para lotes de inventario -->
+    <record id="view_divisas_inventory_lot_form" model="ir.ui.view">
+        <field name="name">divisas.inventory.lot.form</field>
+        <field name="model">divisas.inventory.lot</field>
+        <field name="arch" type="xml">
+            <form string="Lote de Inventario FIFO">
+                <header>
+                    <button name="action_cancel" type="object" string="Cancelar Lote" 
+                            invisible="state != 'available'"
+                            confirm="¿Está seguro de cancelar este lote? Se revertirán todos sus consumos."/>
+                    <field name="state" widget="statusbar" statusbar_visible="available,exhausted,cancelled"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" readonly="1"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="purchase_operation_id"/>
+                            <field name="partner_id"/>
+                            <field name="date"/>
+                        </group>
+                        <group>
+                            <field name="currency_type"/>
+                            <field name="acquisition_rate"/>
+                            <field name="reference_currency"/>
+                            <field name="total_cost"/>
+                        </group>
+                    </group>
+                    <group string="Cantidades">
+                        <group>
+                            <field name="quantity_purchased"/>
+                            <field name="quantity_available" 
+                                   decoration-danger="quantity_available == 0"
+                                   decoration-warning="quantity_available &lt; quantity_purchased * 0.2"/>
+                        </group>
+                        <group>
+                            <field name="quantity_consumed"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Consumos" invisible="not consumption_ids">
+                            <field name="consumption_ids" readonly="1">
+                                <tree decoration-muted="state == 'reverted'">
+                                    <field name="sale_operation_id"/>
+                                    <field name="partner_id"/>
+                                    <field name="date"/>
+                                    <field name="quantity_consumed" sum="Total"/>
+                                    <field name="acquisition_rate"/>
+                                    <field name="consumption_rate"/>
+                                    <!-- Sin sumas de ganancias para evitar mezcla de monedas -->
+                                    <field name="profit_ars" decoration-success="profit_ars > 0" decoration-danger="profit_ars &lt; 0"/>
+                                    <field name="profit_usd" decoration-success="profit_usd > 0" decoration-danger="profit_usd &lt; 0"/>
+                                    <field name="profit_currency"/>
+                                    <field name="state"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    
+    <!-- Vista de árbol para lotes de inventario -->
+    <record id="view_divisas_inventory_lot_tree" model="ir.ui.view">
+        <field name="name">divisas.inventory.lot.tree</field>
+        <field name="model">divisas.inventory.lot</field>
+        <field name="arch" type="xml">
+            <tree string="Lotes de Inventario FIFO" 
+                  decoration-success="state == 'available' and quantity_available > 0"
+                  decoration-warning="state == 'available' and quantity_available &lt; quantity_purchased * 0.2"
+                  decoration-danger="state == 'exhausted'"
+                  decoration-muted="state == 'cancelled'">
+                <field name="name"/>
+                <field name="purchase_operation_id"/>
+                <field name="partner_id"/>
+                <field name="date"/>
+                <field name="currency_type"/>
+                <!-- Removemos sumas porque mezclan USD y USDT -->
+                <field name="quantity_purchased"/>
+                <field name="quantity_available"/>
+                <field name="quantity_consumed"/>
+                <field name="acquisition_rate"/>
+                <field name="reference_currency"/>
+                <field name="total_cost"/>
+                <field name="state"/>
+            </tree>
+        </field>
+    </record>
+    
+    <!-- Vista Tree específica para lotes en ARS -->
+    <record id="view_divisas_inventory_lot_tree_ars" model="ir.ui.view">
+        <field name="name">divisas.inventory.lot.tree.ars</field>
+        <field name="model">divisas.inventory.lot</field>
+        <field name="arch" type="xml">
+            <tree string="Lotes con TC en ARS" 
+                  decoration-success="state == 'available' and quantity_available > 0"
+                  decoration-warning="state == 'available' and quantity_available &lt; quantity_purchased * 0.2"
+                  decoration-danger="state == 'exhausted'"
+                  decoration-muted="state == 'cancelled'">
+                <field name="name"/>
+                <field name="purchase_operation_id"/>
+                <field name="partner_id"/>
+                <field name="date"/>
+                <field name="currency_type"/>
+                <field name="quantity_purchased" sum="Total"/>
+                <field name="quantity_available" sum="Disponible"/>
+                <field name="quantity_consumed" sum="Consumido"/>
+                <field name="acquisition_rate"/>
+                <field name="reference_currency" invisible="1"/>
+                <field name="total_cost" sum="Total ARS"/>
+                <field name="state"/>
+            </tree>
+        </field>
+    </record>
+    
+    <!-- Vista Tree específica para lotes en USD/USDT -->
+    <record id="view_divisas_inventory_lot_tree_usd" model="ir.ui.view">
+        <field name="name">divisas.inventory.lot.tree.usd</field>
+        <field name="model">divisas.inventory.lot</field>
+        <field name="arch" type="xml">
+            <tree string="Lotes de Conversiones USD/USDT" 
+                  decoration-success="state == 'available' and quantity_available > 0"
+                  decoration-warning="state == 'available' and quantity_available &lt; quantity_purchased * 0.2"
+                  decoration-danger="state == 'exhausted'"
+                  decoration-muted="state == 'cancelled'">
+                <field name="name"/>
+                <field name="purchase_operation_id"/>
+                <field name="partner_id"/>
+                <field name="date"/>
+                <field name="currency_type"/>
+                <field name="quantity_purchased" sum="Total"/>
+                <field name="quantity_available" sum="Disponible"/>
+                <field name="quantity_consumed" sum="Consumido"/>
+                <field name="acquisition_rate"/>
+                <field name="reference_currency"/>
+                <field name="total_cost" sum="Total"/>
+                <field name="state"/>
+            </tree>
+        </field>
+    </record>
+    
+    <!-- Vista de búsqueda para lotes -->
+    <record id="view_divisas_inventory_lot_search" model="ir.ui.view">
+        <field name="name">divisas.inventory.lot.search</field>
+        <field name="model">divisas.inventory.lot</field>
+        <field name="arch" type="xml">
+            <search string="Buscar Lotes">
+                <field name="name"/>
+                <field name="purchase_operation_id"/>
+                <field name="partner_id"/>
+                <field name="currency_type"/>
+                <field name="reference_currency"/>
+                <filter string="USD" name="usd" domain="[('currency_type', '=', 'USD')]"/>
+                <filter string="USDT" name="usdt" domain="[('currency_type', '=', 'USDT')]"/>
+                <separator/>
+                <filter string="TC en ARS" name="ref_ars" domain="[('reference_currency', '=', 'ARS')]"/>
+                <filter string="TC en USD" name="ref_usd" domain="[('reference_currency', '=', 'USD')]"/>
+                <filter string="TC en USDT" name="ref_usdt" domain="[('reference_currency', '=', 'USDT')]"/>
+                <separator/>
+                <filter string="Disponibles" name="available" domain="[('state', '=', 'available'), ('quantity_available', '>', 0)]"/>
+                <filter string="Agotados" name="exhausted" domain="[('state', '=', 'exhausted')]"/>
+                <filter string="Cancelados" name="cancelled" domain="[('state', '=', 'cancelled')]"/>
+                <separator/>
+                <filter string="Con Stock Bajo" name="low_stock" 
+                        domain="[('state', '=', 'available'), ('quantity_available', '&lt;', 'quantity_purchased * 0.2')]"/>
+                <group expand="0" string="Agrupar Por">
+                    <filter string="Divisa" name="group_currency" context="{'group_by': 'currency_type'}"/>
+                    <filter string="Moneda Referencia" name="group_ref_currency" context="{'group_by': 'reference_currency'}"/>
+                    <filter string="Proveedor" name="group_partner" context="{'group_by': 'partner_id'}"/>
+                    <filter string="Estado" name="group_state" context="{'group_by': 'state'}"/>
+                    <filter string="Fecha" name="group_date" context="{'group_by': 'date'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+    
+    <!-- Vista Pivot para análisis por moneda de referencia -->
+    <record id="view_divisas_inventory_lot_pivot" model="ir.ui.view">
+        <field name="name">divisas.inventory.lot.pivot</field>
+        <field name="model">divisas.inventory.lot</field>
+        <field name="arch" type="xml">
+            <pivot string="Análisis de Inventario FIFO">
+                <field name="reference_currency" type="row"/>
+                <field name="currency_type" type="col"/>
+                <field name="state" type="col"/>
+                <field name="quantity_available" type="measure"/>
+                <field name="total_cost" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+    
+    <!-- Vista de formulario para consumos (solo lectura) -->
+    <record id="view_divisas_lot_consumption_form" model="ir.ui.view">
+        <field name="name">divisas.lot.consumption.form</field>
+        <field name="model">divisas.lot.consumption</field>
+        <field name="arch" type="xml">
+            <form string="Consumo de Lote FIFO" create="false" edit="false" delete="false">
+                <header>
+                    <field name="state" widget="statusbar" statusbar_visible="active,reverted"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="lot_id"/>
+                            <field name="sale_operation_id"/>
+                            <field name="partner_id"/>
+                            <field name="date"/>
+                        </group>
+                        <group>
+                            <field name="currency_type"/>
+                            <field name="quantity_consumed"/>
+                            <field name="reference_currency"/>
+                            <field name="profit_currency"/>
+                        </group>
+                    </group>
+                    <group string="Tipos de Cambio y Ganancias">
+                        <group>
+                            <field name="acquisition_rate"/>
+                            <field name="consumption_rate"/>
+                        </group>
+                        <group>
+                            <field name="profit_ars" widget="monetary" 
+                                   invisible="profit_currency != 'ARS'"
+                                   decoration-success="profit_ars > 0"
+                                   decoration-danger="profit_ars &lt; 0"/>
+                            <field name="profit_usd" widget="monetary" 
+                                   invisible="profit_currency != 'USD'"
+                                   decoration-success="profit_usd > 0"
+                                   decoration-danger="profit_usd &lt; 0"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    
+    <!-- Vista de árbol para consumos -->
+    <record id="view_divisas_lot_consumption_tree" model="ir.ui.view">
+        <field name="name">divisas.lot.consumption.tree</field>
+        <field name="model">divisas.lot.consumption</field>
+        <field name="arch" type="xml">
+            <tree string="Consumos de Lotes FIFO" decoration-muted="state == 'reverted'" create="false" delete="false">
+                <field name="lot_id"/>
+                <field name="sale_operation_id"/>
+                <field name="partner_id"/>
+                <field name="date"/>
+                <field name="currency_type"/>
+                <!-- Removemos suma porque mezcla USD y USDT -->
+                <field name="quantity_consumed"/>
+                <field name="acquisition_rate"/>
+                <field name="consumption_rate"/>
+                <!-- Sin sumas de ganancias para evitar mezcla de monedas -->
+                <field name="profit_ars"/>
+                <field name="profit_usd"/>
+                <field name="profit_currency"/>
+                <field name="state"/>
+            </tree>
+        </field>
+    </record>
+    
+    <!-- Vista Tree específica para consumos con ganancias ARS -->
+    <record id="view_divisas_lot_consumption_tree_ars" model="ir.ui.view">
+        <field name="name">divisas.lot.consumption.tree.ars</field>
+        <field name="model">divisas.lot.consumption</field>
+        <field name="arch" type="xml">
+            <tree string="Consumos con Ganancias en ARS" decoration-muted="state == 'reverted'" create="false" delete="false">
+                <field name="lot_id"/>
+                <field name="sale_operation_id"/>
+                <field name="partner_id"/>
+                <field name="date"/>
+                <field name="currency_type"/>
+                <field name="quantity_consumed" sum="Total"/>
+                <field name="acquisition_rate"/>
+                <field name="consumption_rate"/>
+                <field name="profit_ars" sum="Total Ganancia ARS" decoration-success="profit_ars > 0" decoration-danger="profit_ars &lt; 0"/>
+                <field name="state"/>
+            </tree>
+        </field>
+    </record>
+    
+    <!-- Vista Tree específica para consumos con ganancias USD -->
+    <record id="view_divisas_lot_consumption_tree_usd" model="ir.ui.view">
+        <field name="name">divisas.lot.consumption.tree.usd</field>
+        <field name="model">divisas.lot.consumption</field>
+        <field name="arch" type="xml">
+            <tree string="Consumos de Conversiones USD/USDT" decoration-muted="state == 'reverted'" create="false" delete="false">
+                <field name="lot_id"/>
+                <field name="sale_operation_id"/>
+                <field name="partner_id"/>
+                <field name="date"/>
+                <field name="currency_type"/>
+                <field name="quantity_consumed" sum="Total"/>
+                <field name="acquisition_rate"/>
+                <field name="consumption_rate"/>
+                <field name="profit_usd" sum="Total Ganancia USD" decoration-success="profit_usd > 0" decoration-danger="profit_usd &lt; 0"/>
+                <field name="state"/>
+            </tree>
+        </field>
+    </record>
+    
+    <!-- Vista de búsqueda para consumos -->
+    <record id="view_divisas_lot_consumption_search" model="ir.ui.view">
+        <field name="name">divisas.lot.consumption.search</field>
+        <field name="model">divisas.lot.consumption</field>
+        <field name="arch" type="xml">
+            <search string="Buscar Consumos">
+                <field name="lot_id"/>
+                <field name="sale_operation_id"/>
+                <field name="partner_id"/>
+                <field name="profit_currency"/>
+                <filter string="Activos" name="active" domain="[('state', '=', 'active')]"/>
+                <filter string="Revertidos" name="reverted" domain="[('state', '=', 'reverted')]"/>
+                <separator/>
+                <filter string="Con Ganancia ARS" name="with_profit_ars" domain="[('profit_ars', '>', 0)]"/>
+                <filter string="Con Pérdida ARS" name="with_loss_ars" domain="[('profit_ars', '&lt;', 0)]"/>
+                <filter string="Con Ganancia USD" name="with_profit_usd" domain="[('profit_usd', '>', 0)]"/>
+                <filter string="Con Pérdida USD" name="with_loss_usd" domain="[('profit_usd', '&lt;', 0)]"/>
+                <separator/>
+                <filter string="Ganancias en ARS" name="profit_in_ars" domain="[('profit_currency', '=', 'ARS')]"/>
+                <filter string="Ganancias en USD" name="profit_in_usd" domain="[('profit_currency', '=', 'USD')]"/>
+                <group expand="0" string="Agrupar Por">
+                    <filter string="Divisa" name="group_currency" context="{'group_by': 'currency_type'}"/>
+                    <filter string="Cliente" name="group_partner" context="{'group_by': 'partner_id'}"/>
+                    <filter string="Moneda Ganancia" name="group_profit_currency" context="{'group_by': 'profit_currency'}"/>
+                    <filter string="Fecha" name="group_date" context="{'group_by': 'date'}"/>
+                    <filter string="Estado" name="group_state" context="{'group_by': 'state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+    
+    <!-- Vista Pivot para análisis de consumos por moneda de ganancia -->
+    <record id="view_divisas_lot_consumption_pivot" model="ir.ui.view">
+        <field name="name">divisas.lot.consumption.pivot</field>
+        <field name="model">divisas.lot.consumption</field>
+        <field name="arch" type="xml">
+            <pivot string="Análisis de Consumos y Ganancias">
+                <field name="date" type="row" interval="month"/>
+                <field name="profit_currency" type="row"/>
+                <field name="currency_type" type="col"/>
+                <field name="quantity_consumed" type="measure"/>
+                <field name="profit_ars" type="measure"/>
+                <field name="profit_usd" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+    
+    <!-- Acciones -->
+    <record id="action_divisas_inventory_lot" model="ir.actions.act_window">
+        <field name="name">Inventario FIFO</field>
+        <field name="res_model">divisas.inventory.lot</field>
+        <field name="view_mode">tree,form,pivot</field>
+        <field name="search_view_id" ref="view_divisas_inventory_lot_search"/>
+        <field name="context">{'search_default_available': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Los lotes de inventario se crean automáticamente al confirmar compras de divisas.
+            </p>
+            <p>
+                Aquí puede ver el stock disponible con su tipo de cambio de adquisición.
+            </p>
+        </field>
+    </record>
+    
+    <!-- Acción para lotes con TC en ARS -->
+    <record id="action_divisas_inventory_lot_ars" model="ir.actions.act_window">
+        <field name="name">Inventario con TC en ARS</field>
+        <field name="res_model">divisas.inventory.lot</field>
+        <field name="view_mode">tree,form,pivot</field>
+        <field name="view_id" ref="view_divisas_inventory_lot_tree_ars"/>
+        <field name="domain">[('reference_currency', '=', 'ARS')]</field>
+        <field name="context">{'search_default_available': 1}</field>
+        <field name="search_view_id" ref="view_divisas_inventory_lot_search"/>
+    </record>
+    
+    <!-- Acción para lotes de conversiones -->
+    <record id="action_divisas_inventory_lot_usd" model="ir.actions.act_window">
+        <field name="name">Inventario de Conversiones USD/USDT</field>
+        <field name="res_model">divisas.inventory.lot</field>
+        <field name="view_mode">tree,form,pivot</field>
+        <field name="view_id" ref="view_divisas_inventory_lot_tree_usd"/>
+        <field name="domain">[('reference_currency', 'in', ['USD', 'USDT'])]</field>
+        <field name="context">{'search_default_available': 1}</field>
+        <field name="search_view_id" ref="view_divisas_inventory_lot_search"/>
+    </record>
+    
+    <record id="action_divisas_lot_consumption" model="ir.actions.act_window">
+        <field name="name">Consumos FIFO</field>
+        <field name="res_model">divisas.lot.consumption</field>
+        <field name="view_mode">tree,form,pivot</field>
+        <field name="search_view_id" ref="view_divisas_lot_consumption_search"/>
+        <field name="context">{'search_default_active': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Los consumos se generan automáticamente al confirmar ventas de divisas.
+            </p>
+        </field>
+    </record>
+    
+    <!-- Acción para consumos con ganancias en ARS -->
+    <record id="action_divisas_lot_consumption_ars" model="ir.actions.act_window">
+        <field name="name">Consumos con Ganancias ARS</field>
+        <field name="res_model">divisas.lot.consumption</field>
+        <field name="view_mode">tree,form,pivot</field>
+        <field name="view_id" ref="view_divisas_lot_consumption_tree_ars"/>
+        <field name="domain">[('profit_currency', '=', 'ARS')]</field>
+        <field name="context">{'search_default_active': 1}</field>
+        <field name="search_view_id" ref="view_divisas_lot_consumption_search"/>
+    </record>
+    
+    <!-- Acción para consumos con ganancias en USD -->
+    <record id="action_divisas_lot_consumption_usd" model="ir.actions.act_window">
+        <field name="name">Consumos de Conversiones USD/USDT</field>
+        <field name="res_model">divisas.lot.consumption</field>
+        <field name="view_mode">tree,form,pivot</field>
+        <field name="view_id" ref="view_divisas_lot_consumption_tree_usd"/>
+        <field name="domain">[('profit_currency', '=', 'USD')]</field>
+        <field name="context">{'search_default_active': 1}</field>
+        <field name="search_view_id" ref="view_divisas_lot_consumption_search"/>
+    </record>
+</odoo>

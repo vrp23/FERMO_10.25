@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Dashboard View -->
+    <record id="view_sucursales_cajas_dashboard" model="ir.ui.view">
+        <field name="name">sucursales_cajas.dashboard</field>
+        <field name="model">sucursales_cajas.cashbox</field>
+        <field name="mode">primary</field>
+        <field name="arch" type="xml">
+            <form string="Dashboard - Sucursales y Cajas" create="false" edit="false">
+                <sheet>
+                    <div class="oe_title">
+                        <h1>Dashboard - Sucursales y Cajas</h1>
+                    </div>
+                    
+                    <!-- Botones de acceso rápido -->
+                    <div class="row mt-4 mb-4">
+                        <div class="col-md-3">
+                            <button name="%(action_sucursales_cajas_send_to_cashbox_wizard)d" 
+                                    type="action" 
+                                    class="btn btn-primary btn-block"
+                                    icon="fa-paper-plane">
+                                <span>Nueva Operación</span>
+                            </button>
+                        </div>
+                        <div class="col-md-3">
+                            <button name="%(action_sucursales_cajas_cashbox_in_session)d" 
+                                    type="action" 
+                                    class="btn btn-info btn-block"
+                                    icon="fa-desktop">
+                                <span>Cajas Activas</span>
+                            </button>
+                        </div>
+                        <div class="col-md-3">
+                            <button name="%(action_sucursales_cajas_operation_pending)d" 
+                                    type="action" 
+                                    class="btn btn-warning btn-block"
+                                    icon="fa-clock-o">
+                                <span>Operaciones Pendientes</span>
+                            </button>
+                        </div>
+                        <div class="col-md-3">
+                            <button name="%(action_sucursales_cajas_session_open)d" 
+                                    type="action" 
+                                    class="btn btn-success btn-block"
+                                    icon="fa-user-circle">
+                                <span>Sesiones Activas</span>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Estadísticas del día -->
+                    <div class="row">
+                        <div class="col-12">
+                            <h3>Estadísticas del Día</h3>
+                            <div class="o_kanban_view">
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        <div class="o_kanban_card_header">
+                                            <div class="o_kanban_card_header_title">
+                                                <span class="o_value">Operaciones Totales</span>
+                                            </div>
+                                        </div>
+                                        <div class="o_kanban_card_content">
+                                            <field name="operation_count_today" widget="statinfo" 
+                                                   class="o_kanban_primary_left"/>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-md-3">
+                                        <div class="o_kanban_card_header">
+                                            <div class="o_kanban_card_header_title">
+                                                <span class="o_value">Depósitos</span>
+                                            </div>
+                                        </div>
+                                        <div class="o_kanban_card_content">
+                                            <field name="deposit_count_today" widget="statinfo" 
+                                                   class="o_kanban_primary_left text-success"/>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-md-3">
+                                        <div class="o_kanban_card_header">
+                                            <div class="o_kanban_card_header_title">
+                                                <span class="o_value">Retiros</span>
+                                            </div>
+                                        </div>
+                                        <div class="o_kanban_card_content">
+                                            <field name="withdrawal_count_today" widget="statinfo" 
+                                                   class="o_kanban_primary_left text-danger"/>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-md-3">
+                                        <div class="o_kanban_card_header">
+                                            <div class="o_kanban_card_header_title">
+                                                <span class="o_value">Pendientes</span>
+                                            </div>
+                                        </div>
+                                        <div class="o_kanban_card_content">
+                                            <field name="pending_count_today" widget="statinfo" 
+                                                   class="o_kanban_primary_left text-warning"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Sucursales y Cajas -->
+                    <div class="row mt-4">
+                        <div class="col-md-6">
+                            <h3>Sucursales</h3>
+                            <field name="branch_summary_ids" nolabel="1">
+                                <tree create="false" edit="false" delete="false">
+                                    <field name="name"/>
+                                    <field name="cashbox_count"/>
+                                    <field name="active_sessions_count"/>
+                                    <field name="active" widget="badge" 
+                                           decoration-success="active == True"
+                                           decoration-muted="active == False"/>
+                                </tree>
+                            </field>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <h3>Cajas con Sesión Activa</h3>
+                            <field name="active_cashbox_ids" nolabel="1">
+                                <tree create="false" edit="false" delete="false">
+                                    <field name="display_name"/>
+                                    <field name="session_user_id"/>
+                                    <field name="session_start_time" widget="datetime"/>
+                                    <field name="pending_operations_count" 
+                                           decoration-warning="pending_operations_count > 0"/>
+                                    <button name="action_view_active_session" 
+                                            type="object" 
+                                            string="Ver Sesión" 
+                                            class="btn-sm btn-primary"
+                                            icon="fa-eye"/>
+                                </tree>
+                            </field>
+                        </div>
+                    </div>
+                    
+                    <!-- Últimas Operaciones -->
+                    <div class="row mt-4">
+                        <div class="col-12">
+                            <h3>Últimas Operaciones</h3>
+                            <field name="recent_operation_ids" nolabel="1">
+                                <tree create="false" edit="false" delete="false"
+                                      decoration-success="state == 'done'"
+                                      decoration-warning="state == 'pending'"
+                                      decoration-info="state == 'processing'">
+                                    <field name="name"/>
+                                    <field name="operation_type"/>
+                                    <field name="partner_id"/>
+                                    <field name="currency_type"/>
+                                    <field name="amount"/>
+                                    <field name="cashbox_id"/>
+                                    <field name="state" widget="badge"/>
+                                    <field name="request_date" widget="datetime"/>
+                                </tree>
+                            </field>
+                        </div>
+                    </div>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    
+    <!-- Action for Dashboard -->
+    <record id="action_sucursales_cajas_dashboard" model="ir.actions.act_window">
+        <field name="name">Dashboard</field>
+        <field name="res_model">sucursales_cajas.cashbox</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="view_sucursales_cajas_dashboard"/>
+        <field name="target">inline</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Bienvenido al módulo de Sucursales y Cajas
+            </p>
+            <p>
+                Desde aquí puede gestionar las operaciones de caja de todas las sucursales.
+            </p>
+        </field>
+    </record>
+    
+    <!-- Server Action para computar datos del dashboard -->
+    <record id="ir_cron_compute_dashboard_data" model="ir.cron">
+        <field name="name">Sucursales y Cajas: Actualizar Dashboard</field>
+        <field name="model_id" ref="model_sucursales_cajas_cashbox"/>
+        <field name="state">code</field>
+        <field name="code">model._compute_dashboard_data()</field>
+        <field name="user_id" ref="base.user_root"/>
+        <field name="interval_number">5</field>
+        <field name="interval_type">minutes</field>
+        <field name="numbercall">-1</field>
+        <field name="active" eval="True"/>
+    </record>
+</odoo>

@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Vista Form del Wizard Procesar Operación -->
+    <record id="view_process_operation_wizard_form" model="ir.ui.view">
+        <field name="name">sucursales_cajas.process_operation_wizard.form</field>
+        <field name="model">sucursales_cajas.process_operation_wizard</field>
+        <field name="arch" type="xml">
+            <form string="Procesar Operación">
+                <sheet>
+                    <field name="operation_id" invisible="1"/>
+                    <field name="beneficiary_info" readonly="1" nolabel="1" colspan="2" 
+                           invisible="not is_third_party"/>
+                    <field name="transfer_info" readonly="1" nolabel="1" colspan="2" 
+                           invisible="not operation_id.transfer_type"/>
+                    
+                    <group>
+                        <group>
+                            <field name="operation_type" readonly="1" widget="badge"/>
+                            <field name="partner_id" readonly="1"/>
+                            <field name="currency_type" readonly="1"/>
+                            <field name="amount" readonly="1" widget="monetary"/>
+                        </group>
+                        <group invisible="not is_third_party">
+                            <field name="is_third_party" invisible="1"/>
+                            <field name="identity_verified" required="is_third_party"/>
+                            <field name="verification_notes" placeholder="Observaciones de verificación..."/>
+                        </group>
+                    </group>
+                    
+                    <separator string="Selección de Subcaja/Cuenta"/>
+                    
+                    <group>
+                        <group>
+                            <field name="cashbox_id" invisible="1"/>
+                            <field name="cashbox_line_id" required="1" 
+                                   options="{'no_create': True}"/>
+                            <field name="account_id" 
+                                   options="{'no_create': True}"
+                                   invisible="is_cash"
+                                   required="not is_cash"/>
+                            <field name="is_cash" invisible="1"/>
+                            <field name="has_sufficient_balance" invisible="1"/>
+                        </group>
+                        <group>
+                            <field name="current_balance" readonly="1" widget="monetary" string="Saldo Disponible"/>
+                            <field name="balance_after" readonly="1" widget="monetary" string="Saldo Después"
+                                   decoration-danger="balance_after &lt; 0 and operation_type == 'withdrawal'"
+                                   decoration-success="balance_after &gt; current_balance"/>
+                        </group>
+                    </group>
+                    
+                    <group string="Datos de Transferencia" 
+                           invisible="not operation_id.transfer_type or is_cash">
+                        <group>
+                            <field name="transfer_completed" required="operation_id.transfer_type and not is_cash"/>
+                            <field name="transfer_reference" required="transfer_completed"/>
+                        </group>
+                    </group>
+                    
+                    <separator string="Resumen de la Operación"/>
+                    <field name="operation_summary" readonly="1" nolabel="1"/>
+                    
+                    <group string="Opciones">
+                        <group>
+                            <field name="print_receipt"/>
+                            <field name="send_notification"/>
+                        </group>
+                    </group>
+                </sheet>
+                <footer>
+                    <button name="action_process" 
+                            string="Procesar" 
+                            type="object" 
+                            class="btn-primary"
+                            invisible="not has_sufficient_balance and operation_type == 'withdrawal'"
+                            confirm="¿Confirma el procesamiento de esta operación?"/>
+                    <button name="action_reject" 
+                            string="Rechazar" 
+                            type="object" 
+                            class="btn-danger"/>
+                    <button string="Cancelar" 
+                            class="btn-secondary" 
+                            special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+    
+    <!-- Vista Form del Wizard Rechazar Operación -->
+    <record id="view_reject_operation_wizard_form" model="ir.ui.view">
+        <field name="name">sucursales_cajas.reject_operation_wizard.form</field>
+        <field name="model">sucursales_cajas.reject_operation_wizard</field>
+        <field name="arch" type="xml">
+            <form string="Rechazar Operación">
+                <sheet>
+                    <group>
+                        <field name="operation_id" invisible="1"/>
+                        <p class="text-danger">
+                            Esta acción rechazará la operación. 
+                            Por favor, indique el motivo del rechazo.
+                        </p>
+                    </group>
+                    <group>
+                        <field name="rejection_reason" required="1" nolabel="1" 
+                               placeholder="Motivo del rechazo..."/>
+                    </group>
+                </sheet>
+                <footer>
+                    <button name="action_confirm_reject" 
+                            string="Confirmar Rechazo" 
+                            type="object" 
+                            class="btn-danger"/>
+                    <button string="Cancelar" 
+                            class="btn-secondary" 
+                            special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>

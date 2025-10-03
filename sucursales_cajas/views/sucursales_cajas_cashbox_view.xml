@@ -1,0 +1,238 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Vista Tree de Cajas -->
+    <record id="view_sucursales_cajas_cashbox_tree" model="ir.ui.view">
+        <field name="name">sucursales_cajas.cashbox.tree</field>
+        <field name="model">sucursales_cajas.cashbox</field>
+        <field name="arch" type="xml">
+            <tree string="Cajas" 
+                  decoration-success="state == 'in_session'"
+                  decoration-info="state == 'ready'"
+                  decoration-muted="active == False">
+                <field name="code"/>
+                <field name="name"/>
+                <field name="branch_id"/>
+                <field name="responsible_user_id"/>
+                <field name="state"/>
+                <field name="session_user_id"/>
+                <field name="line_count" string="Subcajas"/>
+                <field name="pending_operations_count" 
+                       decoration-warning="pending_operations_count > 0"/>
+                <field name="active" invisible="1"/>
+            </tree>
+        </field>
+    </record>
+    
+    <!-- Vista Form de Cajas -->
+    <record id="view_sucursales_cajas_cashbox_form" model="ir.ui.view">
+        <field name="name">sucursales_cajas.cashbox.form</field>
+        <field name="model">sucursales_cajas.cashbox</field>
+        <field name="arch" type="xml">
+            <form string="Caja">
+                <header>
+                    <button name="action_open_session" 
+                            type="object" 
+                            string="Iniciar Sesión" 
+                            class="btn-primary"
+                            invisible="state != 'ready'"
+                            groups="sucursales_cajas.group_sucursales_cajas_cashier"/>
+                    <button name="action_view_active_session" 
+                            type="object" 
+                            string="Ver Sesión Activa" 
+                            class="btn-primary"
+                            invisible="state != 'in_session'"
+                            groups="sucursales_cajas.group_sucursales_cajas_cashier"/>
+                    <field name="state" widget="statusbar" 
+                           statusbar_visible="draft,ready,in_session"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_cashbox_lines" 
+                                type="object" 
+                                class="oe_stat_button" 
+                                icon="fa-list">
+                            <field name="line_count" widget="statinfo" string="Subcajas"/>
+                        </button>
+                        <button name="action_view_pending_operations" 
+                                type="object" 
+                                class="oe_stat_button" 
+                                icon="fa-clock-o"
+                                invisible="pending_operations_count == 0">
+                            <field name="pending_operations_count" widget="statinfo" string="Pendientes"/>
+                        </button>
+                    </div>
+                    
+                    <widget name="web_ribbon" title="Archivado" bg_color="bg-danger" 
+                            invisible="active == True"/>
+                    
+                    <div class="oe_title">
+                        <label for="name" class="oe_edit_only"/>
+                        <h1>
+                            <field name="name" placeholder="Nombre de la caja"/>
+                        </h1>
+                        <field name="code" placeholder="Código" class="oe_inline"/>
+                    </div>
+                    
+                    <group>
+                        <group>
+                            <field name="branch_id" 
+                                   options="{'no_create': True}"
+                                   domain="[('active', '=', True)]"/>
+                            <field name="responsible_user_id" 
+                                   domain="[('id', 'in', allowed_user_ids)]"
+                                   options="{'no_create': True}"/>
+                            <field name="active" invisible="1"/>
+                        </group>
+                        <group>
+                            <field name="session_user_id" readonly="1" invisible="state != 'in_session'"/>
+                            <field name="operating_hours" placeholder="Ej: Lun-Vie 8:00-17:00"/>
+                        </group>
+                    </group>
+                    
+                    <group string="Configuración">
+                        <group>
+                            <field name="require_pin"/>
+                            <field name="allow_negative_balance"/>
+                        </group>
+                        <group>
+                            <field name="max_cash_amount" widget="monetary"/>
+                        </group>
+                    </group>
+                    
+                    <group string="Balances" col="4">
+                        <field name="total_balance_ars" widget="monetary" string="Balance ARS"/>
+                        <field name="total_balance_usd" widget="monetary" string="Balance USD"/>
+                    </group>
+                    
+                    <notebook>
+                        <page string="Subcajas">
+                            <button name="action_add_cashbox_line" 
+                                    type="object" 
+                                    string="Agregar Subcaja" 
+                                    class="btn-secondary mb-2"
+                                    groups="sucursales_cajas.group_sucursales_cajas_admin"/>
+                            <field name="cashbox_line_ids" 
+                                   context="{'default_cashbox_id': active_id}">
+                                <tree editable="bottom" 
+                                      decoration-success="current_balance &gt; 0"
+                                      decoration-danger="current_balance &lt; 0">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="line_type"/>
+                                    <field name="currency_type"/>
+                                    <field name="current_balance" widget="monetary"/>
+                                    <field name="account_count" invisible="is_cash"/>
+                                    <field name="active"/>
+                                    <field name="is_cash" invisible="1"/>
+                                    <button name="action_view_accounts" 
+                                            type="object" 
+                                            string="Cuentas" 
+                                            icon="fa-credit-card"
+                                            invisible="is_cash or account_count == 0"/>
+                                    <button name="action_add_account" 
+                                            type="object" 
+                                            string="Agregar Cuenta" 
+                                            icon="fa-plus"
+                                            invisible="is_cash"/>
+                                </tree>
+                            </field>
+                        </page>
+                        
+                        <page string="Usuarios Permitidos">
+                            <field name="allowed_user_ids">
+                                <tree>
+                                    <field name="name"/>
+                                    <field name="login"/>
+                                    <field name="groups_id" widget="many2many_tags" 
+                                           options="{'color_field': 'color'}"/>
+                                </tree>
+                            </field>
+                        </page>
+                        
+                        <page string="Última Sesión" invisible="not last_session_closing_date">
+                            <group>
+                                <group>
+                                    <field name="last_session_closing_date" readonly="1"/>
+                                    <field name="last_session_closing_user_id" readonly="1"/>
+                                </group>
+                            </group>
+                        </page>
+                        
+                        <page string="Notas">
+                            <field name="notes" nolabel="1" placeholder="Notas adicionales..."/>
+                        </page>
+                    </notebook>
+                </sheet>
+                
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers"/>
+                    <field name="activity_ids" widget="mail_activity"/>
+                    <field name="message_ids" widget="mail_thread"/>
+                </div>
+            </form>
+        </field>
+    </record>
+    
+    <!-- Vista Search de Cajas -->
+    <record id="view_sucursales_cajas_cashbox_search" model="ir.ui.view">
+        <field name="name">sucursales_cajas.cashbox.search</field>
+        <field name="model">sucursales_cajas.cashbox</field>
+        <field name="arch" type="xml">
+            <search string="Buscar Caja">
+                <field name="name" string="Caja" 
+                       filter_domain="['|', ('name', 'ilike', self), ('code', 'ilike', self)]"/>
+                <field name="code"/>
+                <field name="branch_id"/>
+                <field name="responsible_user_id"/>
+                <field name="session_user_id"/>
+                <separator/>
+                <filter string="Activas" name="active" 
+                        domain="[('active', '=', True)]"/>
+                <filter string="Archivadas" name="archived" 
+                        domain="[('active', '=', False)]"/>
+                <separator/>
+                <filter string="En Sesión" name="in_session" 
+                        domain="[('state', '=', 'in_session')]"/>
+                <filter string="Listas" name="ready" 
+                        domain="[('state', '=', 'ready')]"/>
+                <filter string="Con Pendientes" name="with_pending" 
+                        domain="[('pending_operations_count', '&gt;', 0)]"/>
+                <group expand="0" string="Agrupar Por">
+                    <filter string="Sucursal" name="branch" 
+                            context="{'group_by': 'branch_id'}"/>
+                    <filter string="Estado" name="state" 
+                            context="{'group_by': 'state'}"/>
+                    <filter string="Responsable" name="responsible" 
+                            context="{'group_by': 'responsible_user_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+    
+    <!-- Acciones para Cajas -->
+    <record id="action_sucursales_cajas_cashbox" model="ir.actions.act_window">
+        <field name="name">Cajas</field>
+        <field name="res_model">sucursales_cajas.cashbox</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_sucursales_cajas_cashbox_search"/>
+        <field name="context">{'search_default_active': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Crear una nueva caja
+            </p>
+            <p>
+                Las cajas son los puntos de atención donde se realizan las operaciones.
+                Cada caja puede manejar múltiples tipos de activos (efectivo, cuentas bancarias, crypto).
+            </p>
+        </field>
+    </record>
+    
+    <!-- Acción para Cajas en Sesión -->
+    <record id="action_sucursales_cajas_cashbox_in_session" model="ir.actions.act_window">
+        <field name="name">Cajas Activas</field>
+        <field name="res_model">sucursales_cajas.cashbox</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_sucursales_cajas_cashbox_search"/>
+        <field name="domain">[('state', '=', 'in_session')]</field>
+        <field name="context">{'search_default_branch': 1}</field>
+    </record>
+</odoo>

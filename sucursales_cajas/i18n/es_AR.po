@@ -1,0 +1,515 @@
+# Translation of Odoo Module.
+# This file contains the translation of the following modules:
+# * sucursales_cajas
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo 17.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2024-01-01 00:00:00\n"
+"PO-Revision-Date: 2024-01-01 00:00:00\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: es_AR\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#. module: sucursales_cajas
+#: model:ir.module.module,description:sucursales_cajas.module_meta_information
+msgid "Branch and Cashbox Management"
+msgstr "Gestión de Sucursales y Cajas"
+
+#. module: sucursales_cajas
+#: model:ir.model.fields,field_description:sucursales_cajas.field_sucursales_cajas_branch__name
+msgid "Branch Name"
+msgstr "Nombre de la Sucursal"
+
+#. module: sucursales_cajas
+#: model:ir.model.fields,field_description:sucursales_cajas.field_sucursales_cajas_cashbox__name
+msgid "Cashbox Name"
+msgstr "Nombre de la Caja"
+
+#. module: sucursales_cajas
+#: selection:sucursales_cajas.operation,operation_type:0
+msgid "Deposit"
+msgstr "Depósito"
+
+#. module: sucursales_cajas
+#: selection:sucursales_cajas.operation,operation_type:0
+msgid "Withdrawal"
+msgstr "Retiro"
+
+#. module: sucursales_cajas
+#: selection:sucursales_cajas.operation,operation_type:0
+msgid "Transfer In"
+msgstr "Transferencia Entrada"
+
+#. module: sucursales_cajas
+#: selection:sucursales_cajas.operation,operation_type:0
+msgid "Transfer Out"
+msgstr "Transferencia Salida"
+
+#. module: sucursales_cajas
+#: selection:sucursales_cajas.operation,state:0
+msgid "Draft"
+msgstr "Borrador"
+
+#. module: sucursales_cajas
+#: selection:sucursales_cajas.operation,state:0
+msgid "Pending"
+msgstr "Pendiente"
+
+#. module: sucursales_cajas
+#: selection:sucursales_cajas.operation,state:0
+msgid "Processing"
+msgstr "En Proceso"
+
+#. module: sucursales_cajas
+#: selection:sucursales_cajas.operation,state:0
+msgid "Done"
+msgstr "Realizada"
+
+#. module: sucursales_cajas
+#: selection:sucursales_cajas.operation,state:0
+msgid "Cancelled"
+msgstr "Cancelada"
+
+#. module: sucursales_cajas
+#: model:ir.model.fields,field_description:sucursales_cajas.field_sucursales_cajas_operation__partner_id
+msgid "Customer/Contact"
+msgstr "Cliente/Contacto"
+
+#. module: sucursales_cajas
+#: model:ir.model.fields,field_description:sucursales_cajas.field_sucursales_cajas_operation__amount
+msgid "Amount"
+msgstr "Monto"
+
+#. module: sucursales_cajas
+#: model:ir.model.fields,field_description:sucursales_cajas.field_sucursales_cajas_operation__currency_type
+msgid "Currency"
+msgstr "Moneda"
+
+#. module: sucursales_cajas
+#: selection:sucursales_cajas.operation,currency_type:0
+msgid "Argentine Pesos"
+msgstr "Pesos Argentinos"
+
+#. module: sucursales_cajas
+#: selection:sucursales_cajas.operation,currency_type:0
+msgid "US Dollars"
+msgstr "Dólares Estadounidenses"
+
+#. module: sucursales_cajas
+#: selection:sucursales_cajas.operation,currency_type:0
+msgid "Euros"
+msgstr "Euros"
+
+#. module: sucursales_cajas
+#: model:ir.model.fields,field_description:sucursales_cajas.field_sucursales_cajas_operation__is_third_party
+msgid "Is for Third Party"
+msgstr "Es para Tercero"
+
+#. module: sucursales_cajas
+#: model:ir.model.fields,field_description:sucursales_cajas.field_sucursales_cajas_operation__beneficiary_name
+msgid "Beneficiary Name"
+msgstr "Nombre del Beneficiario"
+
+#. module: sucursales_cajas
+#: model:ir.model.fields,field_description:sucursales_cajas.field_sucursales_cajas_operation__beneficiary_dni
+msgid "Beneficiary ID Number"
+msgstr "DNI del Beneficiario"
+
+#. module: sucursales_cajas
+#: model:ir.model.fields,field_description:sucursales_cajas.field_sucursales_cajas_session__pin_hash
+msgid "PIN Hash"
+msgstr "Hash del PIN"
+
+#. module: sucursales_cajas
+#: model:ir.model.fields,field_description:sucursales_cajas.field_sucursales_cajas_cashbox__require_pin
+msgid "Requires PIN"
+msgstr "Requiere PIN"
+
+#. module: sucursales_cajas
+#: model:ir.ui.view,arch_db:sucursales_cajas.view_sucursales_cajas_session_form
+msgid "Start Closing"
+msgstr "Iniciar Cierre"
+
+#. module: sucursales_cajas
+#: model:ir.ui.view,arch_db:sucursales_cajas.view_sucursales_cajas_session_form
+msgid "Close Session"
+msgstr "Cerrar Sesión"
+
+#. module: sucursales_cajas
+#: model:ir.ui.view,arch_db:sucursales_cajas.view_sucursales_cajas_operation_form
+msgid "Send to Cashbox"
+msgstr "Enviar a Caja"
+
+#. module: sucursales_cajas
+#: model:ir.ui.view,arch_db:sucursales_cajas.view_sucursales_cajas_operation_form
+msgid "Process"
+msgstr "Procesar"
+
+#. module: sucursales_cajas
+#: model:ir.ui.view,arch_db:sucursales_cajas.view_sucursales_cajas_operation_form
+msgid "Complete"
+msgstr "Completar"
+
+#. module: sucursales_cajas
+#: model:ir.ui.view,arch_db:sucursales_cajas.view_sucursales_cajas_operation_form
+msgid "Cancel"
+msgstr "Cancelar"
+
+#. module: sucursales_cajas
+#: model:ir.ui.view,arch_db:sucursales_cajas.view_sucursales_cajas_operation_form
+msgid "Print Voucher"
+msgstr "Imprimir Comprobante"
+
+#. module: sucursales_cajas
+#: model:ir.ui.view,arch_db:sucursales_cajas.view_sucursales_cajas_operation_form
+msgid "Print Receipt"
+msgstr "Imprimir Recibo"
+
+#. module: sucursales_cajas
+#: model:ir.model.fields,field_description:sucursales_cajas.field_sucursales_cajas_balance__difference
+msgid "Difference"
+msgstr "Diferencia"
+
+#. module: sucursales_cajas
+#: model:ir.model.fields,field_description:sucursales_cajas.field_sucursales_cajas_balance__system_balance
+msgid "System Balance"
+msgstr "Saldo del Sistema"
+
+#. module: sucursales_cajas
+#: model:ir.model.fields,field_description:sucursales_cajas.field_sucursales_cajas_balance__declared_amount
+msgid "Declared Amount"
+msgstr "Monto Declarado"
+
+#. module: sucursales_cajas
+#: model:ir.model.fields,field_description:sucursales_cajas.field_sucursales_cajas_balance__counted_amount
+msgid "Counted Amount"
+msgstr "Monto Contado"
+
+#. module: sucursales_cajas
+#: selection:sucursales_cajas.balance,balance_type:0
+msgid "Opening"
+msgstr "Apertura"
+
+#. module: sucursales_cajas
+#: selection:sucursales_cajas.balance,balance_type:0
+msgid "Closing"
+msgstr "Cierre"
+
+#. module: sucursales_cajas
+#: model:ir.ui.view,arch_db:sucursales_cajas.view_sucursales_cajas_cash_count_wizard_form
+msgid "Cash Count"
+msgstr "Conteo de Efectivo"
+
+#. module: sucursales_cajas
+#: model:ir.model.fields,field_description:sucursales_cajas.field_sucursales_cajas_cash_count_wizard_line__denomination
+msgid "Denomination"
+msgstr "Denominación"
+
+#. module: sucursales_cajas
+#: model:ir.model.fields,field_description:sucursales_cajas.field_sucursales_cajas_cash_count_wizard_line__quantity
+msgid "Quantity"
+msgstr "Cantidad"
+
+#. module: sucursales_cajas
+#: model:ir.model.fields,field_description:sucursales_cajas.field_sucursales_cajas_cash_count_wizard_line__subtotal
+msgid "Subtotal"
+msgstr "Subtotal"
+
+#. module: sucursales_cajas
+#: code:addons/sucursales_cajas/models/sucursales_cajas_operation.py:0
+#, python-format
+msgid "The amount must be greater than zero."
+msgstr "El monto debe ser mayor a cero."
+
+#. module: sucursales_cajas
+#: code:addons/sucursales_cajas/models/sucursales_cajas_operation.py:0
+#, python-format
+msgid "Must specify the beneficiary name."
+msgstr "Debe especificar el nombre del beneficiario."
+
+#. module: sucursales_cajas
+#: code:addons/sucursales_cajas/models/sucursales_cajas_operation.py:0
+#, python-format
+msgid "Must specify the beneficiary ID number."
+msgstr "Debe especificar el DNI del beneficiario."
+
+#. module: sucursales_cajas
+#: code:addons/sucursales_cajas/models/sucursales_cajas_session.py:0
+#, python-format
+msgid "Cannot close session with pending operations."
+msgstr "No se puede cerrar la sesión con operaciones pendientes."
+
+#. module: sucursales_cajas
+#: code:addons/sucursales_cajas/models/sucursales_cajas_session.py:0
+#, python-format
+msgid "Must enter session PIN to confirm closing."
+msgstr "Debe ingresar su PIN de sesión para confirmar el cierre."
+
+#. module: sucursales_cajas
+#: code:addons/sucursales_cajas/models/sucursales_cajas_cashbox.py:0
+#, python-format
+msgid "The responsible user must be included in the allowed users of the cashbox."
+msgstr "El responsable debe estar incluido en los usuarios permitidos de la caja."
+
+#. module: sucursales_cajas
+#: code:addons/sucursales_cajas/models/sucursales_cajas_cashbox.py:0
+#, python-format
+msgid "A cashbox with the name \"%s\" already exists in the branch \"%s\"."
+msgstr "Ya existe una caja con el nombre \"%s\" en la sucursal \"%s\"."
+
+#. module: sucursales_cajas
+#: model:ir.ui.view,arch_db:sucursales_cajas.view_sucursales_cajas_dashboard
+msgid "Dashboard - Branches and Cashboxes"
+msgstr "Tablero - Sucursales y Cajas"
+
+#. module: sucursales_cajas
+#: model:ir.ui.view,arch_db:sucursales_cajas.view_sucursales_cajas_dashboard
+msgid "New Operation"
+msgstr "Nueva Operación"
+
+#. module: sucursales_cajas
+#: model:ir.ui.view,arch_db:sucursales_cajas.view_sucursales_cajas_dashboard
+msgid "Active Cashboxes"
+msgstr "Cajas Activas"
+
+#. module: sucursales_cajas
+#: model:ir.ui.view,arch_db:sucursales_cajas.view_sucursales_cajas_dashboard
+msgid "Pending Operations"
+msgstr "Operaciones Pendientes"
+
+#. module: sucursales_cajas
+#: model:ir.ui.view,arch_db:sucursales_cajas.view_sucursales_cajas_dashboard
+msgid "Active Sessions"
+msgstr "Sesiones Activas"
+
+#. module: sucursales_cajas
+#: model:ir.ui.view,arch_db:sucursales_cajas.view_sucursales_cajas_dashboard
+msgid "Statistics of the Day"
+msgstr "Estadísticas del Día"
+
+#. module: sucursales_cajas
+#: model:ir.ui.view,arch_db:sucursales_cajas.view_sucursales_cajas_dashboard
+msgid "Total Operations"
+msgstr "Operaciones Totales"
+
+#. module: sucursales_cajas
+#: model:ir.ui.view,arch_db:sucursales_cajas.view_sucursales_cajas_dashboard
+msgid "Deposits"
+msgstr "Depósitos"
+
+#. module: sucursales_cajas
+#: model:ir.ui.view,arch_db:sucursales_cajas.view_sucursales_cajas_dashboard
+msgid "Withdrawals"
+msgstr "Retiros"
+
+#. module: sucursales_cajas
+#: model:ir.ui.view,arch_db:sucursales_cajas.view_sucursales_cajas_dashboard
+msgid "Branches"
+msgstr "Sucursales"
+
+#. module: sucursales_cajas
+#: model:ir.ui.view,arch_db:sucursales_cajas.view_sucursales_cajas_dashboard
+msgid "Cashboxes with Active Session"
+msgstr "Cajas con Sesión Activa"
+
+#. module: sucursales_cajas
+#: model:ir.ui.view,arch_db:sucursales_cajas.view_sucursales_cajas_dashboard
+msgid "Latest Operations"
+msgstr "Últimas Operaciones"
+
+#. module: sucursales_cajas
+#: model:ir.actions.act_window,name:sucursales_cajas.action_sucursales_cajas_dashboard
+#: model:ir.ui.menu,name:sucursales_cajas.menu_sucursales_cajas_dashboard
+msgid "Dashboard"
+msgstr "Tablero"
+
+#. module: sucursales_cajas
+#: model:ir.actions.act_window,name:sucursales_cajas.action_sucursales_cajas_branch
+#: model:ir.ui.menu,name:sucursales_cajas.menu_sucursales_list
+#: model:ir.ui.menu,name:sucursales_cajas.menu_config_branches
+msgid "Branches"
+msgstr "Sucursales"
+
+#. module: sucursales_cajas
+#: model:ir.actions.act_window,name:sucursales_cajas.action_sucursales_cajas_cashbox
+#: model:ir.ui.menu,name:sucursales_cajas.menu_cashbox_list
+#: model:ir.ui.menu,name:sucursales_cajas.menu_config_cashboxes
+msgid "Cashboxes"
+msgstr "Cajas"
+
+#. module: sucursales_cajas
+#: model:ir.actions.act_window,name:sucursales_cajas.action_sucursales_cajas_operation
+#: model:ir.ui.menu,name:sucursales_cajas.menu_operations_all
+msgid "All Operations"
+msgstr "Todas las Operaciones"
+
+#. module: sucursales_cajas
+#: model:ir.actions.act_window,name:sucursales_cajas.action_sucursales_cajas_operation_pending
+#: model:ir.ui.menu,name:sucursales_cajas.menu_operations_pending
+msgid "Pending"
+msgstr "Pendientes"
+
+#. module: sucursales_cajas
+#: model:ir.actions.act_window,name:sucursales_cajas.action_sucursales_cajas_operation_today
+#: model:ir.ui.menu,name:sucursales_cajas.menu_operations_today
+msgid "Today's Operations"
+msgstr "Operaciones del Día"
+
+#. module: sucursales_cajas
+#: model:ir.actions.act_window,name:sucursales_cajas.action_sucursales_cajas_session
+#: model:ir.ui.menu,name:sucursales_cajas.menu_sessions_all
+msgid "All Sessions"
+msgstr "Todas las Sesiones"
+
+#. module: sucursales_cajas
+#: model:ir.actions.act_window,name:sucursales_cajas.action_sucursales_cajas_my_session
+#: model:ir.ui.menu,name:sucursales_cajas.menu_my_session
+msgid "My Current Session"
+msgstr "Mi Sesión Actual"
+
+#. module: sucursales_cajas
+#: model:ir.ui.menu,name:sucursales_cajas.menu_sucursales_cajas_root
+msgid "Branches and Cashboxes"
+msgstr "Sucursales y Cajas"
+
+#. module: sucursales_cajas
+#: model:ir.ui.menu,name:sucursales_cajas.menu_sucursales_main
+msgid "Branches"
+msgstr "Sucursales"
+
+#. module: sucursales_cajas
+#: model:ir.ui.menu,name:sucursales_cajas.menu_operations_main
+msgid "Operations"
+msgstr "Operaciones"
+
+#. module: sucursales_cajas
+#: model:ir.ui.menu,name:sucursales_cajas.menu_sessions_main
+msgid "Sessions"
+msgstr "Sesiones"
+
+#. module: sucursales_cajas
+#: model:ir.ui.menu,name:sucursales_cajas.menu_configuration_main
+msgid "Configuration"
+msgstr "Configuración"
+
+#. module: sucursales_cajas
+#: model:ir.ui.menu,name:sucursales_cajas.menu_config_advanced
+msgid "Advanced"
+msgstr "Avanzado"
+
+#. module: sucursales_cajas
+#: model:ir.ui.menu,name:sucursales_cajas.menu_config_denominations
+msgid "Bill Denominations"
+msgstr "Denominaciones de Billetes"
+
+#. module: sucursales_cajas
+#: model:res.groups,name:sucursales_cajas.group_sucursales_cajas_cashier
+msgid "Cashier"
+msgstr "Cajero"
+
+#. module: sucursales_cajas
+#: model:res.groups,name:sucursales_cajas.group_sucursales_cajas_admin
+msgid "Administrator"
+msgstr "Administrador"
+
+#. module: sucursales_cajas
+#: model:ir.module.category,name:sucursales_cajas.module_category_sucursales_cajas
+msgid "Branches and Cashboxes"
+msgstr "Sucursales y Cajas"
+
+#. module: sucursales_cajas
+#: model:ir.module.category,description:sucursales_cajas.module_category_sucursales_cajas
+msgid "Branch and Cashbox Management"
+msgstr "Gestión de Sucursales y Cajas"
+
+#. module: sucursales_cajas
+#: code:addons/sucursales_cajas/wizards/send_to_cashbox_wizard.py:0
+#, python-format
+msgid "The withdrawal amount (%(amount)s) exceeds the available balance (%(balance)s) in %(currency)s."
+msgstr "El monto a retirar (%(amount)s) excede el saldo disponible (%(balance)s) en %(currency)s."
+
+#. module: sucursales_cajas
+#: code:addons/sucursales_cajas/wizards/send_to_cashbox_wizard.py:0
+#, python-format
+msgid "Operation created successfully.\n\nBeneficiary: %s (ID: %s)\nMust present at %s - %s to complete the operation."
+msgstr "Se ha creado la operación exitosamente.\n\nBeneficiario: %s (DNI: %s)\nDebe presentarse en %s - %s para completar la operación."
+
+#. module: sucursales_cajas
+#: code:addons/sucursales_cajas/wizards/process_operation_wizard.py:0
+#, python-format
+msgid "Must verify the identity of the beneficiary before processing the withdrawal."
+msgstr "Debe verificar la identidad del beneficiario antes de procesar el retiro."
+
+#. module: sucursales_cajas
+#: code:addons/sucursales_cajas/wizards/process_operation_wizard.py:0
+#, python-format
+msgid "Must mark the transfer as completed before processing."
+msgstr "Debe marcar la transferencia como completada antes de procesar."
+
+#. module: sucursales_cajas
+#: code:addons/sucursales_cajas/wizards/process_operation_wizard.py:0
+#, python-format
+msgid "Must enter the transfer reference or voucher."
+msgstr "Debe ingresar la referencia o comprobante de la transferencia."
+
+#. module: sucursales_cajas
+#: code:addons/sucursales_cajas/wizards/process_operation_wizard.py:0
+#, python-format
+msgid "Insufficient balance. Available: %s %s"
+msgstr "Saldo insuficiente. Disponible: %s %s"
+
+#. module: sucursales_cajas
+#: code:addons/sucursales_cajas/wizards/close_session_wizard.py:0
+#, python-format
+msgid "There are discrepancies of %.2f. Must justify them or mark \"Force Close\"."
+msgstr "Hay discrepancias por %.2f. Debe justificarlas o marcar \"Forzar Cierre\"."
+
+#. module: sucursales_cajas
+#: code:addons/sucursales_cajas/wizards/close_session_wizard.py:0
+#, python-format
+msgid "Must count the cash from %s or mark \"Force Close\"."
+msgstr "Debe contar el efectivo de %s o marcar \"Forzar Cierre\"."
+
+#. module: sucursales_cajas
+#: code:addons/sucursales_cajas/wizards/close_session_wizard.py:0
+#, python-format
+msgid "The session %s has been closed successfully."
+msgstr "La sesión %s ha sido cerrada exitosamente."
+
+#. module: sucursales_cajas
+#: code:addons/sucursales_cajas/wizards/cash_count_wizard.py:0
+#, python-format
+msgid "Must count at least some bills before confirming."
+msgstr "Debe contar al menos algunos billetes antes de confirmar."
+
+#. module: sucursales_cajas
+#: code:addons/sucursales_cajas/wizards/cash_count_wizard.py:0
+#, python-format
+msgid "Count registered successfully. Total: $%s"
+msgstr "Conteo registrado exitosamente. Total: $%s"
+
+#. module: sucursales_cajas
+#: model:ir.actions.report,name:sucursales_cajas.action_report_operation_receipt
+msgid "Operation Receipt"
+msgstr "Comprobante de Operación"
+
+#. module: sucursales_cajas
+#: model:ir.actions.report,name:sucursales_cajas.action_report_operation_voucher
+msgid "Operation Order"
+msgstr "Orden de Operación"
+
+#. module: sucursales_cajas
+#: model:ir.actions.report,name:sucursales_cajas.action_report_session_closing
+msgid "Session Closing"
+msgstr "Cierre de Sesión"
+
+#. module: sucursales_cajas
+#: model:ir.actions.report,name:sucursales_cajas.action_report_cash_count
+msgid "Cash Count"
+msgstr "Arqueo de Caja"

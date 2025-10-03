@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        section {
+            margin: 0 auto;
+            max-width: 1200px;
+            padding: 20px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            color: #333;
+        }
+        
+        .hero-section {
+            background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+            color: white;
+            padding: 60px 40px;
+            border-radius: 10px;
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .hero-section h1 {
+            font-size: 2.5em;
+            margin-bottom: 20px;
+            font-weight: 300;
+        }
+        
+        .hero-section p {
+            font-size: 1.2em;
+            opacity: 0.9;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin: 40px 0;
+        }
+        
+        .feature-card {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 30px;
+            border: 1px solid #e9ecef;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        
+        .feature-card h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .feature-icon {
+            width: 40px;
+            height: 40px;
+            background: #3498db;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 20px;
+        }
+        
+        .workflow-section {
+            background: #ecf0f1;
+            padding: 40px;
+            border-radius: 10px;
+            margin: 40px 0;
+        }
+        
+        .workflow-steps {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        
+        .workflow-step {
+            flex: 1;
+            text-align: center;
+            min-width: 150px;
+        }
+        
+        .workflow-step .step-number {
+            width: 60px;
+            height: 60px;
+            background: #3498db;
+            color: white;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+        
+        .workflow-arrow {
+            font-size: 30px;
+            color: #3498db;
+            align-self: center;
+        }
+        
+        .screenshot-gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+        
+        .screenshot-item {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            overflow: hidden;
+            transition: transform 0.3s ease;
+        }
+        
+        .screenshot-item:hover {
+            transform: scale(1.05);
+        }
+        
+        .screenshot-item img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+        
+        .benefits-list {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .benefits-list li {
+            padding: 15px 0;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+        }
+        
+        .benefits-list li:last-child {
+            border-bottom: none;
+        }
+        
+        .check-icon {
+            color: #27ae60;
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+        
+        .cta-section {
+            background: #2c3e50;
+            color: white;
+            padding: 40px;
+            border-radius: 10px;
+            text-align: center;
+            margin-top: 40px;
+        }
+        
+        .cta-section h2 {
+            margin-bottom: 20px;
+        }
+        
+        .cta-button {
+            display: inline-block;
+            background: #3498db;
+            color: white;
+            padding: 15px 30px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: background 0.3s ease;
+        }
+        
+        .cta-button:hover {
+            background: #2980b9;
+        }
+        
+        .tech-specs {
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 8px;
+            margin: 30px 0;
+        }
+        
+        .tech-specs table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .tech-specs td {
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .tech-specs td:first-child {
+            font-weight: bold;
+            width: 200px;
+        }
+    </style>
+</head>
+<body>
+    <section>
+        <div class="hero-section">
+            <h1>Sucursales y Cajas</h1>
+            <p>Sistema integral para la gestión de sucursales, cajas y operaciones financieras. 
+            Controle depósitos, retiros, transferencias y mantenga un registro detallado de todas las operaciones 
+            con múltiples tipos de activos: efectivo, cuentas bancarias y criptomonedas.</p>
+        </div>
+
+        <h2>🚀 Características Principales</h2>
+        <div class="feature-grid">
+            <div class="feature-card">
+                <h3><span class="feature-icon">🏢</span> Gestión de Sucursales</h3>
+                <p>Administre múltiples sucursales con sus propias cajas, usuarios y configuraciones. 
+                Control total sobre permisos y accesos por ubicación.</p>
+            </div>
+            
+            <div class="feature-card">
+                <h3><span class="feature-icon">💰</span> Múltiples Tipos de Activos</h3>
+                <p>Maneje efectivo en diferentes monedas (ARS, USD, EUR), cuentas bancarias nacionales e 
+                internacionales, y billeteras de criptomonedas en una sola plataforma.</p>
+            </div>
+            
+            <div class="feature-card">
+                <h3><span class="feature-icon">🔐</span> Control de Sesiones</h3>
+                <p>Sistema robusto de sesiones con PIN de seguridad, control de apertura y cierre, 
+                y arqueo de caja con contador de billetes integrado.</p>
+            </div>
+            
+            <div class="feature-card">
+                <h3><span class="feature-icon">📊</span> Dashboard en Tiempo Real</h3>
+                <p>Visualice el estado de todas las cajas, operaciones pendientes y estadísticas 
+                del día en un panel de control intuitivo y actualizado.</p>
+            </div>
+            
+            <div class="feature-card">
+                <h3><span class="feature-icon">🔄</span> Integración con Wallets</h3>
+                <p>Conecta perfectamente con los módulos de Chequera y Divisas para actualizar 
+                automáticamente los saldos de los clientes.</p>
+            </div>
+            
+            <div class="feature-card">
+                <h3><span class="feature-icon">📄</span> Comprobantes y Reportes</h3>
+                <p>Genere comprobantes profesionales para cada operación y reportes detallados 
+                de cierre de caja con análisis de discrepancias.</p>
+            </div>
+        </div>
+
+        <div class="workflow-section">
+            <h2>📋 Flujo de Trabajo</h2>
+            <div class="workflow-steps">
+                <div class="workflow-step">
+                    <div class="step-number">1</div>
+                    <h4>Inicio de Sesión</h4>
+                    <p>El cajero inicia sesión con PIN y declara saldos iniciales</p>
+                </div>
+                
+                <div class="workflow-arrow">→</div>
+                
+                <div class="workflow-step">
+                    <div class="step-number">2</div>
+                    <h4>Recepción de Operaciones</h4>
+                    <p>Procesa depósitos y retiros desde la cola de pendientes</p>
+                </div>
+                
+                <div class="workflow-arrow">→</div>
+                
+                <div class="workflow-step">
+                    <div class="step-number">3</div>
+                    <h4>Procesamiento</h4>
+                    <p>Verifica identidad, cuenta efectivo y completa la operación</p>
+                </div>
+                
+                <div class="workflow-arrow">→</div>
+                
+                <div class="workflow-step">
+                    <div class="step-number">4</div>
+                    <h4>Cierre de Sesión</h4>
+                    <p>Arqueo de caja, registro de discrepancias y cierre formal</p>
+                </div>
+            </div>
+        </div>
+
+        <h2>✨ Beneficios Clave</h2>
+        <ul class="benefits-list">
+            <li>
+                <span class="check-icon">✓</span>
+                <div>
+                    <strong>Trazabilidad Completa:</strong> Cada operación queda registrada con fecha, hora, 
+                    usuario responsable y todos los detalles relevantes.
+                </div>
+            </li>
+            <li>
+                <span class="check-icon">✓</span>
+                <div>
+                    <strong>Reducción de Errores:</strong> El sistema de doble verificación y arqueo 
+                    automatizado minimiza las discrepancias y errores humanos.
+                </div>
+            </li>
+            <li>
+                <span class="check-icon">✓</span>
+                <div>
+                    <strong>Operaciones para Terceros:</strong> Permite gestionar retiros y depósitos 
+                    para beneficiarios con verificación de identidad obligatoria.
+                </div>
+            </li>
+            <li>
+                <span class="check-icon">✓</span>
+                <div>
+                    <strong>Multi-moneda y Multi-activo:</strong> Un solo sistema para gestionar todos 
+                    los tipos de activos financieros de su empresa.
+                </div>
+            </li>
+            <li>
+                <span class="check-icon">✓</span>
+                <div>
+                    <strong>Seguridad Reforzada:</strong> Control de accesos por usuario, PIN de sesión 
+                    y validaciones en cada paso del proceso.
+                </div>
+            </li>
+        </ul>
+
+        <div class="tech-specs">
+            <h2>🔧 Especificaciones Técnicas</h2>
+            <table>
+                <tr>
+                    <td>Versión de Odoo</td>
+                    <td>17.0 Community Edition</td>
+                </tr>
+                <tr>
+                    <td>Dependencias</td>
+                    <td>base, mail, web, chequera, divisas</td>
+                </tr>
+                <tr>
+                    <td>Licencia</td>
+                    <td>LGPL-3</td>
+                </tr>
+                <tr>
+                    <td>Idiomas</td>
+                    <td>Español (Argentina)</td>
+                </tr>
+                <tr>
+                    <td>Arquitectura</td>
+                    <td>Modular, extensible y escalable</td>
+                </tr>
+            </table>
+        </div>
+
+        <h2>🎯 Casos de Uso</h2>
+        <div class="feature-grid">
+            <div class="feature-card">
+                <h3>Casa de Cambio</h3>
+                <p>Gestione compra y venta de divisas con control total sobre múltiples cajas 
+                y tipos de cambio diferenciados.</p>
+            </div>
+            
+            <div class="feature-card">
+                <h3>Financiera</h3>
+                <p>Administre cobros, pagos y transferencias con trazabilidad completa y 
+                generación automática de comprobantes.</p>
+            </div>
+            
+            <div class="feature-card">
+                <h3>Exchange Crypto</h3>
+                <p>Opere con criptomonedas manteniendo control sobre wallets, redes y 
+                direcciones de forma segura.</p>
+            </div>
+        </div>
+
+        <div class="cta-section">
+            <h2>¿Listo para optimizar la gestión de sus cajas?</h2>
+            <p>Instale el módulo y comience a disfrutar de un control total sobre sus operaciones financieras.</p>
+            <a href="#" class="cta-button">Comenzar Ahora</a>
+        </div>
+    </section>
+</body>
+</html>

@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Extender la vista de formulario de contactos -->
+    <record id="view_partner_form_sucursales_cajas" model="ir.ui.view">
+        <field name="name">res.partner.form.sucursales_cajas</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="divisas.view_partner_form_divisas_wallet"/>
+        <field name="arch" type="xml">
+            <!-- Agregar botones en el button_box -->
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button class="oe_stat_button" 
+                        name="action_view_cashbox_operations"
+                        type="object" 
+                        icon="fa-exchange"
+                        invisible="is_company == False and parent_id != False">
+                    <div class="o_field_widget o_stat_info">
+                        <span class="o_stat_value">
+                            <field name="cashbox_operation_count"/>
+                            <span invisible="pending_cashbox_operation_count == 0" class="text-warning"> 
+                                (<field name="pending_cashbox_operation_count"/>)
+                            </span>
+                        </span>
+                        <span class="o_stat_text">Operaciones Caja</span>
+                    </div>
+                </button>
+            </xpath>
+            
+            <!-- Agregar campos invisibles necesarios -->
+            <xpath expr="//sheet" position="inside">
+                <field name="has_pending_cashbox_operations" invisible="1"/>
+            </xpath>
+            
+            <!-- Modificar la pestaña de Wallets para agregar botones de caja -->
+            <xpath expr="//notebook/page[descendant::field[@name='wallet_balance']]" position="inside">
+                <!-- Botones de acción de caja -->
+                <div class="row mt-3 mb-3">
+                    <div class="col-md-12">
+                        <h4>Operaciones de Caja</h4>
+                        <button name="action_send_to_cashbox" 
+                                string="Retirar de Caja" 
+                                type="object" 
+                                class="btn btn-primary mr-2"
+                                icon="fa-download"
+                                help="Solicitar retiro de efectivo o transferencia desde caja"/>
+                        <button name="action_receive_from_cashbox" 
+                                string="Depositar en Caja" 
+                                type="object" 
+                                class="btn btn-secondary mr-2"
+                                icon="fa-upload"
+                                help="Depositar efectivo o transferir a caja"/>
+                        <button name="action_view_pending_cashbox_operations" 
+                                string="Ver Pendientes" 
+                                type="object" 
+                                class="btn btn-warning"
+                                icon="fa-clock-o"
+                                invisible="not has_pending_cashbox_operations"
+                                help="Ver operaciones pendientes de procesar"/>
+                    </div>
+                </div>
+                
+                <!-- Mostrar resumen de operaciones recientes -->
+                <div class="row" invisible="cashbox_operation_count == 0">
+                    <div class="col-md-12">
+                        <h5>Últimas Operaciones de Caja</h5>
+                        <field name="cashbox_operation_ids" 
+                               readonly="1" 
+                               context="{'tree_view_ref': 'sucursales_cajas.view_operation_partner_tree'}"
+                               limit="5">
+                            <tree create="false" edit="false" delete="false"
+                                  decoration-success="state == 'done'"
+                                  decoration-warning="state == 'pending'"
+                                  decoration-info="state == 'processing'">
+                                <field name="name"/>
+                                <field name="operation_type"/>
+                                <field name="currency_type"/>
+                                <field name="amount"/>
+                                <field name="cashbox_id"/>
+                                <field name="state" widget="badge"/>
+                                <field name="request_date" widget="date"/>
+                                <button name="action_print_voucher" 
+                                        type="object" 
+                                        string="Imprimir" 
+                                        icon="fa-print"
+                                        invisible="state not in ['pending', 'processing', 'done']"/>
+                            </tree>
+                        </field>
+                    </div>
+                </div>
+            </xpath>
+        </field>
+    </record>
+    
+    <!-- Vista tree específica para operaciones en partner -->
+    <record id="view_operation_partner_tree" model="ir.ui.view">
+        <field name="name">sucursales_cajas.operation.partner.tree</field>
+        <field name="model">sucursales_cajas.operation</field>
+        <field name="arch" type="xml">
+            <tree create="false" edit="false" delete="false"
+                  decoration-success="state == 'done'"
+                  decoration-warning="state == 'pending'"
+                  decoration-info="state == 'processing'"
+                  decoration-muted="state == 'cancelled'">
+                <field name="name"/>
+                <field name="operation_type"/>
+                <field name="currency_type"/>
+                <field name="amount"/>
+                <field name="cashbox_id"/>
+                <field name="state" widget="badge"/>
+                <field name="request_date" widget="date"/>
+                <field name="is_third_party" widget="boolean_toggle" optional="hide"/>
+                <field name="beneficiary_name" optional="hide"/>
+            </tree>
+        </field>
+    </record>
+    
+    <!-- Acción para el wizard de envío a caja -->
+    <record id="action_sucursales_cajas_send_to_cashbox_wizard" model="ir.actions.act_window">
+        <field name="name">Enviar a Caja</field>
+        <field name="res_model">sucursales_cajas.send_to_cashbox_wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="binding_model_id" ref="base.model_res_partner"/>
+        <field name="binding_view_types">form</field>
+    </record>
+</odoo>

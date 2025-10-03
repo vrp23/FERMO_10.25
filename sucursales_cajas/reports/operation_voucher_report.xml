@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="report_operation_voucher_document">
+        <t t-call="web.external_layout">
+            <t t-set="doc" t-value="doc.with_context(lang=doc.partner_id.lang)"/>
+            <div class="page">
+                <div class="oe_structure"/>
+                
+                <div class="text-center mb-4">
+                    <h2>
+                        <span t-if="doc.operation_type == 'deposit'">ORDEN DE DEPÓSITO</span>
+                        <span t-elif="doc.operation_type == 'withdrawal'">ORDEN DE RETIRO</span>
+                        <span t-else="">ORDEN DE OPERACIÓN</span>
+                    </h2>
+                    <h3><span t-field="doc.name"/></h3>
+                    <div t-if="doc.state == 'pending'" class="alert alert-warning">
+                        <strong>PENDIENTE DE PROCESAR</strong>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-12">
+                        <div class="border p-3 mb-3">
+                            <h4>Información de la Operación</h4>
+                            <table class="table table-sm mb-0">
+                                <tr>
+                                    <td width="30%"><strong>Fecha de Solicitud:</strong></td>
+                                    <td><span t-field="doc.request_date" t-options='{"widget": "datetime"}'/></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Sucursal:</strong></td>
+                                    <td><span t-field="doc.branch_id.name"/> - <span t-field="doc.branch_id.address"/></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Caja Asignada:</strong></td>
+                                    <td><span t-field="doc.cashbox_id.display_name"/></td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-12">
+                        <div class="border p-3 mb-3">
+                            <h4>Datos del Titular</h4>
+                            <table class="table table-sm mb-0">
+                                <tr>
+                                    <td width="30%"><strong>Cliente/Titular:</strong></td>
+                                    <td><span t-field="doc.partner_id.name"/></td>
+                                </tr>
+                                <tr t-if="doc.partner_id.vat">
+                                    <td><strong>CUIT/DNI:</strong></td>
+                                    <td><span t-field="doc.partner_id.vat"/></td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row" t-if="doc.is_third_party">
+                    <div class="col-12">
+                        <div class="border border-warning p-3 mb-3">
+                            <h4 class="text-warning">Beneficiario (Tercero)</h4>
+                            <table class="table table-sm mb-0">
+                                <tr>
+                                    <td width="30%"><strong>Nombre:</strong></td>
+                                    <td><span t-field="doc.beneficiary_name"/></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>DNI:</strong></td>
+                                    <td><span t-field="doc.beneficiary_dni"/></td>
+                                </tr>
+                                <tr t-if="doc.beneficiary_phone">
+                                    <td><strong>Teléfono:</strong></td>
+                                    <td><span t-field="doc.beneficiary_phone"/></td>
+                                </tr>
+                            </table>
+                            <div class="alert alert-warning mt-2 mb-0">
+                                <i class="fa fa-exclamation-triangle"/> 
+                                <strong>IMPORTANTE:</strong> Verificar identidad con DNI físico
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-12">
+                        <div class="border p-3 mb-3">
+                            <h4>Detalle de la Operación</h4>
+                            <table class="table table-sm mb-0">
+                                <tr>
+                                    <td width="30%"><strong>Tipo:</strong></td>
+                                    <td>
+                                        <span t-if="doc.operation_type == 'deposit'" class="badge badge-success">DEPÓSITO</span>
+                                        <span t-elif="doc.operation_type == 'withdrawal'" class="badge badge-danger">RETIRO</span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Moneda:</strong></td>
+                                    <td><span t-field="doc.currency_type"/></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Monto:</strong></td>
+                                    <td>
+                                        <h3 class="mb-0">
+                                            <span t-field="doc.currency_type"/> 
+                                            <span t-field="doc.amount" t-options='{"widget": "float", "precision": 2}'/>
+                                        </h3>
+                                    </td>
+                                </tr>
+                                <tr t-if="doc.transfer_type">
+                                    <td><strong>Forma:</strong></td>
+                                    <td>
+                                        <span t-if="doc.transfer_type == 'cash'" class="badge badge-primary">EFECTIVO</span>
+                                        <span t-elif="doc.transfer_type == 'bank_transfer'" class="badge badge-info">TRANSFERENCIA BANCARIA</span>
+                                        <span t-elif="doc.transfer_type == 'crypto'" class="badge badge-warning">CRIPTOMONEDA</span>
+                                        <span t-else="" t-field="doc.transfer_type"/>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row" t-if="doc.transfer_data and doc.operation_type == 'withdrawal'">
+                    <div class="col-12">
+                        <div class="border p-3 mb-3">
+                            <h4>Datos para la Transferencia</h4>
+                            <div class="alert alert-info">
+                                <span t-esc="doc.destination_account_display"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row" t-if="doc.notes">
+                    <div class="col-12">
+                        <div class="border p-3 mb-3">
+                            <h4>Observaciones</h4>
+                            <p t-field="doc.notes" class="mb-0"/>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row mt-4">
+                    <div class="col-12">
+                        <div class="alert alert-danger">
+                            <h5 class="alert-heading">
+                                <i class="fa fa-id-card"/> DOCUMENTACIÓN REQUERIDA
+                            </h5>
+                            <ul class="mb-0">
+                                <li t-if="doc.is_third_party">
+                                    <strong>DNI del beneficiario</strong> (Sr./Sra. <span t-field="doc.beneficiary_name"/>)
+                                </li>
+                                <li t-else="">
+                                    <strong>DNI del titular</strong> (Sr./Sra. <span t-field="doc.partner_id.name"/>)
+                                </li>
+                                <li>Este comprobante impreso</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row mt-5">
+                    <div class="col-12">
+                        <div style="border: 2px dashed #666; padding: 20px; background-color: #f8f9fa;">
+                            <p class="text-center mb-0">
+                                <strong>ESPACIO RESERVADO PARA USO DE CAJA</strong>
+                            </p>
+                            <div style="height: 100px;"></div>
+                            <table class="table table-sm table-borderless">
+                                <tr>
+                                    <td width="50%">Procesado por: _______________________</td>
+                                    <td>Fecha/Hora: _______________________</td>
+                                </tr>
+                                <tr>
+                                    <td>Firma Cajero: _______________________</td>
+                                    <td>Firma Cliente: _______________________</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="oe_structure"/>
+            </div>
+        </t>
+    </template>
+    
+    <template id="report_operation_voucher">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="doc">
+                <t t-call="sucursales_cajas.report_operation_voucher_document"/>
+            </t>
+        </t>
+    </template>
+</odoo>

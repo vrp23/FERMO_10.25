@@ -1,0 +1,270 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Vista de Dashboard con TransientModel -->
+    <record id="view_divisas_dashboard_wizard" model="ir.ui.view">
+        <field name="name">divisas.dashboard.wizard.form</field>
+        <field name="model">divisas.dashboard.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Dashboard Divisas" create="false" edit="false" delete="false">
+                <sheet>
+                    <!-- Header con Selector de Período -->
+                    <div class="row mb-3">
+                        <div class="col-md-8">
+                            <h1 class="text-primary">
+                                <i class="fa fa-dashboard"/> Dashboard de Operaciones
+                            </h1>
+                        </div>
+                        <div class="col-md-4 text-right">
+                            <field name="dashboard_period" widget="selection" nolabel="1"/>
+                        </div>
+                    </div>
+                    
+                    <!-- Fechas personalizadas -->
+                    <group invisible="dashboard_period != 'custom'" cols="4">
+                        <field name="dashboard_date_from"/>
+                        <field name="dashboard_date_to"/>
+                    </group>
+                    
+                    <notebook>
+                        <!-- Pestaña Principal del Dashboard -->
+                        <page string="Dashboard">
+                            <!-- KPIs Principales -->
+                            <div class="row mb-4">
+                                <!-- Card Inventario USD -->
+                                <div class="col-md-3">
+                                    <div class="card text-center">
+                                        <div class="card-header bg-primary text-white">
+                                            <h5>Inventario USD</h5>
+                                        </div>
+                                        <div class="card-body">
+                                            <h2 class="text-primary">
+                                                <field name="inventory_usd_quantity" widget="float" options="{'digits': [16, 2]}" nolabel="1"/>
+                                            </h2>
+                                            <small class="text-muted">
+                                                TC Promedio: $<field name="inventory_usd_avg_rate" widget="float" options="{'digits': [16, 2]}" nolabel="1"/>
+                                            </small>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Card Inventario USDT -->
+                                <div class="col-md-3">
+                                    <div class="card text-center">
+                                        <div class="card-header bg-info text-white">
+                                            <h5>Inventario USDT</h5>
+                                        </div>
+                                        <div class="card-body">
+                                            <h2 class="text-info">
+                                                <field name="inventory_usdt_quantity" widget="float" options="{'digits': [16, 2]}" nolabel="1"/>
+                                            </h2>
+                                            <small class="text-muted">
+                                                TC Promedio: $<field name="inventory_usdt_avg_rate" widget="float" options="{'digits': [16, 2]}" nolabel="1"/>
+                                            </small>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Card Ganancias ARS -->
+                                <div class="col-md-3">
+                                    <div class="card text-center">
+                                        <div class="card-header bg-success text-white">
+                                            <h5>Ganancias ARS</h5>
+                                        </div>
+                                        <div class="card-body">
+                                            <h2 class="text-success">
+                                                $<field name="profit_total_ars" widget="float" options="{'digits': [16, 2]}" nolabel="1"/>
+                                            </h2>
+                                            <small class="text-muted">
+                                                <field name="profit_count_ars" nolabel="1"/> operaciones
+                                            </small>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Card Ganancias USD -->
+                                <div class="col-md-3">
+                                    <div class="card text-center">
+                                        <div class="card-header bg-warning text-white">
+                                            <h5>Ganancias USD</h5>
+                                        </div>
+                                        <div class="card-body">
+                                            <h2 class="text-warning">
+                                                $<field name="profit_total_usd" widget="float" options="{'digits': [16, 2]}" nolabel="1"/>
+                                            </h2>
+                                            <small class="text-muted">
+                                                <field name="profit_count_usd" nolabel="1"/> conversiones
+                                            </small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Balance y Alertas -->
+                            <div class="row mb-4">
+                                <!-- Balance de Posición USD -->
+                                <div class="col-md-6">
+                                    <div class="card">
+                                        <div class="card-header">
+                                            <h5>
+                                                <i class="fa fa-dollar"/> Balance USD
+                                            </h5>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="mb-2">
+                                                <field name="balance_usd_badge_html" widget="html" nolabel="1"/>
+                                            </div>
+                                            <field name="balance_usd_progress_html" widget="html" nolabel="1"/>
+                                            <div class="mt-3">
+                                                <field name="position_usd_html" widget="html" nolabel="1"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Balance de Posición USDT -->
+                                <div class="col-md-6">
+                                    <div class="card">
+                                        <div class="card-header">
+                                            <h5>
+                                                <i class="fa fa-bitcoin"/> Balance USDT
+                                            </h5>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="mb-2">
+                                                <field name="balance_usdt_badge_html" widget="html" nolabel="1"/>
+                                            </div>
+                                            <field name="balance_usdt_progress_html" widget="html" nolabel="1"/>
+                                            <div class="mt-3">
+                                                <field name="position_usdt_html" widget="html" nolabel="1"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Sugerencias y Alertas -->
+                            <div class="row mb-4">
+                                <div class="col-md-12">
+                                    <div class="card">
+                                        <div class="card-header">
+                                            <h5>
+                                                <i class="fa fa-lightbulb-o"/> Sugerencias y Alertas
+                                            </h5>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <h6>Tipos de Cambio Objetivo</h6>
+                                                    <table class="table table-sm mb-3">
+                                                        <tr>
+                                                            <td>USD/ARS Sugerido:</td>
+                                                            <td class="text-right font-weight-bold text-primary">
+                                                                $<field name="suggested_rate_usd" widget="float" options="{'digits': [16, 2]}" nolabel="1"/>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>USDT/ARS Sugerido:</td>
+                                                            <td class="text-right font-weight-bold text-info">
+                                                                $<field name="suggested_rate_usdt" widget="float" options="{'digits': [16, 2]}" nolabel="1"/>
+                                                            </td>
+                                                        </tr>
+                                                    </table>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <h6>Alertas del Sistema</h6>
+                                                    <field name="alerts_html" widget="html" nolabel="1"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Botones de Acción con Espaciado -->
+                            <div class="row mb-4">
+                                <div class="col-md-12 text-center">
+                                    <button name="action_open_buy_wizard" string="Nueva Compra" type="object" 
+                                            class="btn btn-primary" icon="fa-plus-circle" style="margin: 0 10px;"/>
+                                    <button name="action_open_sell_wizard" string="Nueva Venta" type="object" 
+                                            class="btn btn-success" icon="fa-minus-circle" style="margin: 0 10px;"/>
+                                    <button name="action_update_exchange_rate" string="Actualizar TC" type="object" 
+                                            class="btn btn-info" icon="fa-refresh" style="margin: 0 10px;"/>
+                                </div>
+                            </div>
+                            
+                            <!-- Tabla de Operaciones SIN OPERADOR -->
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <h4 class="text-center mb-3">
+                                        <i class="fa fa-list"/> Últimas <field name="operations_limit" style="width: 50px;" nolabel="1"/> Operaciones
+                                    </h4>
+                                    <field name="recent_operations" readonly="1" nolabel="1">
+                                        <tree string="Operaciones Recientes" create="false" delete="false" edit="false">
+                                            <field name="name" string="Referencia"/>
+                                            <field name="operation_type" string="Tipo"/>
+                                            <field name="partner_id" string="Cliente"/>
+                                            <field name="date" string="Fecha"/>
+                                            <field name="currency_type" string="Divisa"/>
+                                            <field name="amount" string="Monto"/>
+                                            <field name="exchange_rate" string="TC"/>
+                                            <field name="payment_currency_type" string="Moneda Pago"/>
+                                            <field name="payment_amount" string="Monto Pago"/>
+                                            <field name="profit_ars" string="Ganancia ARS"/>
+                                            <field name="profit_usd" string="Ganancia USD"/>
+                                            <field name="state" string="Estado" widget="badge" 
+                                                decoration-success="state == 'confirmed'" 
+                                                decoration-danger="state == 'cancelled'"/>
+                                        </tree>
+                                    </field>
+                                </div>
+                            </div>
+                        </page>
+                        
+                        <!-- Pestaña de Configuración -->
+                        <page string="Configuración">
+                            <group string="Límites de Operaciones">
+                                <field name="operations_limit" string="Cantidad de Operaciones a Mostrar"/>
+                            </group>
+                            <group string="Umbrales de Inventario">
+                                <group>
+                                    <field name="inventory_low_usd" string="Inventario Bajo USD"/>
+                                </group>
+                                <group>
+                                    <field name="inventory_low_usdt" string="Inventario Bajo USDT"/>
+                                </group>
+                            </group>
+                            <group string="Umbrales de Balance">
+                                <group>
+                                    <field name="threshold_critical_low" string="Crítico Venta Baja (%)"/>
+                                    <field name="threshold_warning_low" string="Advertencia Venta Baja (%)"/>
+                                    <field name="threshold_balanced_min" string="Balanceado Mínimo (%)"/>
+                                </group>
+                                <group>
+                                    <field name="threshold_balanced_max" string="Balanceado Máximo (%)"/>
+                                    <field name="threshold_warning_high" string="Advertencia Stock Bajo (%)"/>
+                                    <field name="threshold_critical_high" string="Crítico Stock Bajo (%)"/>
+                                </group>
+                            </group>
+                            <group string="Margen Objetivo">
+                                <field name="suggested_margin" string="Margen Objetivo (%)"/>
+                            </group>
+                            <div class="text-center mt-4">
+                                <button name="action_save_settings" type="object" 
+                                        string="Guardar Configuración" class="btn btn-primary btn-lg"/>
+                            </div>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    
+    <!-- Acción del Dashboard -->
+    <record id="action_divisas_dashboard" model="ir.actions.act_window">
+        <field name="name">Dashboard Divisas</field>
+        <field name="res_model">divisas.dashboard.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="view_divisas_dashboard_wizard"/>
+        <field name="target">current</field>
+    </record>
+</odoo>

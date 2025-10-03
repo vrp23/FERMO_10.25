@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="report_operation_receipt_document">
+        <t t-call="web.external_layout">
+            <t t-set="doc" t-value="doc.with_context(lang=doc.partner_id.lang)"/>
+            <div class="page">
+                <div class="oe_structure"/>
+                
+                <h2 class="text-center">
+                    <span t-if="doc.operation_type == 'deposit'">COMPROBANTE DE DEPÓSITO</span>
+                    <span t-elif="doc.operation_type == 'withdrawal'">COMPROBANTE DE RETIRO</span>
+                    <span t-else="">COMPROBANTE DE OPERACIÓN</span>
+                </h2>
+                
+                <div class="row mt-4">
+                    <div class="col-6">
+                        <p>
+                            <strong>Número:</strong> <span t-field="doc.name"/><br/>
+                            <strong>Fecha:</strong> <span t-field="doc.completion_date" t-options='{"widget": "datetime"}'/><br/>
+                            <strong>Sucursal:</strong> <span t-field="doc.branch_id.name"/><br/>
+                            <strong>Caja:</strong> <span t-field="doc.cashbox_id.name"/>
+                        </p>
+                    </div>
+                    <div class="col-6 text-right">
+                        <img t-if="doc.state == 'done'" 
+                             src="/sucursales_cajas/static/src/img/stamp_completed.png" 
+                             style="max-height: 100px;"
+                             alt="Completado"/>
+                    </div>
+                </div>
+                
+                <div class="row mt-4">
+                    <div class="col-12">
+                        <table class="table table-sm table-bordered">
+                            <tbody>
+                                <tr>
+                                    <td width="30%"><strong>Cliente/Titular:</strong></td>
+                                    <td><span t-field="doc.partner_id.name"/></td>
+                                </tr>
+                                <tr t-if="doc.is_third_party">
+                                    <td><strong>Beneficiario:</strong></td>
+                                    <td>
+                                        <span t-field="doc.beneficiary_name"/>
+                                        (DNI: <span t-field="doc.beneficiary_dni"/>)
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Tipo de Operación:</strong></td>
+                                    <td>
+                                        <span t-if="doc.operation_type == 'deposit'">DEPÓSITO</span>
+                                        <span t-elif="doc.operation_type == 'withdrawal'">RETIRO</span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Moneda:</strong></td>
+                                    <td><span t-field="doc.currency_type"/></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Monto:</strong></td>
+                                    <td class="text-right">
+                                        <strong style="font-size: 1.2em;">
+                                            <span t-field="doc.currency_type"/> 
+                                            <span t-field="doc.amount" t-options='{"widget": "float", "precision": 2}'/>
+                                        </strong>
+                                    </td>
+                                </tr>
+                                <tr t-if="doc.transfer_type">
+                                    <td><strong>Forma:</strong></td>
+                                    <td>
+                                        <span t-if="doc.transfer_type == 'cash'">EFECTIVO</span>
+                                        <span t-elif="doc.transfer_type == 'bank_transfer'">TRANSFERENCIA BANCARIA</span>
+                                        <span t-elif="doc.transfer_type == 'crypto'">CRIPTOMONEDA</span>
+                                        <span t-else="" t-field="doc.transfer_type"/>
+                                    </td>
+                                </tr>
+                                <tr t-if="doc.transfer_reference">
+                                    <td><strong>Referencia:</strong></td>
+                                    <td><span t-field="doc.transfer_reference"/></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <div class="row mt-4" t-if="doc.notes">
+                    <div class="col-12">
+                        <p><strong>Observaciones:</strong></p>
+                        <p t-field="doc.notes" class="text-muted"/>
+                    </div>
+                </div>
+                
+                <div class="row mt-5">
+                    <div class="col-6 text-center">
+                        <div style="border-top: 1px solid black; margin-top: 50px;">
+                            <p class="mt-2">
+                                <strong>Firma del Cajero</strong><br/>
+                                <span t-field="doc.processed_by_user_id.name"/>
+                            </p>
+                        </div>
+                    </div>
+                    <div class="col-6 text-center">
+                        <div style="border-top: 1px solid black; margin-top: 50px;">
+                            <p class="mt-2">
+                                <strong>Firma del Cliente/Beneficiario</strong><br/>
+                                <span t-if="doc.is_third_party" t-field="doc.beneficiary_name"/>
+                                <span t-else="" t-field="doc.partner_id.name"/>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row mt-4">
+                    <div class="col-12 text-center text-muted">
+                        <small>
+                            Este comprobante es válido como constancia de la operación realizada.
+                            Conserve este documento para futuras referencias.
+                        </small>
+                    </div>
+                </div>
+                
+                <div class="oe_structure"/>
+            </div>
+        </t>
+    </template>
+    
+    <template id="report_operation_receipt">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="doc">
+                <t t-call="sucursales_cajas.report_operation_receipt_document"/>
+            </t>
+        </t>
+    </template>
+</odoo>

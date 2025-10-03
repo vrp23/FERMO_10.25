@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Menú raíz de la aplicación -->
+    <menuitem id="menu_sucursales_cajas_root" 
+              name="Sucursales y Cajas" 
+              sequence="45"
+              web_icon="sucursales_cajas,static/description/icon.png"
+              groups="sucursales_cajas.group_sucursales_cajas_cashier"/>
+    
+    <!-- Dashboard -->
+    <menuitem id="menu_sucursales_cajas_dashboard" 
+              name="Dashboard" 
+              parent="menu_sucursales_cajas_root" 
+              action="action_sucursales_cajas_dashboard" 
+              sequence="1"/>
+    
+    <!-- Menú Sucursales -->
+    <menuitem id="menu_sucursales_main" 
+              name="Sucursales" 
+              parent="menu_sucursales_cajas_root" 
+              sequence="10"/>
+    
+    <menuitem id="menu_sucursales_list" 
+              name="Sucursales" 
+              parent="menu_sucursales_main" 
+              action="action_sucursales_cajas_branch" 
+              sequence="1"/>
+    
+    <menuitem id="menu_cashbox_list" 
+              name="Cajas" 
+              parent="menu_sucursales_main" 
+              action="action_sucursales_cajas_cashbox" 
+              sequence="2"/>
+    
+    <!-- Menú Operaciones -->
+    <menuitem id="menu_operations_main" 
+              name="Operaciones" 
+              parent="menu_sucursales_cajas_root" 
+              sequence="20"/>
+    
+    <menuitem id="menu_operations_pending" 
+              name="Pendientes" 
+              parent="menu_operations_main" 
+              action="action_sucursales_cajas_operation_pending" 
+              sequence="1"/>
+    
+    <menuitem id="menu_operations_today" 
+              name="Operaciones del Día" 
+              parent="menu_operations_main" 
+              action="action_sucursales_cajas_operation_today" 
+              sequence="2"/>
+    
+    <menuitem id="menu_operations_all" 
+              name="Todas las Operaciones" 
+              parent="menu_operations_main" 
+              action="action_sucursales_cajas_operation" 
+              sequence="3"/>
+    
+    <menuitem id="menu_operations_new" 
+              name="Nueva Operación" 
+              parent="menu_operations_main" 
+              action="action_sucursales_cajas_send_to_cashbox_wizard" 
+              sequence="4"/>
+    
+    <!-- Menú Sesiones -->
+    <menuitem id="menu_sessions_main" 
+              name="Sesiones" 
+              parent="menu_sucursales_cajas_root" 
+              sequence="30"
+              groups="sucursales_cajas.group_sucursales_cajas_cashier"/>
+    
+    <menuitem id="menu_my_session" 
+              name="Mi Sesión Actual" 
+              parent="menu_sessions_main" 
+              action="action_sucursales_cajas_my_session" 
+              sequence="1"/>
+    
+    <menuitem id="menu_sessions_active" 
+              name="Sesiones Activas" 
+              parent="menu_sessions_main" 
+              action="action_sucursales_cajas_session_open" 
+              sequence="2"/>
+    
+    <menuitem id="menu_sessions_all" 
+              name="Todas las Sesiones" 
+              parent="menu_sessions_main" 
+              action="action_sucursales_cajas_session" 
+              sequence="3"
+              groups="sucursales_cajas.group_sucursales_cajas_admin"/>
+    
+    <!-- Menú Configuración -->
+    <menuitem id="menu_configuration_main" 
+              name="Configuración" 
+              parent="menu_sucursales_cajas_root" 
+              sequence="100"
+              groups="sucursales_cajas.group_sucursales_cajas_admin"/>
+    
+    <menuitem id="menu_config_branches" 
+              name="Sucursales" 
+              parent="menu_configuration_main" 
+              action="action_sucursales_cajas_branch" 
+              sequence="1"/>
+    
+    <menuitem id="menu_config_cashboxes" 
+              name="Cajas" 
+              parent="menu_configuration_main" 
+              action="action_sucursales_cajas_cashbox" 
+              sequence="2"/>
+    
+    <!-- Submenú para configuración avanzada -->
+    <menuitem id="menu_config_advanced" 
+              name="Avanzado" 
+              parent="menu_configuration_main" 
+              sequence="50"/>
+    
+    <!-- Comentado temporalmente hasta crear la acción correcta -->
+    <!-- 
+    <menuitem id="menu_config_denominations" 
+              name="Denominaciones de Billetes" 
+              parent="menu_config_advanced" 
+              action="base.action_ir_config_parameter"
+              sequence="1"/>
+    -->
+</odoo>

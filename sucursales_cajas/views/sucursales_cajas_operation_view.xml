@@ -1,0 +1,376 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Vista Tree de Operaciones -->
+    <record id="view_sucursales_cajas_operation_tree" model="ir.ui.view">
+        <field name="name">sucursales_cajas.operation.tree</field>
+        <field name="model">sucursales_cajas.operation</field>
+        <field name="arch" type="xml">
+            <tree string="Operaciones de Caja" 
+                  decoration-success="state == 'done'"
+                  decoration-warning="state == 'pending'"
+                  decoration-info="state == 'processing'"
+                  decoration-muted="state == 'cancelled'">
+                <field name="name"/>
+                <field name="operation_type"/>
+                <field name="partner_id"/>
+                <field name="currency_type"/>
+                <field name="amount" sum="Total"/>
+                <field name="cashbox_id"/>
+                <field name="cashbox_line_id" optional="hide"/>
+                <field name="is_third_party" widget="boolean_toggle"/>
+                <field name="beneficiary_name" optional="show" invisible="not is_third_party"/>
+                <field name="state" widget="badge"/>
+                <field name="request_date" widget="datetime"/>
+                <field name="origin" optional="hide"/>
+            </tree>
+        </field>
+    </record>
+    
+    <!-- Vista Form de Operaciones -->
+    <record id="view_sucursales_cajas_operation_form" model="ir.ui.view">
+        <field name="name">sucursales_cajas.operation.form</field>
+        <field name="model">sucursales_cajas.operation</field>
+        <field name="arch" type="xml">
+            <form string="Operación de Caja">
+                <header>
+                    <button name="action_send_to_cashbox" 
+                            type="object" 
+                            string="Enviar a Caja" 
+                            class="btn-primary"
+                            invisible="state != 'draft'"
+                            groups="base.group_user"/>
+                    <button name="action_start_processing" 
+                            type="object" 
+                            string="Procesar" 
+                            class="btn-primary"
+                            invisible="state != 'pending' or not can_process"
+                            groups="sucursales_cajas.group_sucursales_cajas_cashier"/>
+                    <button name="action_complete" 
+                            type="object" 
+                            string="Completar" 
+                            class="btn-success"
+                            invisible="state != 'processing'"
+                            groups="sucursales_cajas.group_sucursales_cajas_cashier"/>
+                    <button name="action_cancel" 
+                            type="object" 
+                            string="Cancelar" 
+                            invisible="state not in ['draft', 'pending', 'processing']"
+                            confirm="¿Está seguro de cancelar esta operación?"
+                            groups="sucursales_cajas.group_sucursales_cajas_cashier"/>
+                    <button name="action_print_voucher" 
+                            type="object" 
+                            string="Imprimir Comprobante" 
+                            class="btn-secondary"
+                            invisible="state not in ['pending', 'processing', 'done']"/>
+                    <button name="action_print_receipt" 
+                            type="object" 
+                            string="Imprimir Recibo" 
+                            class="btn-secondary"
+                            invisible="state != 'done'"/>
+                    <field name="state" widget="statusbar" 
+                           statusbar_visible="draft,pending,processing,done"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_print_receipt" 
+                                type="object" 
+                                class="oe_stat_button" 
+                                icon="fa-print"
+                                invisible="state != 'done'">
+                            <div class="o_field_widget o_stat_info">
+                                <span class="o_stat_value">
+                                    <field name="print_count"/>
+                                </span>
+                                <span class="o_stat_text">Impresiones</span>
+                            </div>
+                        </button>
+                    </div>
+                    
+                    <widget name="web_ribbon" title="Pendiente" bg_color="bg-warning" 
+                            invisible="state != 'pending'"/>
+                    <widget name="web_ribbon" title="Procesando" bg_color="bg-info" 
+                            invisible="state != 'processing'"/>
+                    <widget name="web_ribbon" title="Completada" bg_color="bg-success" 
+                            invisible="state != 'done'"/>
+                    <widget name="web_ribbon" title="Cancelada" bg_color="bg-danger" 
+                            invisible="state != 'cancelled'"/>
+                    
+                    <div class="oe_title">
+                        <label for="operation_type"/>
+                        <h1>
+                            <field name="operation_type" readonly="state != 'draft'" class="oe_inline"/>
+                            <span class="oe_inline"> - </span>
+                            <field name="name" readonly="1" class="oe_inline"/>
+                        </h1>
+                    </div>
+                    
+                    <group>
+                        <group>
+                            <field name="partner_id" readonly="state != 'draft'"
+                                   options="{'no_create': True}"/>
+                            <field name="currency_type" readonly="state != 'draft'"/>
+                            <field name="amount" readonly="state != 'draft'" widget="monetary"/>
+                            <field name="origin" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="cashbox_id" readonly="state not in ['draft', 'pending']"
+                                   options="{'no_create': True}"
+                                   domain="[('state', '=', 'in_session')]"/>
+                            <field name="session_id" readonly="1" invisible="not session_id"/>
+                            <field name="request_date" readonly="1"/>
+                        </group>
+                    </group>
+                    
+                    <group string="Beneficiario" invisible="not is_third_party">
+                        <group>
+                            <field name="is_third_party" readonly="state != 'draft'"/>
+                            <field name="beneficiary_name" readonly="state != 'draft'"
+                                   required="is_third_party"/>
+                            <field name="beneficiary_dni" readonly="state != 'draft'"
+                                   required="is_third_party"/>
+                            <field name="beneficiary_phone" readonly="state != 'draft'"/>
+                        </group>
+                    </group>
+                    
+                    <group string="Datos de Transferencia" invisible="not transfer_type">
+                        <group>
+                            <field name="transfer_type" readonly="state not in ['draft', 'pending']"/>
+                            <field name="transfer_reference" readonly="state == 'done'"/>
+                        </group>
+                        <group>
+                            <field name="destination_account_display" readonly="1" nolabel="1" colspan="2"/>
+                        </group>
+                    </group>
+                    
+                    <group string="Procesamiento" invisible="state in ['draft', 'cancelled']">
+                        <group>
+                            <field name="cashbox_line_id" readonly="state != 'processing'"
+                                   domain="[('cashbox_id', '=', cashbox_id), ('currency_type', '=', currency_type)]"
+                                   options="{'no_create': True}"/>
+                            <field name="account_id" readonly="state != 'processing'"
+                                   domain="[('cashbox_line_id', '=', cashbox_line_id)]"
+                                   options="{'no_create': True}"
+                                   invisible="is_cash"/>
+                            <field name="is_cash" invisible="1"/>
+                            <field name="can_process" invisible="1"/>
+                            <field name="has_sufficient_balance" invisible="1"/>
+                        </group>
+                        <group>
+                            <field name="processed_by_user_id" readonly="1"/>
+                            <field name="processing_date" readonly="1"/>
+                            <field name="completion_date" readonly="1" invisible="not completion_date"/>
+                        </group>
+                    </group>
+                    
+                    <group string="Motivo de Rechazo" invisible="not rejection_reason">
+                        <field name="rejection_reason" readonly="1" nolabel="1"/>
+                    </group>
+                    
+                    <notebook>
+                        <page string="Notas">
+                            <field name="notes" readonly="state == 'done'"
+                                   placeholder="Observaciones adicionales..."/>
+                        </page>
+                        
+                        <page string="Movimientos de Wallet" invisible="state != 'done'">
+                            <field name="wallet_movement_ids" readonly="1" invisible="not wallet_movement_ids">
+                                <tree create="false" edit="false" delete="false">
+                                    <field name="name"/>
+                                    <field name="fecha"/>
+                                    <field name="tipo"/>
+                                    <field name="monto"/>
+                                    <field name="state"/>
+                                </tree>
+                            </field>
+                            <field name="divisas_movement_ids" readonly="1" invisible="not divisas_movement_ids">
+                                <tree create="false" edit="false" delete="false">
+                                    <field name="name"/>
+                                    <field name="date"/>
+                                    <field name="operation_type"/>
+                                    <field name="currency_type"/>
+                                    <field name="amount"/>
+                                    <field name="state"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers"/>
+                    <field name="activity_ids" widget="mail_activity"/>
+                    <field name="message_ids" widget="mail_thread"/>
+                </div>
+            </form>
+        </field>
+    </record>
+    
+    <!-- Vista Search de Operaciones -->
+    <record id="view_sucursales_cajas_operation_search" model="ir.ui.view">
+        <field name="name">sucursales_cajas.operation.search</field>
+        <field name="model">sucursales_cajas.operation</field>
+        <field name="arch" type="xml">
+            <search string="Buscar Operación">
+                <field name="name"/>
+                <field name="partner_id"/>
+                <field name="cashbox_id"/>
+                <field name="beneficiary_name"/>
+                <field name="beneficiary_dni"/>
+                <separator/>
+                <filter string="Depósitos" name="deposits" 
+                        domain="[('operation_type', '=', 'deposit')]"/>
+                <filter string="Retiros" name="withdrawals" 
+                        domain="[('operation_type', '=', 'withdrawal')]"/>
+                <separator/>
+                <filter string="Borrador" name="draft" 
+                        domain="[('state', '=', 'draft')]"/>
+                <filter string="Pendientes" name="pending" 
+                        domain="[('state', '=', 'pending')]"/>
+                <filter string="En Proceso" name="processing" 
+                        domain="[('state', '=', 'processing')]"/>
+                <filter string="Completadas" name="done" 
+                        domain="[('state', '=', 'done')]"/>
+                <filter string="Canceladas" name="cancelled" 
+                        domain="[('state', '=', 'cancelled')]"/>
+                <separator/>
+                <filter string="Para Terceros" name="third_party" 
+                        domain="[('is_third_party', '=', True)]"/>
+                <filter string="Con Transferencia" name="with_transfer" 
+                        domain="[('transfer_type', '!=', False)]"/>
+                <separator/>
+                <filter string="Hoy" name="today" 
+                        domain="[('request_date', '&gt;=', datetime.datetime.now().strftime('%Y-%m-%d 00:00:00')),
+                                ('request_date', '&lt;=', datetime.datetime.now().strftime('%Y-%m-%d 23:59:59'))]"/>
+                <filter string="Esta Semana" name="this_week" 
+                        domain="[('request_date', '&gt;=', (datetime.datetime.now() - datetime.timedelta(days=7)).strftime('%Y-%m-%d'))]"/>
+                <group expand="0" string="Agrupar Por">
+                    <filter string="Tipo de Operación" name="operation_type" 
+                            context="{'group_by': 'operation_type'}"/>
+                    <filter string="Cliente" name="partner" 
+                            context="{'group_by': 'partner_id'}"/>
+                    <filter string="Caja" name="cashbox" 
+                            context="{'group_by': 'cashbox_id'}"/>
+                    <filter string="Moneda" name="currency" 
+                            context="{'group_by': 'currency_type'}"/>
+                    <filter string="Estado" name="state" 
+                            context="{'group_by': 'state'}"/>
+                    <filter string="Fecha de Solicitud" name="request_date" 
+                            context="{'group_by': 'request_date:day'}"/>
+                    <filter string="Origen" name="origin" 
+                            context="{'group_by': 'origin'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+    
+    <!-- Vista Kanban de Operaciones -->
+    <record id="view_sucursales_cajas_operation_kanban" model="ir.ui.view">
+        <field name="name">sucursales_cajas.operation.kanban</field>
+        <field name="model">sucursales_cajas.operation</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="state" class="o_kanban_mobile">
+                <field name="name"/>
+                <field name="operation_type"/>
+                <field name="partner_id"/>
+                <field name="currency_type"/>
+                <field name="amount"/>
+                <field name="state"/>
+                <field name="cashbox_id"/>
+                <field name="is_third_party"/>
+                <field name="beneficiary_name"/>
+                <progressbar field="state" 
+                            colors='{"done": "success", "pending": "warning", "cancelled": "danger"}'/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div t-attf-class="oe_kanban_card oe_kanban_global_click">
+                            <div class="o_kanban_record_top">
+                                <div class="o_kanban_record_headings">
+                                    <strong class="o_kanban_record_title">
+                                        <field name="name"/>
+                                    </strong>
+                                </div>
+                                <field name="currency_type" class="o_kanban_record_subtitle"/>
+                            </div>
+                            <div class="o_kanban_record_body">
+                                <div>
+                                    <t t-if="record.operation_type.raw_value == 'deposit'">
+                                        <span class="text-success">
+                                            <i class="fa fa-arrow-down"/> Depósito
+                                        </span>
+                                    </t>
+                                    <t t-else="">
+                                        <span class="text-danger">
+                                            <i class="fa fa-arrow-up"/> Retiro
+                                        </span>
+                                    </t>
+                                    <strong class="ml-2">
+                                        <field name="amount" widget="monetary"/>
+                                    </strong>
+                                </div>
+                                <div>
+                                    <i class="fa fa-user"/> 
+                                    <t t-if="record.is_third_party.raw_value">
+                                        <field name="beneficiary_name"/>
+                                    </t>
+                                    <t t-else="">
+                                        <field name="partner_id"/>
+                                    </t>
+                                </div>
+                                <div class="text-muted">
+                                    <i class="fa fa-inbox"/> <field name="cashbox_id"/>
+                                </div>
+                            </div>
+                            <div class="o_kanban_record_bottom">
+                                <div class="oe_kanban_bottom_left">
+                                    <field name="request_date" widget="date"/>
+                                </div>
+                                <div class="oe_kanban_bottom_right">
+                                    <field name="state" widget="label_selection" 
+                                           options="{'classes': {'draft': 'default', 'pending': 'warning', 
+                                                                'processing': 'info', 'done': 'success', 
+                                                                'cancelled': 'danger'}}"/>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+    
+    <!-- Acciones para Operaciones -->
+    <record id="action_sucursales_cajas_operation" model="ir.actions.act_window">
+        <field name="name">Operaciones de Caja</field>
+        <field name="res_model">sucursales_cajas.operation</field>
+        <field name="view_mode">tree,kanban,form</field>
+        <field name="search_view_id" ref="view_sucursales_cajas_operation_search"/>
+        <field name="context">{}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No hay operaciones registradas
+            </p>
+            <p>
+                Las operaciones se crean cuando los clientes solicitan depósitos o retiros.
+            </p>
+        </field>
+    </record>
+    
+    <!-- Acción para Operaciones Pendientes -->
+    <record id="action_sucursales_cajas_operation_pending" model="ir.actions.act_window">
+        <field name="name">Operaciones Pendientes</field>
+        <field name="res_model">sucursales_cajas.operation</field>
+        <field name="view_mode">tree,kanban,form</field>
+        <field name="search_view_id" ref="view_sucursales_cajas_operation_search"/>
+        <field name="domain">[('state', '=', 'pending')]</field>
+        <field name="context">{'search_default_cashbox': 1}</field>
+    </record>
+    
+    <!-- Acción para Operaciones del Día -->
+    <record id="action_sucursales_cajas_operation_today" model="ir.actions.act_window">
+        <field name="name">Operaciones del Día</field>
+        <field name="res_model">sucursales_cajas.operation</field>
+        <field name="view_mode">tree,kanban,form</field>
+        <field name="search_view_id" ref="view_sucursales_cajas_operation_search"/>
+        <field name="context">{'search_default_today': 1, 'search_default_state': 1}</field>
+    </record>
+</odoo>

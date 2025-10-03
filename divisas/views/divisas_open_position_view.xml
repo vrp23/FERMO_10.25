@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Vista Tree -->
+    <record id="view_divisas_open_position_tree" model="ir.ui.view">
+        <field name="name">divisas.open.position.tree</field>
+        <field name="model">divisas.open.position</field>
+        <field name="arch" type="xml">
+            <tree string="Posiciones Abiertas" 
+                  decoration-success="state == 'closed'"
+                  decoration-warning="state == 'partial'"
+                  decoration-danger="state == 'open'"
+                  decoration-muted="state == 'cancelled'">
+                <field name="name"/>
+                <field name="sale_operation_id"/>
+                <field name="partner_id"/>
+                <field name="currency_type"/>
+                <field name="quantity_open" sum="Total"/>
+                <field name="quantity_covered" sum="Cubierto"/>
+                <field name="quantity_pending" sum="Pendiente"/>
+                <field name="sale_rate"/>
+                <field name="profit_ars" sum="Total ARS"/>
+                <field name="profit_usd" sum="Total USD"/>
+                <field name="state"/>
+            </tree>
+        </field>
+    </record>
+    
+    <!-- Vista Form -->
+    <record id="view_divisas_open_position_form" model="ir.ui.view">
+        <field name="name">divisas.open.position.form</field>
+        <field name="model">divisas.open.position</field>
+        <field name="arch" type="xml">
+            <form string="Posición Abierta">
+                <header>
+                    <field name="state" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="sale_operation_id"/>
+                            <field name="partner_id"/>
+                            <field name="date_opened"/>
+                            <field name="date_closed" invisible="not date_closed"/>
+                        </group>
+                        <group>
+                            <field name="currency_type"/>
+                            <field name="quantity_open"/>
+                            <field name="quantity_covered"/>
+                            <field name="quantity_pending"/>
+                        </group>
+                    </group>
+                    <group string="Tasas y Ganancias">
+                        <group>
+                            <field name="sale_rate"/>
+                            <field name="payment_currency"/>
+                        </group>
+                        <group>
+                            <field name="profit_ars" widget="monetary"/>
+                            <field name="profit_usd" widget="monetary"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Coberturas" invisible="not coverage_ids">
+                            <field name="coverage_ids" readonly="1">
+                                <tree>
+                                    <field name="purchase_operation_id"/>
+                                    <field name="quantity_covered" sum="Total"/>
+                                    <field name="purchase_rate"/>
+                                    <field name="profit_ars" sum="Total"/>
+                                    <field name="profit_usd" sum="Total"/>
+                                    <field name="date"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    
+    <!-- Vista Search -->
+    <record id="view_divisas_open_position_search" model="ir.ui.view">
+        <field name="name">divisas.open.position.search</field>
+        <field name="model">divisas.open.position</field>
+        <field name="arch" type="xml">
+            <search string="Buscar Posiciones Abiertas">
+                <field name="name"/>
+                <field name="sale_operation_id"/>
+                <field name="partner_id"/>
+                <field name="currency_type"/>
+                <filter string="USD" name="usd" domain="[('currency_type', '=', 'USD')]"/>
+                <filter string="USDT" name="usdt" domain="[('currency_type', '=', 'USDT')]"/>
+                <separator/>
+                <filter string="Abiertas" name="open" domain="[('state', '=', 'open')]"/>
+                <filter string="Parciales" name="partial" domain="[('state', '=', 'partial')]"/>
+                <filter string="Cerradas" name="closed" domain="[('state', '=', 'closed')]"/>
+                <filter string="Canceladas" name="cancelled" domain="[('state', '=', 'cancelled')]"/>
+                <group expand="0" string="Agrupar Por">
+                    <filter string="Divisa" name="group_currency" context="{'group_by': 'currency_type'}"/>
+                    <filter string="Cliente" name="group_partner" context="{'group_by': 'partner_id'}"/>
+                    <filter string="Estado" name="group_state" context="{'group_by': 'state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+    
+    <!-- Acción -->
+    <record id="action_divisas_open_positions" model="ir.actions.act_window">
+        <field name="name">Posiciones Abiertas</field>
+        <field name="res_model">divisas.open.position</field>
+        <field name="view_mode">tree,form</field>
+        <field name="context">{'search_default_open': 1}</field>
+    </record>
+    
+    <!-- Menú en Inventario FIFO -->
+    <menuitem id="menu_divisas_open_positions"
+              name="Posiciones Abiertas"
+              parent="menu_divisas_inventory"
+              action="action_divisas_open_positions"
+              sequence="30"/>
+</odoo>

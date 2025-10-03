@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Acción para el wizard de conteo desde cierre (MOVIDO AL PRINCIPIO) -->
+    <record id="action_cash_count_wizard" model="ir.actions.act_window">
+        <field name="name">Contar Efectivo</field>
+        <field name="res_model">sucursales_cajas.cash_count_wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <!-- Vista Form del Wizard Cerrar Sesión -->
+    <record id="view_close_session_wizard_form" model="ir.ui.view">
+        <field name="name">sucursales_cajas.close_session_wizard.form</field>
+        <field name="model">sucursales_cajas.close_session_wizard</field>
+        <field name="arch" type="xml">
+            <form string="Cerrar Sesión de Caja">
+                <sheet>
+                    <field name="session_id" invisible="1"/>
+                    
+                    <field name="session_info" readonly="1" nolabel="1" colspan="2"/>
+                    
+                    <separator string="Resumen de Operaciones"/>
+                    <field name="operations_summary" readonly="1" nolabel="1" colspan="2"/>
+                    
+                    <group col="4">
+                        <field name="total_operations_count" readonly="1"/>
+                        <field name="total_deposits_count" readonly="1"/>
+                        <field name="total_withdrawals_count" readonly="1"/>
+                        <newline/>
+                    </group>
+                    
+                    <separator string="Balances de Cierre"/>
+                    
+                    <field name="balance_line_ids" nolabel="1">
+                        <tree editable="bottom" create="false" delete="false">
+                            <field name="line_name" string="Subcaja" readonly="1"/>
+                            <field name="currency_type" readonly="1"/>
+                            <field name="opening_balance" readonly="1" widget="monetary" optional="show"/>
+                            <field name="deposits_amount" readonly="1" widget="monetary" string="(+) Depósitos" optional="show"/>
+                            <field name="withdrawals_amount" readonly="1" widget="monetary" string="(-) Retiros" optional="show"/>
+                            <field name="system_balance" readonly="1" widget="monetary" string="Saldo Sistema"/>
+                            <field name="declared_balance" widget="monetary" string="Saldo Declarado"/>
+                            <field name="counted_balance" widget="monetary" string="Saldo Contado" 
+                                   invisible="not is_cash"/>
+                            <field name="difference" readonly="1" widget="monetary" 
+                                   decoration-danger="difference &lt; 0"
+                                   decoration-success="difference &gt; 0"
+                                   decoration-muted="difference == 0"/>
+                            <button name="%(action_cash_count_wizard)d" 
+                                    type="action" 
+                                    string="Contar" 
+                                    icon="fa-calculator"
+                                    invisible="not is_cash"
+                                    context="{'line_id': id}"/>
+                            <field name="notes" optional="hide"/>
+                            <field name="cashbox_line_id" invisible="1"/>
+                            <field name="is_cash" invisible="1"/>
+                            <field name="balance_id" invisible="1"/>
+                        </tree>
+                    </field>
+                    
+                    <group invisible="not has_discrepancies">
+                        <group>
+                            <field name="has_discrepancies" invisible="1"/>
+                            <field name="total_discrepancy" readonly="1" widget="monetary" 
+                                   string="Discrepancia Total"
+                                   decoration-danger="total_discrepancy &gt; 0"/>
+                        </group>
+                        <group>
+                            <field name="force_close" invisible="not has_discrepancies"/>
+                        </group>
+                        <field name="discrepancy_notes" required="has_discrepancies and not force_close"
+                               placeholder="Explique las razones de las diferencias encontradas..."
+                               colspan="2"/>
+                    </group>
+                    
+                    <separator string="Observaciones de Cierre"/>
+                    <field name="closing_notes" nolabel="1" 
+                           placeholder="Observaciones adicionales del cierre..."/>
+                    
+                    <group invisible="not session_id.cashbox_id.require_pin">
+                        <group>
+                            <field name="confirm_pin" password="True" 
+                                   required="session_id.cashbox_id.require_pin"
+                                   string="PIN de Confirmación"/>
+                        </group>
+                        <group>
+                            <field name="print_report"/>
+                        </group>
+                    </group>
+                </sheet>
+                <footer>
+                    <button name="action_close_session" 
+                            string="Cerrar Sesión" 
+                            type="object" 
+                            class="btn-primary"
+                            confirm="¿Confirma el cierre de la sesión? Esta acción no se puede deshacer."/>
+                    <button string="Cancelar" 
+                            class="btn-secondary" 
+                            special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>

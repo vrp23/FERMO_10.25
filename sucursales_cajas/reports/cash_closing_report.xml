@@ -1,0 +1,237 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="report_session_closing_document">
+        <t t-call="web.external_layout">
+            <t t-set="doc" t-value="doc.with_context(lang=doc.user_id.lang)"/>
+            <div class="page">
+                <div class="oe_structure"/>
+                
+                <h2 class="text-center">CIERRE DE SESIÓN DE CAJA</h2>
+                <h3 class="text-center"><span t-field="doc.name"/></h3>
+                
+                <!-- Información General -->
+                <div class="row mt-4">
+                    <div class="col-6">
+                        <table class="table table-sm">
+                            <tr>
+                                <td><strong>Caja:</strong></td>
+                                <td><span t-field="doc.cashbox_id.display_name"/></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Sucursal:</strong></td>
+                                <td><span t-field="doc.branch_id.name"/></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Usuario:</strong></td>
+                                <td><span t-field="doc.user_id.name"/></td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="col-6">
+                        <table class="table table-sm">
+                            <tr>
+                                <td><strong>Apertura:</strong></td>
+                                <td><span t-field="doc.start_datetime" t-options='{"widget": "datetime"}'/></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Cierre:</strong></td>
+                                <td><span t-field="doc.end_datetime" t-options='{"widget": "datetime"}'/></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Duración:</strong></td>
+                                <td><span t-field="doc.duration" t-options='{"widget": "float_time"}'/></td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+                
+                <!-- Resumen de Operaciones -->
+                <h4 class="mt-4">Resumen de Operaciones</h4>
+                <table class="table table-bordered table-sm">
+                    <thead>
+                        <tr class="bg-light">
+                            <th>Tipo</th>
+                            <th class="text-center">Cantidad</th>
+                            <th class="text-right">ARS</th>
+                            <th class="text-right">USD</th>
+                            <th class="text-right">USDT</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Depósitos</td>
+                            <td class="text-center"><span t-field="doc.deposit_count"/></td>
+                            <td class="text-right">
+                                <span t-if="doc.total_deposits_ars &gt; 0" 
+                                      t-field="doc.total_deposits_ars" 
+                                      t-options='{"widget": "monetary", "display_currency": False}'/>
+                                <span t-else="">-</span>
+                            </td>
+                            <td class="text-right">
+                                <span t-if="doc.total_deposits_usd &gt; 0" 
+                                      t-field="doc.total_deposits_usd" 
+                                      t-options='{"widget": "monetary", "display_currency": False}'/>
+                                <span t-else="">-</span>
+                            </td>
+                            <td class="text-right">
+                                <t t-set="deposits_usdt" t-value="sum(doc.operation_ids.filtered(lambda o: o.operation_type == 'deposit' and o.currency_type == 'USDT' and o.state == 'done').mapped('amount'))"/>
+                                <span t-if="deposits_usdt &gt; 0" t-esc="deposits_usdt" t-options='{"widget": "float", "precision": 2}'/>
+                                <span t-else="">-</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Retiros</td>
+                            <td class="text-center"><span t-field="doc.withdrawal_count"/></td>
+                            <td class="text-right">
+                                <span t-if="doc.total_withdrawals_ars &gt; 0" 
+                                      t-field="doc.total_withdrawals_ars" 
+                                      t-options='{"widget": "monetary", "display_currency": False}'/>
+                                <span t-else="">-</span>
+                            </td>
+                            <td class="text-right">
+                                <span t-if="doc.total_withdrawals_usd &gt; 0" 
+                                      t-field="doc.total_withdrawals_usd" 
+                                      t-options='{"widget": "monetary", "display_currency": False}'/>
+                                <span t-else="">-</span>
+                            </td>
+                            <td class="text-right">
+                                <t t-set="withdrawals_usdt" t-value="sum(doc.operation_ids.filtered(lambda o: o.operation_type == 'withdrawal' and o.currency_type == 'USDT' and o.state == 'done').mapped('amount'))"/>
+                                <span t-if="withdrawals_usdt &gt; 0" t-esc="withdrawals_usdt" t-options='{"widget": "float", "precision": 2}'/>
+                                <span t-else="">-</span>
+                            </td>
+                        </tr>
+                        <tr class="font-weight-bold">
+                            <td>Movimiento Neto</td>
+                            <td class="text-center"><span t-field="doc.operation_count"/></td>
+                            <td class="text-right">
+                                <t t-set="net_ars" t-value="doc.total_deposits_ars - doc.total_withdrawals_ars"/>
+                                <span t-esc="net_ars" 
+                                      t-options='{"widget": "monetary", "display_currency": False}'
+                                      t-att-class="'text-success' if net_ars &gt;= 0 else 'text-danger'"/>
+                            </td>
+                            <td class="text-right">
+                                <t t-set="net_usd" t-value="doc.total_deposits_usd - doc.total_withdrawals_usd"/>
+                                <span t-esc="net_usd" 
+                                      t-options='{"widget": "monetary", "display_currency": False}'
+                                      t-att-class="'text-success' if net_usd &gt;= 0 else 'text-danger'"/>
+                            </td>
+                            <td class="text-right">
+                                <t t-set="net_usdt" t-value="(deposits_usdt or 0) - (withdrawals_usdt or 0)"/>
+                                <span t-esc="net_usdt" 
+                                      t-options='{"widget": "float", "precision": 2}'
+                                      t-att-class="'text-success' if net_usdt &gt;= 0 else 'text-danger'"/>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <!-- Detalle de Balances -->
+                <h4 class="mt-4">Detalle de Balances por Subcaja</h4>
+                <table class="table table-bordered table-sm">
+                    <thead>
+                        <tr class="bg-light">
+                            <th>Subcaja</th>
+                            <th class="text-right">Saldo Apertura</th>
+                            <th class="text-right">Depósitos</th>
+                            <th class="text-right">Retiros</th>
+                            <th class="text-right">Saldo Sistema</th>
+                            <th class="text-right">Saldo Declarado</th>
+                            <th class="text-right">Diferencia</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <t t-foreach="doc.cashbox_id.cashbox_line_ids.filtered('active')" t-as="line">
+                            <t t-set="opening" t-value="doc.opening_balance_ids.filtered(lambda b: b.cashbox_line_id == line)"/>
+                            <t t-set="closing" t-value="doc.closing_balance_ids.filtered(lambda b: b.cashbox_line_id == line)"/>
+                            <t t-set="operations" t-value="doc.operation_ids.filtered(lambda o: o.cashbox_line_id == line and o.state == 'done')"/>
+                            <t t-set="deposits" t-value="sum(operations.filtered(lambda o: o.operation_type == 'deposit').mapped('amount'))"/>
+                            <t t-set="withdrawals" t-value="sum(operations.filtered(lambda o: o.operation_type == 'withdrawal').mapped('amount'))"/>
+                            
+                            <tr>
+                                <td>
+                                    <span t-field="line.display_name"/>
+                                    <small class="text-muted">(<span t-field="line.currency_type"/>)</small>
+                                </td>
+                                <td class="text-right">
+                                    <span t-if="opening" t-field="opening[0].declared_amount" t-options='{"widget": "monetary", "display_currency": False}'/>
+                                    <span t-else="">0.00</span>
+                                </td>
+                                <td class="text-right">
+                                    <span t-esc="deposits" t-options='{"widget": "monetary", "display_currency": False}'/>
+                                </td>
+                                <td class="text-right">
+                                    <span t-esc="withdrawals" t-options='{"widget": "monetary", "display_currency": False}'/>
+                                </td>
+                                <td class="text-right">
+                                    <span t-if="closing" t-field="closing[0].system_balance" t-options='{"widget": "monetary", "display_currency": False}'/>
+                                    <span t-else="">-</span>
+                                </td>
+                                <td class="text-right">
+                                    <span t-if="closing and line.is_cash and closing[0].counted_amount" 
+                                          t-field="closing[0].counted_amount" 
+                                          t-options='{"widget": "monetary", "display_currency": False}'/>
+                                    <span t-elif="closing" 
+                                          t-field="closing[0].declared_amount" 
+                                          t-options='{"widget": "monetary", "display_currency": False}'/>
+                                    <span t-else="">-</span>
+                                </td>
+                                <td class="text-right">
+                                    <span t-if="closing and closing[0].difference != 0" 
+                                          t-field="closing[0].difference" 
+                                          t-options='{"widget": "monetary", "display_currency": False}'
+                                          t-att-class="'text-danger' if closing[0].difference &lt; 0 else 'text-success'"/>
+                                    <span t-else="">-</span>
+                                </td>
+                            </tr>
+                        </t>
+                        
+                        <tr t-if="doc.has_discrepancies" class="font-weight-bold bg-warning">
+                            <td colspan="6" class="text-right">Total Discrepancias:</td>
+                            <td class="text-right text-danger">
+                                <span t-field="doc.total_discrepancy_amount" t-options='{"widget": "monetary", "display_currency": False}'/>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <!-- Observaciones -->
+                <div t-if="doc.closing_notes" class="mt-4">
+                    <h4>Observaciones de Cierre</h4>
+                    <div class="border p-3">
+                        <p t-field="doc.closing_notes" class="mb-0"/>
+                    </div>
+                </div>
+                
+                <!-- Firmas -->
+                <div class="row mt-5">
+                    <div class="col-6 text-center">
+                        <div style="border-top: 1px solid black; margin-top: 50px;">
+                            <p class="mt-2">
+                                <strong>Cajero</strong><br/>
+                                <span t-field="doc.user_id.name"/>
+                            </p>
+                        </div>
+                    </div>
+                    <div class="col-6 text-center">
+                        <div style="border-top: 1px solid black; margin-top: 50px;">
+                            <p class="mt-2">
+                                <strong>Supervisor/Responsable</strong><br/>
+                                ____________________________
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="oe_structure"/>
+            </div>
+        </t>
+    </template>
+    
+    <template id="report_session_closing">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="doc">
+                <t t-call="sucursales_cajas.report_session_closing_document"/>
+            </t>
+        </t>
+    </template>
+</odoo>

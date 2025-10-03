@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- Denominaciones ARS -->
+        <record id="denom_ars_10000" model="ir.config_parameter">
+            <field name="key">sucursales_cajas.denom_ars_10000</field>
+            <field name="value">10000</field>
+        </record>
+        
+        <record id="denom_ars_2000" model="ir.config_parameter">
+            <field name="key">sucursales_cajas.denom_ars_2000</field>
+            <field name="value">2000</field>
+        </record>
+        
+        <record id="denom_ars_1000" model="ir.config_parameter">
+            <field name="key">sucursales_cajas.denom_ars_1000</field>
+            <field name="value">1000</field>
+        </record>
+        
+        <record id="denom_ars_500" model="ir.config_parameter">
+            <field name="key">sucursales_cajas.denom_ars_500</field>
+            <field name="value">500</field>
+        </record>
+        
+        <record id="denom_ars_200" model="ir.config_parameter">
+            <field name="key">sucursales_cajas.denom_ars_200</field>
+            <field name="value">200</field>
+        </record>
+        
+        <record id="denom_ars_100" model="ir.config_parameter">
+            <field name="key">sucursales_cajas.denom_ars_100</field>
+            <field name="value">100</field>
+        </record>
+        
+        <record id="denom_ars_50" model="ir.config_parameter">
+            <field name="key">sucursales_cajas.denom_ars_50</field>
+            <field name="value">50</field>
+        </record>
+        
+        <record id="denom_ars_20" model="ir.config_parameter">
+            <field name="key">sucursales_cajas.denom_ars_20</field>
+            <field name="value">20</field>
+        </record>
+        
+        <record id="denom_ars_10" model="ir.config_parameter">
+            <field name="key">sucursales_cajas.denom_ars_10</field>
+            <field name="value">10</field>
+        </record>
+        
+        <!-- Monedas ARS -->
+        <record id="denom_ars_5" model="ir.config_parameter">
+            <field name="key">sucursales_cajas.denom_ars_5</field>
+            <field name="value">5</field>
+        </record>
+        
+        <record id="denom_ars_2" model="ir.config_parameter">
+            <field name="key">sucursales_cajas.denom_ars_2</field>
+            <field name="value">2</field>
+        </record>
+        
+        <record id="denom_ars_1" model="ir.config_parameter">
+            <field name="key">sucursales_cajas.denom_ars_1</field>
+            <field name="value">1</field>
+        </record>
+        
+        <record id="denom_ars_050" model="ir.config_parameter">
+            <field name="key">sucursales_cajas.denom_ars_050</field>
+            <field name="value">0.50</field>
+        </record>
+        
+        <record id="denom_ars_025" model="ir.config_parameter">
+            <field name="key">sucursales_cajas.denom_ars_025</field>
+            <field name="value">0.25</field>
+        </record>
+        
+        <record id="denom_ars_010" model="ir.config_parameter">
+            <field name="key">sucursales_cajas.denom_ars_010</field>
+            <field name="value">0.10</field>
+        </record>
+        
+        <record id="denom_ars_005" model="ir.config_parameter">
+            <field name="key">sucursales_cajas.denom_ars_005</field>
+            <field name="value">0.05</field>
+        </record>
+        
+        <!-- Denominaciones USD -->
+        <record id="denom_usd_100" model="ir.config_parameter">
+            <field name="key">sucursales_cajas.denom_usd_100</field>
+            <field name="value">100</field>
+        </record>
+        
+        <record id="denom_usd_50" model="ir.config_parameter">
+            <field name="key">sucursales_cajas.denom_usd_50</field>
+            <field name="value">50</field>
+        </record>
+        
+        <record id="denom_usd_20" model="ir.config_parameter">
+            <field name="key">sucursales_cajas.denom_usd_20</field>
+            <field name="value">20</field>
+        </record>
+        
+        <record id="denom_usd_10" model="ir.config_parameter">
+            <field name="key">sucursales_cajas.denom_usd_10</field>
+            <field name="value">10</field>
+        </record>
+        
+        <record id="denom_usd_5" model="ir.config_parameter">
+            <field name="key">sucursales_cajas.denom_usd_5</field>
+            <field name="value">5</field>
+        </record>
+        
+        <record id="denom_usd_2" model="ir.config_parameter">
+            <field name="key">sucursales_cajas.denom_usd_2</field>
+            <field name="value">2</field>
+        </record>
+        
+        <record id="denom_usd_1" model="ir.config_parameter">
+            <field name="key">sucursales_cajas.denom_usd_1</field>
+            <field name="value">1</field>
+        </record>
+        
+        <!-- Denominaciones EUR -->
+        <record id="denom_eur_500" model="ir.config_parameter">
+            <field name="key">sucursales_cajas.denom_eur_500</field>
+            <field name="value">500</field>
+        </record>
+        
+        <record id="denom_eur_200" model="ir.config_parameter">
+            <field name="key">sucursales_cajas.denom_eur_200</field>
+            <field name="value">200</field>
+        </record>
+        
+        <record id="denom_eur_100" model="ir.config_parameter">
+            <field name="key">sucursales_cajas.denom_eur_100</field>
+            <field name="value">100</field>
+        </record>
+        
+        <record id="denom_eur_50" model="ir.config_parameter">
+            <field name="key">sucursales_cajas.denom_eur_50</field>
+            <field name="value">50</field>
+        </record>
+        
+        <record id="denom_eur_20" model="ir.config_parameter">
+            <field name="key">sucursales_cajas.denom_eur_20</field>
+            <field name="value">20</field>
+        </record>
+        
+        <record id="denom_eur_10" model="ir.config_parameter">
+            <field name="key">sucursales_cajas.denom_eur_10</field>
+            <field name="value">10</field>
+        </record>
+        
+        <record id="denom_eur_5" model="ir.config_parameter">
+            <field name="key">sucursales_cajas.denom_eur_5</field>
+            <field name="value">5</field>
+        </record>
+    </data>
+</odoo>

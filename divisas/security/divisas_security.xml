@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Categoría de seguridad -->
+        <record id="module_category_divisas" model="ir.module.category">
+            <field name="name">Divisas</field>
+            <field name="description">Gestión de operaciones de compra y venta de divisas</field>
+            <field name="sequence">20</field>
+        </record>
+        
+        <!-- Grupos de seguridad -->
+        <record id="group_divisas_readonly" model="res.groups">
+            <field name="name">Solo lectura</field>
+            <field name="category_id" ref="module_category_divisas"/>
+            <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+            <field name="comment">Usuario con acceso de solo lectura a las operaciones de divisas.</field>
+        </record>
+        
+        <record id="group_divisas_user" model="res.groups">
+            <field name="name">Operador</field>
+            <field name="category_id" ref="module_category_divisas"/>
+            <field name="implied_ids" eval="[(4, ref('group_divisas_readonly'))]"/>
+            <field name="comment">Usuario que puede realizar operaciones de compra y venta de divisas.</field>
+        </record>
+        
+        <record id="group_divisas_manager" model="res.groups">
+            <field name="name">Responsable</field>
+            <field name="category_id" ref="module_category_divisas"/>
+            <field name="implied_ids" eval="[(4, ref('group_divisas_user'))]"/>
+            <field name="users" eval="[(4, ref('base.user_admin'))]"/>
+            <field name="comment">Usuario con acceso completo a todas las funcionalidades del módulo.</field>
+        </record>
+        
+        <!-- Reglas de registro -->
+        <record id="divisas_currency_comp_rule" model="ir.rule">
+            <field name="name">Divisas Currency Company Rule</field>
+            <field name="model_id" ref="model_divisas_currency"/>
+            <field name="global" eval="True"/>
+            <field name="domain_force">['|',('company_id','=',False),('company_id','in',company_ids)]</field>
+        </record>
+        
+        <record id="divisas_wallet_movement_comp_rule" model="ir.rule">
+            <field name="name">Divisas Wallet Movement Company Rule</field>
+            <field name="model_id" ref="model_divisas_wallet_movement"/>
+            <field name="global" eval="True"/>
+            <field name="domain_force">['|',('company_id','=',False),('company_id','in',company_ids)]</field>
+        </record>
+        
+        <record id="divisas_exchange_rate_comp_rule" model="ir.rule">
+            <field name="name">Divisas Exchange Rate Company Rule</field>
+            <field name="model_id" ref="model_divisas_exchange_rate"/>
+            <field name="global" eval="True"/>
+            <field name="domain_force">['|',('company_id','=',False),('company_id','in',company_ids)]</field>
+        </record>
+    </data>
+</odoo>

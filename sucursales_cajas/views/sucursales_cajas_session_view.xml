@@ -1,0 +1,281 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Vista Tree de Sesiones -->
+    <record id="view_sucursales_cajas_session_tree" model="ir.ui.view">
+        <field name="name">sucursales_cajas.session.tree</field>
+        <field name="model">sucursales_cajas.session</field>
+        <field name="arch" type="xml">
+            <tree string="Sesiones de Caja" 
+                  decoration-success="state == 'open'"
+                  decoration-warning="state == 'closing'"
+                  decoration-muted="state in ['closed', 'cancelled']"
+                  create="false">
+                <field name="name"/>
+                <field name="cashbox_id"/>
+                <field name="user_id"/>
+                <field name="start_datetime"/>
+                <field name="end_datetime"/>
+                <field name="duration" widget="float_time"/>
+                <field name="operation_count"/>
+                <field name="pending_operation_count" 
+                       decoration-warning="pending_operation_count &gt; 0"/>
+                <field name="state" widget="badge"/>
+            </tree>
+        </field>
+    </record>
+    
+    <!-- Vista Form de Sesiones -->
+    <record id="view_sucursales_cajas_session_form" model="ir.ui.view">
+        <field name="name">sucursales_cajas.session.form</field>
+        <field name="model">sucursales_cajas.session</field>
+        <field name="arch" type="xml">
+            <form string="Sesión de Caja" create="false">
+                <header>
+                    <button name="action_start_closing" 
+                            type="object" 
+                            string="Iniciar Cierre" 
+                            class="btn-primary"
+                            invisible="state != 'open' or has_pending_operations"
+                            groups="sucursales_cajas.group_sucursales_cajas_cashier"/>
+                    <button name="action_close_session" 
+                            type="object" 
+                            string="Cerrar Sesión" 
+                            class="btn-primary"
+                            invisible="state != 'closing'"
+                            groups="sucursales_cajas.group_sucursales_cajas_cashier"/>
+                    <button name="action_cancel_session" 
+                            type="object" 
+                            string="Cancelar Sesión" 
+                            class="btn-danger"
+                            invisible="state not in ['open', 'closing'] or operation_count &gt; 0"
+                            confirm="¿Está seguro de cancelar esta sesión? Esta acción no se puede deshacer."
+                            groups="sucursales_cajas.group_sucursales_cajas_admin"/>
+                    <field name="state" widget="statusbar" 
+                           statusbar_visible="open,closing,closed"/>
+                </header>
+                <sheet>
+                    <!-- Campos invisibles necesarios para las condiciones -->
+                    <field name="has_pending_operations" invisible="1"/>
+                    
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_operations" 
+                                type="object" 
+                                class="oe_stat_button" 
+                                icon="fa-exchange">
+                            <div class="o_field_widget o_stat_info">
+                                <span class="o_stat_value">
+                                    <field name="operation_count"/>
+                                    <span invisible="pending_operation_count == 0"> 
+                                        (<field name="pending_operation_count" class="text-warning"/> pendientes)
+                                    </span>
+                                </span>
+                                <span class="o_stat_text">Operaciones</span>
+                            </div>
+                        </button>
+                        <button name="action_view_cash_details" 
+                                type="object" 
+                                class="oe_stat_button" 
+                                icon="fa-money">
+                            <div class="o_field_widget o_stat_info">
+                                <span class="o_stat_value">Ver Detalle</span>
+                                <span class="o_stat_text">Efectivo</span>
+                            </div>
+                        </button>
+                    </div>
+                    
+                    <widget name="web_ribbon" title="Operaciones Pendientes" bg_color="bg-warning" 
+                            invisible="not has_pending_operations"/>
+                    
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" readonly="1"/>
+                        </h1>
+                    </div>
+                    
+                    <group>
+                        <group>
+                            <field name="cashbox_id" readonly="1"/>
+                            <field name="branch_id" readonly="1"/>
+                            <field name="user_id" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="start_datetime" readonly="1"/>
+                            <field name="end_datetime" readonly="1" invisible="not end_datetime"/>
+                            <field name="duration" widget="float_time" readonly="1" invisible="not end_datetime"/>
+                        </group>
+                    </group>
+                    
+                    <group string="Resumen de Operaciones" col="4">
+                        <field name="deposit_count" readonly="1"/>
+                        <field name="withdrawal_count" readonly="1"/>
+                        <field name="total_deposits_ars" widget="monetary" readonly="1"/>
+                        <field name="total_withdrawals_ars" widget="monetary" readonly="1"/>
+                        <field name="total_deposits_usd" widget="monetary" readonly="1"/>
+                        <field name="total_withdrawals_usd" widget="monetary" readonly="1"/>
+                    </group>
+                    
+                    <notebook>
+                        <page string="Balances de Apertura">
+                            <field name="opening_balance_ids" readonly="1">
+                                <tree create="false" edit="false" delete="false"
+                                      decoration-warning="difference != 0">
+                                    <field name="cashbox_line_id" string="Subcaja"/>
+                                    <field name="currency_type"/>
+                                    <field name="system_balance" widget="monetary"/>
+                                    <field name="declared_amount" widget="monetary"/>
+                                    <field name="counted_amount" widget="monetary" invisible="not is_cash"/>
+                                    <field name="difference" widget="monetary"
+                                           decoration-danger="difference &lt; 0"
+                                           decoration-success="difference &gt; 0"/>
+                                    <field name="state" widget="badge"/>
+                                    <field name="is_cash" invisible="1"/>
+                                </tree>
+                            </field>
+                        </page>
+                        
+                        <page string="Balances de Cierre" invisible="state == 'open'">
+                            <field name="closing_balance_ids" readonly="1">
+                                <tree create="false" edit="false" delete="false"
+                                      decoration-warning="difference != 0">
+                                    <field name="cashbox_line_id" string="Subcaja"/>
+                                    <field name="currency_type"/>
+                                    <field name="system_balance" widget="monetary"/>
+                                    <field name="declared_amount" widget="monetary"/>
+                                    <field name="counted_amount" widget="monetary" invisible="not is_cash"/>
+                                    <field name="difference" widget="monetary"
+                                           decoration-danger="difference &lt; 0"
+                                           decoration-success="difference &gt; 0"/>
+                                    <field name="state" widget="badge"/>
+                                    <field name="is_cash" invisible="1"/>
+                                </tree>
+                            </field>
+                        </page>
+                        
+                        <page string="Operaciones">
+                            <field name="operation_ids" readonly="1">
+                                <tree create="false" edit="false"
+                                      decoration-success="state == 'done'"
+                                      decoration-warning="state == 'pending'"
+                                      decoration-info="state == 'processing'">
+                                    <field name="name"/>
+                                    <field name="operation_type"/>
+                                    <field name="partner_id"/>
+                                    <field name="currency_type"/>
+                                    <field name="amount" sum="Total"/>
+                                    <field name="cashbox_line_id"/>
+                                    <field name="state" widget="badge"/>
+                                    <field name="processing_date" widget="datetime"/>
+                                </tree>
+                            </field>
+                        </page>
+                        
+                        <page string="Información Técnica" groups="base.group_no_one">
+                            <group>
+                                <group>
+                                    <field name="login_ip" readonly="1"/>
+                                    <field name="has_discrepancies" readonly="1"/>
+                                    <field name="total_discrepancy_amount" readonly="1" invisible="not has_discrepancies"/>
+                                </group>
+                                <group>
+                                    <field name="device_info" readonly="1"/>
+                                </group>
+                            </group>
+                        </page>
+                        
+                        <page string="Observaciones">
+                            <field name="closing_notes" readonly="state not in ['open', 'closing']"
+                                   placeholder="Observaciones de cierre..."/>
+                        </page>
+                    </notebook>
+                </sheet>
+                
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers"/>
+                    <field name="activity_ids" widget="mail_activity"/>
+                    <field name="message_ids" widget="mail_thread"/>
+                </div>
+            </form>
+        </field>
+    </record>
+    
+    <!-- Vista Search de Sesiones -->
+    <record id="view_sucursales_cajas_session_search" model="ir.ui.view">
+        <field name="name">sucursales_cajas.session.search</field>
+        <field name="model">sucursales_cajas.session</field>
+        <field name="arch" type="xml">
+            <search string="Buscar Sesión">
+                <field name="name"/>
+                <field name="cashbox_id"/>
+                <field name="user_id"/>
+                <separator/>
+                <filter string="Abiertas" name="open" 
+                        domain="[('state', '=', 'open')]"/>
+                <filter string="En Cierre" name="closing" 
+                        domain="[('state', '=', 'closing')]"/>
+                <filter string="Cerradas" name="closed" 
+                        domain="[('state', '=', 'closed')]"/>
+                <filter string="Canceladas" name="cancelled" 
+                        domain="[('state', '=', 'cancelled')]"/>
+                <separator/>
+                <filter string="Con Pendientes" name="with_pending" 
+                        domain="[('pending_operation_count', '&gt;', 0)]"/>
+                <filter string="Con Discrepancias" name="with_discrepancies" 
+                        domain="[('has_discrepancies', '=', True)]"/>
+                <separator/>
+                <filter string="Hoy" name="today" 
+                        domain="[('start_datetime', '&gt;=', datetime.datetime.now().strftime('%Y-%m-%d 00:00:00')),
+                                ('start_datetime', '&lt;=', datetime.datetime.now().strftime('%Y-%m-%d 23:59:59'))]"/>
+                <filter string="Esta Semana" name="this_week" 
+                        domain="[('start_datetime', '&gt;=', (datetime.datetime.now() - datetime.timedelta(days=7)).strftime('%Y-%m-%d'))]"/>
+                <filter string="Este Mes" name="this_month" 
+                        domain="[('start_datetime', '&gt;=', datetime.datetime.now().strftime('%Y-%m-01'))]"/>
+                <group expand="0" string="Agrupar Por">
+                    <filter string="Caja" name="cashbox" 
+                            context="{'group_by': 'cashbox_id'}"/>
+                    <filter string="Usuario" name="user" 
+                            context="{'group_by': 'user_id'}"/>
+                    <filter string="Estado" name="state" 
+                            context="{'group_by': 'state'}"/>
+                    <filter string="Fecha de Inicio" name="start_date" 
+                            context="{'group_by': 'start_datetime:day'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+    
+    <!-- Acciones para Sesiones -->
+    <record id="action_sucursales_cajas_session" model="ir.actions.act_window">
+        <field name="name">Sesiones de Caja</field>
+        <field name="res_model">sucursales_cajas.session</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_sucursales_cajas_session_search"/>
+        <field name="context">{}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No hay sesiones registradas
+            </p>
+            <p>
+                Las sesiones se crean cuando un usuario inicia sesión en una caja.
+            </p>
+        </field>
+    </record>
+    
+    <!-- Acción para Sesiones Abiertas -->
+    <record id="action_sucursales_cajas_session_open" model="ir.actions.act_window">
+        <field name="name">Sesiones Activas</field>
+        <field name="res_model">sucursales_cajas.session</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_sucursales_cajas_session_search"/>
+        <field name="domain">[('state', 'in', ['open', 'closing'])]</field>
+        <field name="context">{'search_default_cashbox': 1}</field>
+    </record>
+    
+    <!-- Acción para Mi Sesión Actual -->
+    <record id="action_sucursales_cajas_my_session" model="ir.actions.act_window">
+        <field name="name">Mi Sesión Actual</field>
+        <field name="res_model">sucursales_cajas.session</field>
+        <field name="view_mode">form</field>
+        <field name="domain">[('user_id', '=', uid), ('state', 'in', ['open', 'closing'])]</field>
+        <field name="context">{}</field>
+    </record>
+</odoo>

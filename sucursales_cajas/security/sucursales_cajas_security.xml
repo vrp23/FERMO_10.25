@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Categoría de aplicación -->
+        <record id="module_category_sucursales_cajas" model="ir.module.category">
+            <field name="name">Sucursales y Cajas</field>
+            <field name="description">Gestión de Sucursales y Cajas</field>
+            <field name="sequence">100</field>
+        </record>
+        
+        <!-- Grupo Cajero -->
+        <record id="group_sucursales_cajas_cashier" model="res.groups">
+            <field name="name">Cajero</field>
+            <field name="category_id" ref="module_category_sucursales_cajas"/>
+            <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+        </record>
+        
+        <!-- Grupo Administrador -->
+        <record id="group_sucursales_cajas_admin" model="res.groups">
+            <field name="name">Administrador</field>
+            <field name="category_id" ref="module_category_sucursales_cajas"/>
+            <field name="implied_ids" eval="[(4, ref('group_sucursales_cajas_cashier'))]"/>
+        </record>
+    </data>
+</odoo>

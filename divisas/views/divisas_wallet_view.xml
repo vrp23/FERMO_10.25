@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Vista de formulario para movimientos de wallet -->
+    <record id="view_divisas_wallet_movement_form" model="ir.ui.view">
+        <field name="name">divisas.wallet.movement.form</field>
+        <field name="model">divisas.wallet.movement</field>
+        <field name="arch" type="xml">
+            <form string="Movimiento de Wallet" create="false">
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" readonly="1"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="partner_id" readonly="1"/>
+                            <field name="operation_type" readonly="1"/>
+                            <field name="date" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="currency_type" readonly="1"/>
+                            <field name="amount" readonly="1"/>
+                            <field name="payment_currency_type" readonly="1"/>
+                            <field name="payment_amount" readonly="1"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group>
+                            <field name="state" readonly="1"/>
+                            <field name="currency_operation_id" readonly="1" invisible="not currency_operation_id"/>
+                        </group>
+                        <group>
+                            <button name="action_cancel" string="Cancelar Movimiento" type="object"
+                                    invisible="state == 'cancelled'"
+                                    confirm="¿Está seguro de cancelar este movimiento? Esto afectará los saldos de wallet."/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Notas">
+                            <field name="notes"/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    
+    <!-- Vista de árbol para movimientos de wallet -->
+    <record id="view_divisas_wallet_movement_tree" model="ir.ui.view">
+        <field name="name">divisas.wallet.movement.tree</field>
+        <field name="model">divisas.wallet.movement</field>
+        <field name="arch" type="xml">
+            <tree string="Movimientos de Wallet" decoration-success="state == 'confirmed'" 
+                  decoration-muted="state == 'cancelled'" create="false">
+                <field name="name"/>
+                <field name="partner_id"/>
+                <field name="operation_type"/>
+                <field name="date"/>
+                <field name="currency_type"/>
+                <field name="amount" sum="Total"/>
+                <field name="payment_currency_type"/>
+                <field name="payment_amount" sum="Total"/>
+                <field name="state"/>
+            </tree>
+        </field>
+    </record>
+    
+    <!-- Vista de búsqueda para movimientos de wallet -->
+    <record id="view_divisas_wallet_movement_search" model="ir.ui.view">
+        <field name="name">divisas.wallet.movement.search</field>
+        <field name="model">divisas.wallet.movement</field>
+        <field name="arch" type="xml">
+            <search string="Buscar Movimientos">
+                <field name="name"/>
+                <field name="partner_id"/>
+                <field name="currency_type"/>
+                <field name="payment_currency_type"/>
+                <filter string="Compras" name="buy" domain="[('operation_type', '=', 'buy')]"/>
+                <filter string="Ventas" name="sell" domain="[('operation_type', '=', 'sell')]"/>
+                <filter string="Ajustes" name="adjustment" domain="[('operation_type', '=', 'adjustment')]"/>
+                <filter string="Confirmado" name="confirmed" domain="[('state', '=', 'confirmed')]"/>
+                <filter string="Cancelado" name="cancelled" domain="[('state', '=', 'cancelled')]"/>
+                <group expand="0" string="Agrupar Por">
+                    <filter string="Cliente/Contacto" name="partner" context="{'group_by': 'partner_id'}"/>
+                    <filter string="Tipo de Operación" name="operation_type" context="{'group_by': 'operation_type'}"/>
+                    <filter string="Moneda" name="currency" context="{'group_by': 'currency_type'}"/>
+                    <filter string="Moneda de Pago" name="payment_currency" context="{'group_by': 'payment_currency_type'}"/>
+                    <filter string="Estado" name="state" context="{'group_by': 'state'}"/>
+                    <filter string="Fecha" name="date" context="{'group_by': 'date'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+    
+    <!-- Acción para movimientos de wallet -->
+    <record id="action_divisas_wallet_movement" model="ir.actions.act_window">
+        <field name="name">Movimientos de Wallet</field>
+        <field name="res_model">divisas.wallet.movement</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_divisas_wallet_movement_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No hay movimientos de wallet registrados.
+            </p>
+        </field>
+    </record>
+</odoo>

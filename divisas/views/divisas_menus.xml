@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Menú raíz -->
+    <menuitem id="menu_divisas_root" 
+              name="Divisas" 
+              web_icon="divisas,static/description/icon.png" 
+              sequence="55"/>
+    
+    <!-- Dashboard -->
+    <menuitem id="menu_divisas_dashboard" 
+              name="Dashboard" 
+              action="action_divisas_dashboard" 
+              parent="menu_divisas_root" 
+              sequence="10"/>
+    
+    <!-- Operaciones -->
+    <menuitem id="menu_divisas_operations" 
+              name="Operaciones" 
+              parent="menu_divisas_root" 
+              sequence="20"/>
+    
+    <menuitem id="menu_divisas_buy" 
+              name="Compras" 
+              action="action_divisas_buy" 
+              parent="menu_divisas_operations" 
+              sequence="10"/>
+    
+    <menuitem id="menu_divisas_sell" 
+              name="Ventas" 
+              action="action_divisas_sell" 
+              parent="menu_divisas_operations" 
+              sequence="20"/>
+    
+    <menuitem id="menu_divisas_all" 
+              name="Todas las Operaciones" 
+              action="action_divisas_currency" 
+              parent="menu_divisas_operations" 
+              sequence="30"/>
+    
+    <!-- Inventario FIFO -->
+    <menuitem id="menu_divisas_inventory" 
+              name="Inventario FIFO" 
+              parent="menu_divisas_root" 
+              sequence="25"/>
+    
+    <menuitem id="menu_divisas_inventory_lots" 
+              name="Lotes de Inventario" 
+              action="action_divisas_inventory_lot" 
+              parent="menu_divisas_inventory" 
+              sequence="10"/>
+    
+    <menuitem id="menu_divisas_lot_consumptions" 
+              name="Consumos de Lotes" 
+              action="action_divisas_lot_consumption" 
+              parent="menu_divisas_inventory" 
+              sequence="20"/>
+    
+    <!-- Movimientos -->
+    <menuitem id="menu_divisas_wallet_movements" 
+              name="Movimientos" 
+              action="action_divisas_wallet_movement" 
+              parent="menu_divisas_root" 
+              sequence="30"/>
+    
+    <!-- Configuración -->
+    <menuitem id="menu_divisas_config" 
+              name="Configuración" 
+              parent="menu_divisas_root" 
+              sequence="100"/>
+    
+    <menuitem id="menu_divisas_exchange_rates" 
+              name="Tipos de Cambio" 
+              action="action_divisas_exchange_rate" 
+              parent="menu_divisas_config" 
+              sequence="10"/>
+    
+    <menuitem id="menu_divisas_update_rate" 
+              name="Actualizar Tipo de Cambio" 
+              action="action_divisas_exchange_rate_wizard" 
+              parent="menu_divisas_config" 
+              sequence="20"/>
+</odoo>

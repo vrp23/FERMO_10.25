@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Vista Form del Wizard Login de Sesión -->
+    <record id="view_session_login_wizard_form" model="ir.ui.view">
+        <field name="name">sucursales_cajas.session_login_wizard.form</field>
+        <field name="model">sucursales_cajas.session_login_wizard</field>
+        <field name="arch" type="xml">
+            <form string="Iniciar Sesión de Caja">
+                <sheet>
+                    <field name="cashbox_info" readonly="1" nolabel="1" colspan="2"/>
+                    
+                    <group>
+                        <group>
+                            <field name="cashbox_id" invisible="1"/>
+                            <field name="user_id" readonly="1"/>
+                        </group>
+                        <group invisible="not cashbox_id.require_pin">
+                            <field name="pin" password="True" required="cashbox_id.require_pin"/>
+                            <field name="confirm_pin" password="True" required="cashbox_id.require_pin"/>
+                        </group>
+                    </group>
+                    
+                    <separator string="Configuración de Saldos Iniciales"/>
+                    
+                    <group>
+                        <field name="use_previous_balance"/>
+                        <field name="skip_opening_balance"/>
+                    </group>
+                    
+                    <field name="balance_line_ids" nolabel="1" invisible="skip_opening_balance">
+                        <tree editable="bottom" create="false" delete="false">
+                            <field name="line_name" string="Subcaja" readonly="1"/>
+                            <field name="currency_type" readonly="1"/>
+                            <field name="system_balance" readonly="1" widget="monetary" string="Saldo Sistema"/>
+                            <field name="declared_balance" widget="monetary" string="Saldo Inicial"/>
+                            <field name="difference" readonly="1" widget="monetary" 
+                                   decoration-danger="difference &lt; 0"
+                                   decoration-success="difference &gt; 0"
+                                   decoration-muted="difference == 0"/>
+                            <field name="account_id" options="{'no_create': True}" 
+                                   invisible="is_cash" 
+                                   domain="[('cashbox_line_id', '=', cashbox_line_id)]"/>
+                            <field name="notes" optional="hide"/>
+                            <field name="cashbox_line_id" invisible="1"/>
+                            <field name="is_cash" invisible="1"/>
+                        </tree>
+                    </field>
+                    
+                    <group string="Observaciones de Apertura">
+                        <field name="opening_notes" nolabel="1" placeholder="Observaciones opcionales..."/>
+                    </group>
+                </sheet>
+                <footer>
+                    <button name="action_start_session" 
+                            string="Iniciar Sesión" 
+                            type="object" 
+                            class="btn-primary"/>
+                    <button name="action_quick_start" 
+                            string="Inicio Rápido" 
+                            type="object" 
+                            class="btn-secondary"/>
+                    <button string="Cancelar" 
+                            class="btn-secondary" 
+                            special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>

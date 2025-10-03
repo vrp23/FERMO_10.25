@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Vista de formulario para el wizard de operaciones -->
+    <record id="view_divisas_exchange_wizard_form" model="ir.ui.view">
+        <field name="name">divisas.exchange.wizard.form</field>
+        <field name="model">divisas.exchange.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Operación de Divisa">
+                <sheet>
+                    <div class="alert alert-info" role="alert">
+                        <strong>Información:</strong> Complete los datos para realizar la operación de divisa.
+                    </div>
+                    
+                    <group>
+                        <group>
+                            <field name="operation_type" widget="radio" options="{'horizontal': true}"/>
+                            <field name="partner_id" options="{'no_create': True}"/>
+                            <field name="date"/>
+                        </group>
+                        <group>
+                            <field name="wallet_ars_balance" widget="float" readonly="1"/>
+                            <field name="wallet_usd_balance" widget="float" readonly="1"/>
+                            <field name="wallet_usdt_balance" widget="float" readonly="1"/>
+                        </group>
+                    </group>
+                    
+                    <group string="Detalles de la Operación">
+                        <group>
+                            <field name="currency_type"/>
+                            <field name="amount"/>
+                        </group>
+                        <group>
+                            <field name="payment_currency_type"/>
+                            <field name="payment_amount" readonly="1"/>
+                        </group>
+                    </group>
+                    
+                    <group string="Tipo de Cambio">
+                        <group>
+                            <field name="exchange_rate"/>
+                            <field name="is_custom_rate"/>
+                        </group>
+                        <group>
+                            <div class="alert alert-warning" role="alert" invisible="not is_custom_rate">
+                                <strong>Atención:</strong> Está utilizando un tipo de cambio personalizado.
+                            </div>
+                        </group>
+                    </group>
+                    
+                    <notebook>
+                        <page string="Notas">
+                            <field name="notes"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <footer>
+                    <button name="action_confirm" string="Confirmar" type="object" class="btn-primary"/>
+                    <button string="Cancelar" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+    
+    <!-- Acción para el wizard de compra de divisas -->
+    <record id="action_divisas_buy_wizard" model="ir.actions.act_window">
+        <field name="name">Comprar Divisa</field>
+        <field name="res_model">divisas.exchange.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="context">{'default_operation_type': 'buy'}</field>
+    </record>
+    
+    <!-- Acción para el wizard de venta de divisas -->
+    <record id="action_divisas_sell_wizard" model="ir.actions.act_window">
+        <field name="name">Vender Divisa</field>
+        <field name="res_model">divisas.exchange.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="context">{'default_operation_type': 'sell'}</field>
+    </record>
+</odoo>

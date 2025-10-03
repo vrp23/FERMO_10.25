@@ -1,0 +1,301 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Vista de formulario para operaciones de divisas -->
+    <record id="view_divisas_currency_form" model="ir.ui.view">
+        <field name="name">divisas.currency.form</field>
+        <field name="model">divisas.currency</field>
+        <field name="arch" type="xml">
+            <form string="Operación de Divisa">
+                <header>
+                    <button name="action_confirm" type="object" string="Confirmar" 
+                            class="oe_highlight" invisible="state != 'draft'"/>
+                    <button name="action_cancel" type="object" string="Cancelar" 
+                            invisible="state != 'confirmed'" confirm="¿Está seguro de cancelar esta operación?"/>
+                    <button name="action_draft" type="object" string="Volver a Borrador" 
+                            invisible="state != 'cancelled'"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,confirmed,cancelled"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" readonly="1"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="operation_type" widget="radio" options="{'horizontal': true}" readonly="state != 'draft'"/>
+                            <field name="partner_id" readonly="state != 'draft'"/>
+                            <field name="date" readonly="state != 'draft'"/>
+                        </group>
+                        <group>
+                            <field name="currency_type" readonly="state != 'draft'"/>
+                            <field name="amount" readonly="state != 'draft'"/>
+                            <field name="payment_currency_type" readonly="state != 'draft'"/>
+                            <field name="payment_amount" readonly="1"/>
+                        </group>
+                    </group>
+                    <group string="Tipo de Cambio">
+                        <group>
+                            <field name="exchange_rate" readonly="state != 'draft'"/>
+                            <field name="is_custom_rate" readonly="state != 'draft'"/>
+                        </group>
+                        <group>
+                            <field name="wallet_movement_id" readonly="1" invisible="not wallet_movement_id"/>
+                            <field name="is_conversion" invisible="1"/>
+                            <field name="is_fifo_processed" invisible="1"/>
+                            <field name="profit_currency" invisible="1"/>
+                        </group>
+                    </group>
+                    
+                    <!-- Grupo para información FIFO con ganancias duales -->
+                    <group string="Información FIFO" invisible="not is_fifo_processed">
+                        <group invisible="operation_type != 'buy' or not inventory_lot_id">
+                            <field name="inventory_lot_id" readonly="1"/>
+                        </group>
+                        <group invisible="operation_type != 'sell'">
+                            <field name="profit_ars" readonly="1" widget="monetary" 
+                                   invisible="profit_currency != 'ARS'"
+                                   decoration-success="profit_ars > 0"
+                                   decoration-danger="profit_ars &lt; 0"/>
+                            <field name="profit_usd" readonly="1" widget="monetary" 
+                                   invisible="profit_currency != 'USD'"
+                                   decoration-success="profit_usd > 0"
+                                   decoration-danger="profit_usd &lt; 0"/>
+                            <field name="total_consumed" readonly="1" invisible="1"/>
+                        </group>
+                    </group>
+                    
+                    <notebook>
+                        <page string="Notas">
+                            <field name="notes" readonly="state != 'draft'"/>
+                        </page>
+                        
+                        <!-- Pestaña para consumos de lotes (solo para ventas) -->
+                        <page string="Consumo de Lotes FIFO" invisible="operation_type != 'sell' or not lot_consumption_ids">
+                            <field name="lot_consumption_ids" readonly="1">
+                                <tree decoration-muted="state == 'reverted'">
+                                    <field name="lot_id"/>
+                                    <field name="quantity_consumed" sum="Total"/>
+                                    <field name="acquisition_rate"/>
+                                    <field name="consumption_rate"/>
+                                    <!-- Sin sumas de ganancias dentro del form para evitar mezcla de monedas -->
+                                    <field name="profit_ars" decoration-success="profit_ars > 0" decoration-danger="profit_ars &lt; 0"/>
+                                    <field name="profit_usd" decoration-success="profit_usd > 0" decoration-danger="profit_usd &lt; 0"/>
+                                    <field name="profit_currency"/>
+                                    <field name="state"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+    
+    <!-- Vista de árbol para operaciones de divisas -->
+    <record id="view_divisas_currency_tree" model="ir.ui.view">
+        <field name="name">divisas.currency.tree</field>
+        <field name="model">divisas.currency</field>
+        <field name="arch" type="xml">
+            <tree string="Operaciones de Divisas" decoration-info="state == 'draft'" 
+                  decoration-success="state == 'confirmed'" decoration-muted="state == 'cancelled'">
+                <field name="name"/>
+                <field name="operation_type"/>
+                <field name="partner_id"/>
+                <field name="date"/>
+                <field name="currency_type"/>
+                <field name="amount" sum="Total"/>
+                <field name="payment_currency_type"/>
+                <!-- Removemos suma de payment_amount porque puede ser de diferentes monedas -->
+                <field name="payment_amount"/>
+                <field name="exchange_rate"/>
+                <!-- Removemos sumas de ganancias en vista tree principal para evitar mezclas -->
+                <field name="profit_ars" invisible="context.get('default_operation_type') == 'buy'"/>
+                <field name="profit_usd" invisible="context.get('default_operation_type') == 'buy'"/>
+                <field name="profit_currency" invisible="context.get('default_operation_type') == 'buy'"/>
+                <field name="state"/>
+            </tree>
+        </field>
+    </record>
+    
+    <!-- Vista de búsqueda para operaciones de divisas -->
+    <record id="view_divisas_currency_search" model="ir.ui.view">
+        <field name="name">divisas.currency.search</field>
+        <field name="model">divisas.currency</field>
+        <field name="arch" type="xml">
+            <search string="Buscar Operaciones">
+                <field name="name"/>
+                <field name="partner_id"/>
+                <field name="currency_type"/>
+                <field name="payment_currency_type"/>
+                <filter string="Compras" name="buy" domain="[('operation_type', '=', 'buy')]"/>
+                <filter string="Ventas" name="sell" domain="[('operation_type', '=', 'sell')]"/>
+                <filter string="Borrador" name="draft" domain="[('state', '=', 'draft')]"/>
+                <filter string="Confirmado" name="confirmed" domain="[('state', '=', 'confirmed')]"/>
+                <filter string="Cancelado" name="cancelled" domain="[('state', '=', 'cancelled')]"/>
+                <separator/>
+                <filter string="Con Ganancia ARS" name="with_profit_ars" domain="[('profit_ars', '>', 0)]"/>
+                <filter string="Con Pérdida ARS" name="with_loss_ars" domain="[('profit_ars', '&lt;', 0)]"/>
+                <filter string="Con Ganancia USD" name="with_profit_usd" domain="[('profit_usd', '>', 0)]"/>
+                <filter string="Con Pérdida USD" name="with_loss_usd" domain="[('profit_usd', '&lt;', 0)]"/>
+                <filter string="Conversiones USD/USDT" name="conversions" domain="[('is_conversion', '=', True)]"/>
+                <separator/>
+                <filter string="Ganancias en ARS" name="profit_in_ars" domain="[('profit_currency', '=', 'ARS')]"/>
+                <filter string="Ganancias en USD" name="profit_in_usd" domain="[('profit_currency', '=', 'USD')]"/>
+                <group expand="0" string="Agrupar Por">
+                    <filter string="Cliente/Contacto" name="partner" context="{'group_by': 'partner_id'}"/>
+                    <filter string="Tipo de Operación" name="operation_type" context="{'group_by': 'operation_type'}"/>
+                    <filter string="Moneda" name="currency" context="{'group_by': 'currency_type'}"/>
+                    <filter string="Moneda de Pago" name="payment_currency" context="{'group_by': 'payment_currency_type'}"/>
+                    <filter string="Moneda de Ganancia" name="profit_currency" context="{'group_by': 'profit_currency'}"/>
+                    <filter string="Estado" name="state" context="{'group_by': 'state'}"/>
+                    <filter string="Fecha" name="date" context="{'group_by': 'date'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+    
+    <!-- Vista Tree específica para operaciones en ARS -->
+    <record id="view_divisas_currency_tree_ars" model="ir.ui.view">
+        <field name="name">divisas.currency.tree.ars</field>
+        <field name="model">divisas.currency</field>
+        <field name="arch" type="xml">
+            <tree string="Operaciones con Ganancias en ARS" decoration-info="state == 'draft'" 
+                  decoration-success="state == 'confirmed'" decoration-muted="state == 'cancelled'">
+                <field name="name"/>
+                <field name="operation_type"/>
+                <field name="partner_id"/>
+                <field name="date"/>
+                <field name="currency_type"/>
+                <field name="amount" sum="Total"/>
+                <field name="payment_currency_type"/>
+                <field name="payment_amount" invisible="payment_currency_type != 'ARS'" sum="Total ARS"/>
+                <field name="exchange_rate"/>
+                <field name="profit_ars" sum="Total Ganancia ARS"/>
+                <field name="state"/>
+            </tree>
+        </field>
+    </record>
+    
+    <!-- Vista Tree específica para operaciones en USD -->
+    <record id="view_divisas_currency_tree_usd" model="ir.ui.view">
+        <field name="name">divisas.currency.tree.usd</field>
+        <field name="model">divisas.currency</field>
+        <field name="arch" type="xml">
+            <tree string="Conversiones USD/USDT" decoration-info="state == 'draft'" 
+                  decoration-success="state == 'confirmed'" decoration-muted="state == 'cancelled'">
+                <field name="name"/>
+                <field name="operation_type"/>
+                <field name="partner_id"/>
+                <field name="date"/>
+                <field name="currency_type"/>
+                <field name="amount" sum="Total"/>
+                <field name="payment_currency_type"/>
+                <field name="payment_amount" sum="Total"/>
+                <field name="exchange_rate"/>
+                <field name="profit_usd" sum="Total Ganancia USD"/>
+                <field name="state"/>
+            </tree>
+        </field>
+    </record>
+    
+    <!-- Vista Pivot para análisis de ganancias -->
+    <record id="view_divisas_currency_pivot" model="ir.ui.view">
+        <field name="name">divisas.currency.pivot</field>
+        <field name="model">divisas.currency</field>
+        <field name="arch" type="xml">
+            <pivot string="Análisis de Operaciones">
+                <field name="date" type="row" interval="month"/>
+                <field name="currency_type" type="col"/>
+                <field name="profit_currency" type="col"/>
+                <field name="amount" type="measure"/>
+                <field name="payment_amount" type="measure"/>
+                <field name="profit_ars" type="measure"/>
+                <field name="profit_usd" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+    
+    <!-- Vista Graph para análisis visual -->
+    <record id="view_divisas_currency_graph" model="ir.ui.view">
+        <field name="name">divisas.currency.graph</field>
+        <field name="model">divisas.currency</field>
+        <field name="arch" type="xml">
+            <graph string="Análisis de Ganancias" type="bar" stacked="False">
+                <field name="date" interval="month"/>
+                <field name="profit_ars" type="measure" string="Ganancia ARS"/>
+                <field name="profit_usd" type="measure" string="Ganancia USD"/>
+            </graph>
+        </field>
+    </record>
+    
+    <!-- Acción para las operaciones de compra -->
+    <record id="action_divisas_buy" model="ir.actions.act_window">
+        <field name="name">Compras de Divisas</field>
+        <field name="res_model">divisas.currency</field>
+        <field name="view_mode">tree,form,pivot,graph</field>
+        <field name="domain">[('operation_type', '=', 'buy')]</field>
+        <field name="context">{'default_operation_type': 'buy'}</field>
+        <field name="search_view_id" ref="view_divisas_currency_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Registre su primera compra de divisa!
+            </p>
+        </field>
+    </record>
+    
+    <!-- Acción para las operaciones de venta -->
+    <record id="action_divisas_sell" model="ir.actions.act_window">
+        <field name="name">Ventas de Divisas</field>
+        <field name="res_model">divisas.currency</field>
+        <field name="view_mode">tree,form,pivot,graph</field>
+        <field name="domain">[('operation_type', '=', 'sell')]</field>
+        <field name="context">{'default_operation_type': 'sell'}</field>
+        <field name="search_view_id" ref="view_divisas_currency_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Registre su primera venta de divisa!
+            </p>
+        </field>
+    </record>
+    
+    <!-- Acción para operaciones con ganancias en ARS -->
+    <record id="action_divisas_profit_ars" model="ir.actions.act_window">
+        <field name="name">Operaciones con Ganancias ARS</field>
+        <field name="res_model">divisas.currency</field>
+        <field name="view_mode">tree,form,pivot,graph</field>
+        <field name="view_id" ref="view_divisas_currency_tree_ars"/>
+        <field name="domain">[('profit_currency', '=', 'ARS'), ('operation_type', '=', 'sell')]</field>
+        <field name="context">{'default_operation_type': 'sell'}</field>
+        <field name="search_view_id" ref="view_divisas_currency_search"/>
+    </record>
+    
+    <!-- Acción para conversiones USD/USDT -->
+    <record id="action_divisas_profit_usd" model="ir.actions.act_window">
+        <field name="name">Conversiones USD/USDT</field>
+        <field name="res_model">divisas.currency</field>
+        <field name="view_mode">tree,form,pivot,graph</field>
+        <field name="view_id" ref="view_divisas_currency_tree_usd"/>
+        <field name="domain">[('is_conversion', '=', True), ('operation_type', '=', 'sell')]</field>
+        <field name="context">{'default_operation_type': 'sell'}</field>
+        <field name="search_view_id" ref="view_divisas_currency_search"/>
+    </record>
+    
+    <!-- Acción para todas las operaciones -->
+    <record id="action_divisas_currency" model="ir.actions.act_window">
+        <field name="name">Operaciones de Divisas</field>
+        <field name="res_model">divisas.currency</field>
+        <field name="view_mode">tree,form,pivot,graph</field>
+        <field name="search_view_id" ref="view_divisas_currency_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Registre su primera operación de divisa!
+            </p>
+        </field>
+    </record>
+</odoo>

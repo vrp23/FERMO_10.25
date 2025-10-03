@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Acción para el wizard de enviar a caja -->
+    <record id="action_sucursales_cajas_send_to_cashbox_wizard" model="ir.actions.act_window">
+        <field name="name">Nueva Operación</field>
+        <field name="res_model">sucursales_cajas.send_to_cashbox_wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Crear una nueva operación de caja
+            </p>
+        </field>
+    </record>
+    
+    <!-- Las otras acciones ya existen pero están mal referenciadas en el dashboard -->
+    <!-- Vamos a crearlas aquí por si acaso -->
+    
+    <!-- Acción para Cajas en Sesión (ya existe en cashbox_view.xml) -->
+    <record id="action_sucursales_cajas_cashbox_in_session" model="ir.actions.act_window">
+        <field name="name">Cajas Activas</field>
+        <field name="res_model">sucursales_cajas.cashbox</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_sucursales_cajas_cashbox_search"/>
+        <field name="domain">[('state', '=', 'in_session')]</field>
+        <field name="context">{'search_default_branch': 1}</field>
+    </record>
+    
+    <!-- Acción para Operaciones Pendientes (ya existe en operation_view.xml) -->
+    <record id="action_sucursales_cajas_operation_pending" model="ir.actions.act_window">
+        <field name="name">Operaciones Pendientes</field>
+        <field name="res_model">sucursales_cajas.operation</field>
+        <field name="view_mode">tree,kanban,form</field>
+        <field name="search_view_id" ref="view_sucursales_cajas_operation_search"/>
+        <field name="domain">[('state', '=', 'pending')]</field>
+        <field name="context">{'search_default_cashbox': 1}</field>
+    </record>
+    
+    <!-- Acción para Sesiones Abiertas (ya existe en session_view.xml) -->
+    <record id="action_sucursales_cajas_session_open" model="ir.actions.act_window">
+        <field name="name">Sesiones Activas</field>
+        <field name="res_model">sucursales_cajas.session</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_sucursales_cajas_session_search"/>
+        <field name="domain">[('state', 'in', ['open', 'closing'])]</field>
+        <field name="context">{'search_default_cashbox': 1}</field>
+    </record>
+</odoo>

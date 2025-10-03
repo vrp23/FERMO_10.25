@@ -1,0 +1,522 @@
+/* ========================================
+   Sucursales y Cajas - Estilos Personalizados
+   ======================================== */
+
+/* Variables CSS para mantener consistencia */
+:root {
+    --sc-primary-color: #3498db;
+    --sc-secondary-color: #2c3e50;
+    --sc-success-color: #27ae60;
+    --sc-warning-color: #f39c12;
+    --sc-danger-color: #e74c3c;
+    --sc-info-color: #16a085;
+    --sc-light-bg: #ecf0f1;
+    --sc-card-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    --sc-hover-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    --sc-transition: all 0.3s ease;
+}
+
+/* ========================================
+   Dashboard Styles
+   ======================================== */
+
+/* Dashboard Container */
+.o_sucursales_cajas_dashboard {
+    padding: 20px;
+    background-color: #f5f5f5;
+}
+
+/* Dashboard Cards */
+.sc_dashboard_card {
+    background: white;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: var(--sc-card-shadow);
+    transition: var(--sc-transition);
+}
+
+.sc_dashboard_card:hover {
+    box-shadow: var(--sc-hover-shadow);
+    transform: translateY(-2px);
+}
+
+.sc_dashboard_card h3 {
+    color: var(--sc-secondary-color);
+    margin-bottom: 15px;
+    font-size: 1.2rem;
+    font-weight: 600;
+    border-bottom: 2px solid var(--sc-primary-color);
+    padding-bottom: 10px;
+}
+
+/* Quick Action Buttons */
+.sc_quick_actions {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+    margin-bottom: 30px;
+}
+
+.sc_quick_action_btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    padding: 20px;
+    background: white;
+    border: 2px solid transparent;
+    border-radius: 8px;
+    text-decoration: none;
+    transition: var(--sc-transition);
+    box-shadow: var(--sc-card-shadow);
+}
+
+.sc_quick_action_btn:hover {
+    border-color: var(--sc-primary-color);
+    transform: translateY(-3px);
+    box-shadow: var(--sc-hover-shadow);
+}
+
+.sc_quick_action_btn i {
+    font-size: 2.5rem;
+    margin-bottom: 10px;
+    color: var(--sc-primary-color);
+}
+
+.sc_quick_action_btn span {
+    font-weight: 600;
+    color: var(--sc-secondary-color);
+}
+
+/* Statistics Cards */
+.sc_stat_card {
+    background: white;
+    border-radius: 8px;
+    padding: 20px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    box-shadow: var(--sc-card-shadow);
+}
+
+.sc_stat_card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: var(--sc-primary-color);
+}
+
+.sc_stat_card.success::before {
+    background: var(--sc-success-color);
+}
+
+.sc_stat_card.warning::before {
+    background: var(--sc-warning-color);
+}
+
+.sc_stat_card.danger::before {
+    background: var(--sc-danger-color);
+}
+
+.sc_stat_value {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--sc-secondary-color);
+    margin-bottom: 5px;
+}
+
+.sc_stat_label {
+    color: #7f8c8d;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* ========================================
+   Cashbox States
+   ======================================== */
+
+.sc_cashbox_state {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.sc_cashbox_state.ready {
+    background-color: #e8f5e9;
+    color: #2e7d32;
+}
+
+.sc_cashbox_state.in_session {
+    background-color: #e3f2fd;
+    color: #1565c0;
+}
+
+.sc_cashbox_state.closed {
+    background-color: #fce4ec;
+    color: #c62828;
+}
+
+/* ========================================
+   Operation Cards
+   ======================================== */
+
+.sc_operation_card {
+    background: white;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 10px;
+    border-left: 4px solid transparent;
+    transition: var(--sc-transition);
+    position: relative;
+}
+
+.sc_operation_card.deposit {
+    border-left-color: var(--sc-success-color);
+}
+
+.sc_operation_card.withdrawal {
+    border-left-color: var(--sc-danger-color);
+}
+
+.sc_operation_card:hover {
+    box-shadow: var(--sc-hover-shadow);
+    transform: translateX(5px);
+}
+
+.sc_operation_header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.sc_operation_type {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.sc_operation_type i {
+    font-size: 1.2rem;
+}
+
+.sc_operation_type.deposit i {
+    color: var(--sc-success-color);
+}
+
+.sc_operation_type.withdrawal i {
+    color: var(--sc-danger-color);
+}
+
+.sc_operation_amount {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--sc-secondary-color);
+}
+
+.sc_operation_details {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    font-size: 0.9rem;
+    color: #7f8c8d;
+}
+
+.sc_operation_detail {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.sc_operation_detail i {
+    color: var(--sc-info-color);
+}
+
+/* Operation State Badge */
+.sc_operation_state {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    padding: 3px 10px;
+    border-radius: 15px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.sc_operation_state.pending {
+    background-color: #fff3cd;
+    color: #856404;
+}
+
+.sc_operation_state.processing {
+    background-color: #cce5ff;
+    color: #004085;
+}
+
+.sc_operation_state.done {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.sc_operation_state.cancelled {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+/* ========================================
+   Session Management
+   ======================================== */
+
+.sc_session_info {
+    background: linear-gradient(135deg, var(--sc-primary-color), var(--sc-secondary-color));
+    color: white;
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+}
+
+.sc_session_timer {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 1.1rem;
+}
+
+.sc_session_timer i {
+    font-size: 1.5rem;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.5; }
+    100% { opacity: 1; }
+}
+
+/* ========================================
+   Cash Count Widget
+   ======================================== */
+
+.sc_cash_count_table {
+    width: 100%;
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: var(--sc-card-shadow);
+}
+
+.sc_cash_count_table th {
+    background-color: var(--sc-secondary-color);
+    color: white;
+    padding: 12px;
+    text-align: left;
+    font-weight: 600;
+}
+
+.sc_cash_count_table td {
+    padding: 10px 12px;
+    border-bottom: 1px solid #ecf0f1;
+}
+
+.sc_cash_count_table tr:hover {
+    background-color: #f8f9fa;
+}
+
+.sc_denomination_input {
+    width: 80px;
+    text-align: center;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 5px;
+    transition: var(--sc-transition);
+}
+
+.sc_denomination_input:focus {
+    border-color: var(--sc-primary-color);
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+}
+
+.sc_subtotal {
+    font-weight: 600;
+    color: var(--sc-secondary-color);
+}
+
+/* ========================================
+   Balance Display
+   ======================================== */
+
+.sc_balance_display {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    margin-bottom: 10px;
+}
+
+.sc_balance_label {
+    font-weight: 600;
+    color: #7f8c8d;
+}
+
+.sc_balance_amount {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--sc-secondary-color);
+}
+
+.sc_balance_amount.positive {
+    color: var(--sc-success-color);
+}
+
+.sc_balance_amount.negative {
+    color: var(--sc-danger-color);
+}
+
+/* ========================================
+   Forms and Wizards
+   ======================================== */
+
+.sc_wizard_header {
+    background: var(--sc-primary-color);
+    color: white;
+    padding: 20px;
+    margin: -16px -16px 20px -16px;
+    text-align: center;
+}
+
+.sc_wizard_header h2 {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 600;
+}
+
+.sc_wizard_content {
+    padding: 20px;
+}
+
+.sc_wizard_footer {
+    border-top: 1px solid #ecf0f1;
+    padding-top: 20px;
+    margin-top: 30px;
+    text-align: right;
+}
+
+/* Alert Boxes */
+.sc_alert {
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    border: 1px solid transparent;
+}
+
+.sc_alert.info {
+    background-color: #e3f2fd;
+    border-color: #90caf9;
+    color: #1565c0;
+}
+
+.sc_alert.warning {
+    background-color: #fff3cd;
+    border-color: #ffecb3;
+    color: #856404;
+}
+
+.sc_alert.danger {
+    background-color: #f8d7da;
+    border-color: #f5c6cb;
+    color: #721c24;
+}
+
+.sc_alert.success {
+    background-color: #d4edda;
+    border-color: #c3e6cb;
+    color: #155724;
+}
+
+/* ========================================
+   Animations
+   ======================================== */
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.sc_animate_slide {
+    animation: slideIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+.sc_animate_fade {
+    animation: fadeIn 0.5s ease-out;
+}
+
+/* ========================================
+   Responsive Design
+   ======================================== */
+
+@media (max-width: 768px) {
+    .sc_quick_actions {
+        grid-template-columns: 1fr;
+    }
+    
+    .sc_operation_details {
+        grid-template-columns: 1fr;
+    }
+    
+    .sc_stat_value {
+        font-size: 2rem;
+    }
+    
+    .sc_dashboard_card {
+        padding: 15px;
+    }
+}
+
+/* ========================================
+   Print Styles
+   ======================================== */
+
+@media print {
+    .sc_no_print {
+        display: none !important;
+    }
+    
+    .sc_dashboard_card {
+        box-shadow: none;
+        border: 1px solid #ddd;
+        page-break-inside: avoid;
+    }
+    
+    .sc_operation_card {
+        box-shadow: none;
+        border: 1px solid #ddd;
+    }
+}

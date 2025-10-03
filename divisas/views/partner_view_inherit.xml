@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Extender la vista de formulario de res.partner para mostrar wallets -->
+    <record id="view_partner_form_divisas_wallet" model="ir.ui.view">
+        <field name="name">res.partner.form.divisas.wallet</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="chequera.view_partner_form_chequera"/>
+        <field name="arch" type="xml">
+            <!-- Seleccionar por página que contiene el campo wallet_balance en lugar de usar string -->
+            <xpath expr="//notebook/page[descendant::field[@name='wallet_balance']]" position="attributes">
+                <attribute name="string">Wallets</attribute>
+            </xpath>
+            
+            <!-- Añadir los saldos de USD y USDT junto al de ARS -->
+            <xpath expr="//div[contains(@class,'wallet-balance-amount')]" position="after">
+                <div style="font-size: 16px; color: #6c757d; margin-top: 15px; margin-bottom: 5px;">Saldo USD</div>
+                <div class="wallet-balance-amount">
+                    <field name="wallet_usd_balance" widget="monetary" readonly="1"/>
+                </div>
+                <div style="font-size: 16px; color: #6c757d; margin-top: 15px; margin-bottom: 5px;">Saldo USDT</div>
+                <div class="wallet-balance-amount">
+                    <field name="wallet_usdt_balance" widget="monetary" readonly="1"/>
+                </div>
+            </xpath>
+            
+            <!-- Añadir botón para ver movimientos de divisas justo antes de la lista de cheques -->
+            <xpath expr="//field[@name='wallet_cheques_ids']" position="before">
+                <div style="margin-top: 20px; margin-bottom: 10px;">
+                    <button name="action_view_wallet_movements" string="Ver movimientos de divisas" type="object" class="btn btn-primary"/>
+                </div>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Añadir enlaces a Wallets USD y USDT en la vista de partner -->
+    <record id="view_partner_wallet_divisas_button" model="ir.ui.view">
+        <field name="name">res.partner.wallet.divisas.button</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            <div name="button_box" position="inside">
+                <button class="oe_stat_button" type="object" 
+                        name="action_view_wallet_movements"
+                        icon="fa-dollar"
+                        invisible="is_company == False and parent_id != False">
+                    <div class="o_field_widget o_stat_info">
+                        <span class="o_stat_value">
+                            <field name="wallet_usd_balance" widget="monetary"/>
+                        </span>
+                        <span class="o_stat_text">USD/USDT</span>
+                    </div>
+                </button>
+            </div>
+        </field>
+    </record>
+</odoo>

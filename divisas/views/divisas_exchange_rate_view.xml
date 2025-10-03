@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Vista de formulario para tipos de cambio -->
+    <record id="view_divisas_exchange_rate_form" model="ir.ui.view">
+        <field name="name">divisas.exchange.rate.form</field>
+        <field name="model">divisas.exchange.rate</field>
+        <field name="arch" type="xml">
+            <form string="Tipo de Cambio">
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" readonly="1"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="from_currency_type"/>
+                            <field name="to_currency_type"/>
+                            <field name="date"/>
+                        </group>
+                        <group>
+                            <field name="rate"/>
+                            <field name="sell_rate"/>
+                            <field name="active" widget="boolean_toggle"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Notas">
+                            <field name="notes"/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    
+    <!-- Vista de árbol para tipos de cambio -->
+    <record id="view_divisas_exchange_rate_tree" model="ir.ui.view">
+        <field name="name">divisas.exchange.rate.tree</field>
+        <field name="model">divisas.exchange.rate</field>
+        <field name="arch" type="xml">
+            <tree string="Tipos de Cambio" decoration-muted="active == False">
+                <field name="name"/>
+                <field name="from_currency_type"/>
+                <field name="to_currency_type"/>
+                <field name="rate"/>
+                <field name="sell_rate"/>
+                <field name="date"/>
+                <field name="active" widget="boolean_toggle"/>
+            </tree>
+        </field>
+    </record>
+    
+    <!-- Vista de búsqueda para tipos de cambio -->
+    <record id="view_divisas_exchange_rate_search" model="ir.ui.view">
+        <field name="name">divisas.exchange.rate.search</field>
+        <field name="model">divisas.exchange.rate</field>
+        <field name="arch" type="xml">
+            <search string="Buscar Tipos de Cambio">
+                <field name="name"/>
+                <field name="from_currency_type"/>
+                <field name="to_currency_type"/>
+                <filter string="Activos" name="active" domain="[('active', '=', True)]"/>
+                <filter string="Inactivos" name="inactive" domain="[('active', '=', False)]"/>
+                <group expand="0" string="Agrupar Por">
+                    <filter string="Moneda Origen" name="from_currency" context="{'group_by': 'from_currency_type'}"/>
+                    <filter string="Moneda Destino" name="to_currency" context="{'group_by': 'to_currency_type'}"/>
+                    <filter string="Fecha" name="date" context="{'group_by': 'date'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+    
+    <!-- Vista de formulario para el wizard de actualización de tipo de cambio -->
+    <record id="view_divisas_exchange_rate_wizard_form" model="ir.ui.view">
+        <field name="name">divisas.exchange.rate.wizard.form</field>
+        <field name="model">divisas.exchange.rate.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Actualizar Tipo de Cambio">
+                <sheet>
+                    <div class="alert alert-info" role="alert">
+                        <strong>Información:</strong> Complete los datos para actualizar el tipo de cambio.
+                    </div>
+                    
+                    <group>
+                        <group>
+                            <field name="from_currency_type"/>
+                            <field name="to_currency_type"/>
+                            <field name="date"/>
+                        </group>
+                        <group>
+                            <field name="rate"/>
+                            <field name="sell_rate"/>
+                        </group>
+                    </group>
+                    
+                    <notebook>
+                        <page string="Notas">
+                            <field name="notes"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <footer>
+                    <button name="action_update_rate" string="Actualizar" type="object" class="btn-primary"/>
+                    <button string="Cancelar" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+    
+    <!-- Acción para tipos de cambio -->
+    <record id="action_divisas_exchange_rate" model="ir.actions.act_window">
+        <field name="name">Tipos de Cambio</field>
+        <field name="res_model">divisas.exchange.rate</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_divisas_exchange_rate_search"/>
+        <field name="context">{'search_default_active': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Registre su primer tipo de cambio!
+            </p>
+        </field>
+    </record>
+    
+    <!-- Acción para el wizard de actualización de tipo de cambio -->
+    <record id="action_divisas_exchange_rate_wizard" model="ir.actions.act_window">
+        <field name="name">Actualizar Tipo de Cambio</field>
+        <field name="res_model">divisas.exchange.rate.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+</odoo>

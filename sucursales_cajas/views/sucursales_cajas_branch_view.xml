@@ -1,0 +1,242 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Vista Tree de Sucursales -->
+    <record id="view_sucursales_cajas_branch_tree" model="ir.ui.view">
+        <field name="name">sucursales_cajas.branch.tree</field>
+        <field name="model">sucursales_cajas.branch</field>
+        <field name="arch" type="xml">
+            <tree string="Sucursales" decoration-muted="active == False">
+                <field name="code"/>
+                <field name="name"/>
+                <field name="address"/>
+                <field name="phone"/>
+                <field name="manager_id"/>
+                <field name="cashbox_count"/>
+                <field name="active_sessions_count" string="Sesiones Activas"/>
+                <field name="active" invisible="1"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+            </tree>
+        </field>
+    </record>
+    
+    <!-- Vista Form de Sucursales -->
+    <record id="view_sucursales_cajas_branch_form" model="ir.ui.view">
+        <field name="name">sucursales_cajas.branch.form</field>
+        <field name="model">sucursales_cajas.branch</field>
+        <field name="arch" type="xml">
+            <form string="Sucursal">
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_cashboxes" 
+                                type="object" 
+                                class="oe_stat_button" 
+                                icon="fa-inbox">
+                            <field name="cashbox_count" widget="statinfo" string="Cajas"/>
+                        </button>
+                        <button name="action_view_active_sessions" 
+                                type="object" 
+                                class="oe_stat_button" 
+                                icon="fa-users"
+                                invisible="active_sessions_count == 0">
+                            <field name="active_sessions_count" widget="statinfo" string="Sesiones Activas"/>
+                        </button>
+                    </div>
+                    
+                    <widget name="web_ribbon" title="Archivado" bg_color="bg-danger" 
+                            invisible="active == True"/>
+                    
+                    <div class="oe_title">
+                        <label for="name" class="oe_edit_only"/>
+                        <h1>
+                            <field name="name" placeholder="Nombre de la sucursal"/>
+                        </h1>
+                        <field name="code" placeholder="Código" class="oe_inline"/>
+                    </div>
+                    
+                    <group>
+                        <group>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                            <field name="manager_id" 
+                                   domain="[('id', 'in', allowed_user_ids)]"
+                                   options="{'no_create': True}"/>
+                            <field name="active" invisible="1"/>
+                        </group>
+                        <group>
+                            <field name="phone" widget="phone"/>
+                            <field name="email" widget="email"/>
+                        </group>
+                    </group>
+                    
+                    <group string="Dirección">
+                        <field name="address" nolabel="1"/>
+                    </group>
+                    
+                    <notebook>
+                        <page string="Usuarios Permitidos">
+                            <field name="allowed_user_ids">
+                                <tree>
+                                    <field name="name"/>
+                                    <field name="login"/>
+                                    <field name="groups_id" widget="many2many_tags" 
+                                           options="{'color_field': 'color'}"/>
+                                </tree>
+                            </field>
+                        </page>
+                        
+                        <page string="Cajas">
+                            <field name="cashbox_ids" 
+                                   context="{'default_branch_id': active_id}"
+                                   readonly="1">
+                                <tree decoration-success="state == 'in_session'"
+                                      decoration-info="state == 'ready'"
+                                      decoration-muted="active == False">
+                                    <field name="code"/>
+                                    <field name="name"/>
+                                    <field name="responsible_user_id"/>
+                                    <field name="state"/>
+                                    <field name="session_user_id"/>
+                                    <field name="active" invisible="1"/>
+                                </tree>
+                            </field>
+                        </page>
+                        
+                        <page string="Notas">
+                            <field name="notes" nolabel="1" placeholder="Notas adicionales..."/>
+                        </page>
+                    </notebook>
+                </sheet>
+                
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers"/>
+                    <field name="activity_ids" widget="mail_activity"/>
+                    <field name="message_ids" widget="mail_thread"/>
+                </div>
+            </form>
+        </field>
+    </record>
+    
+    <!-- Vista Search de Sucursales -->
+    <record id="view_sucursales_cajas_branch_search" model="ir.ui.view">
+        <field name="name">sucursales_cajas.branch.search</field>
+        <field name="model">sucursales_cajas.branch</field>
+        <field name="arch" type="xml">
+            <search string="Buscar Sucursal">
+                <field name="name" string="Sucursal" 
+                       filter_domain="['|', ('name', 'ilike', self), ('code', 'ilike', self)]"/>
+                <field name="code"/>
+                <field name="manager_id"/>
+                <field name="address"/>
+                <separator/>
+                <filter string="Activas" name="active" 
+                        domain="[('active', '=', True)]"/>
+                <filter string="Archivadas" name="archived" 
+                        domain="[('active', '=', False)]"/>
+                <separator/>
+                <filter string="Con Sesiones Activas" name="with_sessions" 
+                        domain="[('active_sessions_count', '&gt;', 0)]"/>
+                <group expand="0" string="Agrupar Por">
+                    <filter string="Empresa" name="company" 
+                            context="{'group_by': 'company_id'}" 
+                            groups="base.group_multi_company"/>
+                    <filter string="Gerente" name="manager" 
+                            context="{'group_by': 'manager_id'}"/>
+                    <filter string="Estado" name="active_state" 
+                            context="{'group_by': 'active'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+    
+    <!-- Vista Kanban de Sucursales -->
+    <record id="view_sucursales_cajas_branch_kanban" model="ir.ui.view">
+        <field name="name">sucursales_cajas.branch.kanban</field>
+        <field name="model">sucursales_cajas.branch</field>
+        <field name="arch" type="xml">
+            <kanban class="o_kanban_mobile">
+                <field name="id"/>
+                <field name="name"/>
+                <field name="code"/>
+                <field name="manager_id"/>
+                <field name="cashbox_count"/>
+                <field name="active_sessions_count"/>
+                <field name="active"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div t-attf-class="oe_kanban_global_click">
+                            <div class="o_kanban_record_top">
+                                <div class="o_kanban_record_headings">
+                                    <strong class="o_kanban_record_title">
+                                        <t t-if="record.code.value">[<field name="code"/>]</t>
+                                        <field name="name"/>
+                                    </strong>
+                                </div>
+                                <div class="o_dropdown_kanban dropdown">
+                                    <a class="dropdown-toggle o-no-caret btn" 
+                                       role="button" 
+                                       data-toggle="dropdown" 
+                                       href="#" 
+                                       aria-label="Dropdown menu" 
+                                       title="Dropdown menu">
+                                        <span class="fa fa-ellipsis-v"/>
+                                    </a>
+                                    <div class="dropdown-menu" role="menu">
+                                        <a t-if="widget.editable" 
+                                           role="menuitem" 
+                                           type="edit" 
+                                           class="dropdown-item">Editar</a>
+                                        <a t-if="widget.deletable" 
+                                           role="menuitem" 
+                                           type="delete" 
+                                           class="dropdown-item">Eliminar</a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="o_kanban_record_body">
+                                <div t-if="record.manager_id.value">
+                                    <i class="fa fa-user"/> <field name="manager_id"/>
+                                </div>
+                                <div t-if="record.address.value" class="text-muted">
+                                    <i class="fa fa-map-marker"/> <field name="address"/>
+                                </div>
+                            </div>
+                            <div class="o_kanban_record_bottom">
+                                <div class="oe_kanban_bottom_left">
+                                    <span class="badge badge-pill">
+                                        <i class="fa fa-inbox"/> <field name="cashbox_count"/> Cajas
+                                    </span>
+                                    <span t-if="record.active_sessions_count.value > 0" 
+                                          class="badge badge-pill badge-success ml-2">
+                                        <i class="fa fa-users"/> 
+                                        <field name="active_sessions_count"/> Sesiones
+                                    </span>
+                                </div>
+                                <div class="oe_kanban_bottom_right">
+                                    <field name="active" widget="boolean" invisible="1"/>
+                                    <span t-if="!record.active.value" 
+                                          class="badge badge-danger">Archivado</span>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+    
+    <!-- Acción para Sucursales -->
+    <record id="action_sucursales_cajas_branch" model="ir.actions.act_window">
+        <field name="name">Sucursales</field>
+        <field name="res_model">sucursales_cajas.branch</field>
+        <field name="view_mode">tree,kanban,form</field>
+        <field name="search_view_id" ref="view_sucursales_cajas_branch_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Crear una nueva sucursal
+            </p>
+            <p>
+                Las sucursales son las ubicaciones físicas donde se encuentran las cajas.
+                Cada sucursal puede tener múltiples cajas y usuarios asignados.
+            </p>
+        </field>
+    </record>
+</odoo>

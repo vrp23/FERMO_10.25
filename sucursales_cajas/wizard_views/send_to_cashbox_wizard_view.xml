@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Vista Form del Wizard Enviar a Caja -->
+    <record id="view_send_to_cashbox_wizard_form" model="ir.ui.view">
+        <field name="name">sucursales_cajas.send_to_cashbox_wizard.form</field>
+        <field name="model">sucursales_cajas.send_to_cashbox_wizard</field>
+        <field name="arch" type="xml">
+            <form string="Enviar a Caja">
+                <sheet>
+                    <group>
+                        <field name="partner_id" invisible="1"/>
+                        <div class="alert alert-info" role="alert" colspan="2">
+                            <h4 class="alert-heading">
+                                <field name="partner_id" readonly="1" nolabel="1" class="oe_inline"/>
+                            </h4>
+                            <p invisible="context.get('partner_balances')">
+                                Saldos disponibles:
+                                <ul>
+                                    <li>ARS: $<field name="wallet_balance_ars" readonly="1" nolabel="1" class="oe_inline"/></li>
+                                    <li>USD: $<field name="wallet_balance_usd" readonly="1" nolabel="1" class="oe_inline"/></li>
+                                    <li>USDT: <field name="wallet_balance_usdt" readonly="1" nolabel="1" class="oe_inline"/></li>
+                                </ul>
+                            </p>
+                        </div>
+                    </group>
+                    
+                    <group>
+                        <group>
+                            <field name="operation_type" widget="radio"/>
+                            <field name="currency_type" required="1"/>
+                            <field name="amount" required="1" widget="monetary"/>
+                            <field name="current_balance" readonly="1" widget="monetary" string="Saldo Disponible"/>
+                        </group>
+                        <group>
+                            <field name="branch_id" required="1" options="{'no_create': True}"/>
+                            <field name="cashbox_id" required="1" options="{'no_create': True}"/>
+                        </group>
+                    </group>
+                    
+                    <group string="Beneficiario" invisible="operation_type != 'withdrawal'">
+                        <group>
+                            <field name="is_third_party"/>
+                        </group>
+                        <group invisible="not is_third_party">
+                            <field name="beneficiary_name" required="is_third_party"/>
+                            <field name="beneficiary_dni" required="is_third_party"/>
+                            <field name="beneficiary_phone"/>
+                        </group>
+                    </group>
+                    
+                    <group string="Forma de Entrega/Recepción">
+                        <group>
+                            <field name="delivery_method" widget="radio"/>
+                        </group>
+                    </group>
+                    
+                    <group string="Datos de Transferencia" invisible="delivery_method != 'transfer'">
+                        <group>
+                            <field name="transfer_type" required="delivery_method == 'transfer'"/>
+                        </group>
+                        
+                        <!-- Campos para transferencia bancaria -->
+                        <group invisible="transfer_type != 'bank_transfer'" colspan="2">
+                            <group>
+                                <field name="destination_bank" required="transfer_type == 'bank_transfer' and operation_type == 'withdrawal'"/>
+                                <field name="destination_account_holder" required="transfer_type == 'bank_transfer' and operation_type == 'withdrawal'"/>
+                                <field name="destination_account_number" invisible="currency_type == 'ARS'"/>
+                            </group>
+                            <group>
+                                <field name="destination_cbu" invisible="currency_type != 'ARS'"/>
+                                <field name="destination_alias"/>
+                            </group>
+                        </group>
+                        
+                        <!-- Campos para crypto -->
+                        <group invisible="transfer_type != 'crypto'" colspan="2">
+                            <group>
+                                <field name="destination_network" required="transfer_type == 'crypto' and operation_type == 'withdrawal'"/>
+                                <field name="destination_wallet" required="transfer_type == 'crypto' and operation_type == 'withdrawal'" widget="text"/>
+                            </group>
+                        </group>
+                        
+                        <!-- Campos para MercadoPago -->
+                        <group invisible="transfer_type != 'mercadopago'" colspan="2">
+                            <field name="destination_alias" required="transfer_type == 'mercadopago' and operation_type == 'withdrawal'"/>
+                        </group>
+                    </group>
+                    
+                    <group string="Observaciones">
+                        <field name="notes" nolabel="1" placeholder="Observaciones adicionales..."/>
+                    </group>
+                </sheet>
+                <footer>
+                    <button name="action_confirm" 
+                            string="Confirmar" 
+                            type="object" 
+                            class="btn-primary"/>
+                    <button name="action_confirm_and_print" 
+                            string="Confirmar e Imprimir" 
+                            type="object" 
+                            class="btn-secondary"/>
+                    <button string="Cancelar" 
+                            class="btn-secondary" 
+                            special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>
