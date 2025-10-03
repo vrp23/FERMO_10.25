@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Módulo Chequera</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            color: #333;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        h1, h2, h3 {
+            color: #008000;
+        }
+        .section {
+            margin: 20px 0;
+            padding: 15px;
+            background-color: #f9f9f9;
+            border-radius: 5px;
+        }
+        .feature-list {
+            list-style-type: none;
+            padding: 0;
+        }
+        .feature-list li {
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+        }
+        .feature-list li:before {
+            content: "✓ ";
+            color: #008000;
+            font-weight: bold;
+        }
+        .step {
+            margin: 10px 0;
+            padding: 10px;
+            background-color: #f5f5f5;
+            border-left: 4px solid #008000;
+        }
+        .screenshot {
+            max-width: 100%;
+            height: auto;
+            margin: 15px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .warning {
+            padding: 10px;
+            background-color: #fff3cd;
+            border-left: 4px solid #ffc107;
+            color: #856404;
+        }
+    </style>
+</head>
+<body>
+    <h1>Chequera - Gestión de Compra-Venta de Cheques</h1>
+    
+    <div class="section">
+        <h2>Descripción</h2>
+        <p>El módulo Chequera para Odoo 17 CE permite gestionar de forma eficiente todo el proceso de compra y venta de cheques, incluyendo el registro de los cheques, el seguimiento de su estado, la aplicación de tasas y el control de las cuentas de los clientes y proveedores.</p>
+    </div>
+    
+    <div class="section">
+        <h2>Características principales</h2>
+        <ul class="feature-list">
+            <li>Gestión completa del ciclo de vida de los cheques</li>
+            <li>Dashboard con acceso rápido a las operaciones</li>
+            <li>Cálculo automático de tasas y valores según fórmulas configurables</li>
+            <li>Wallet de clientes/proveedores para seguimiento de saldo</li>
+            <li>Sistema de alertas para cheques próximos a vencer</li>
+            <li>Checklist de validación para cada cheque</li>
+            <li>Capacidad para adjuntar imágenes del cheque (frente y dorso)</li>
+            <li>Grupos de seguridad para control de acceso</li>
+        </ul>
+    </div>
+    
+    <div class="section">
+        <h2>Guía rápida de uso</h2>
+        
+        <h3>Compra de cheques</h3>
+        <div class="step">
+            <strong>1.</strong> Acceda al dashboard de Chequera y haga clic en el botón "Comprar Cheques".
+        </div>
+        <div class="step">
+            <strong>2.</strong> Complete los datos del cheque:
+            <ul>
+                <li>Número de cheque</li>
+                <li>Banco</li>
+                <li>Beneficiario</li>
+                <li>Monto</li>
+                <li>Fecha</li>
+            </ul>
+        </div>
+        <div class="step">
+            <strong>3.</strong> Complete el checklist de validación:
+            <ul>
+                <li>Viabilidad del emisor verificada</li>
+                <li>El cheque no posee irregularidades</li>
+                <li>El Cheque está correctamente firmado</li>
+            </ul>
+        </div>
+        <div class="step">
+            <strong>4.</strong> Seleccione el proveedor. Se cargarán automáticamente:
+            <ul>
+                <li>Tasa de pesificación</li>
+                <li>Interés mensual</li>
+                <li>Vendedor</li>
+            </ul>
+        </div>
+        <div class="step">
+            <strong>5.</strong> Verifique los valores calculados (pesificación, interés y precio de compra).
+        </div>
+        <div class="step">
+            <strong>6.</strong> Haga clic en el botón "Comprar" para confirmar la operación.
+        </div>
+        
+        <div class="warning">
+            <strong>Nota:</strong> Una vez confirmada la compra, el cheque pasará a estado "Disponible" y se generará un movimiento en la wallet del proveedor.
+        </div>
+        
+        <h3>Venta de cheques</h3>
+        <div class="step">
+            <strong>1.</strong> Acceda al dashboard de Chequera y haga clic en el botón "Vender Cheques".
+        </div>
+        <div class="step">
+            <strong>2.</strong> Seleccione un cheque en estado "Disponible".
+        </div>
+        <div class="step">
+            <strong>3.</strong> Seleccione el cliente. Se cargarán automáticamente:
+            <ul>
+                <li>Tasa de pesificación</li>
+                <li>Interés mensual</li>
+                <li>Vendedor</li>
+            </ul>
+        </div>
+        <div class="step">
+            <strong>4.</strong> Verifique los valores calculados (pesificación, interés y precio de venta).
+        </div>
+        <div class="step">
+            <strong>5.</strong> Haga clic en el botón "Vender" para confirmar la operación.
+        </div>
+        
+        <div class="warning">
+            <strong>Nota:</strong> Una vez confirmada la venta, el cheque pasará a estado "Vendido" y se generará un movimiento en la wallet del cliente.
+        </div>
+    </div>
+    
+    <div class="section">
+        <h2>Configuración</h2>
+        <h3>Bancos</h3>
+        <p>Para añadir un nuevo banco, vaya a Chequera > Configuración > Bancos y cree un nuevo registro con el nombre y código del banco.</p>
+        
+        <h3>Fórmulas de cálculo</h3>
+        <p>Para personalizar las fórmulas de cálculo, vaya a Chequera > Configuración > Fórmulas de Cálculo. Puede modificar las fórmulas existentes o crear nuevas.</p>
+        
+        <h3>Grupos de seguridad</h3>
+        <p>Puede asignar a los usuarios uno de los siguientes grupos:</p>
+        <ul>
+            <li><strong>Gestor de cheques:</strong> Puede crear y editar cheques, realizar operaciones de compra/venta.</li>
+            <li><strong>Supervisor de cheques:</strong> Además de las funciones del gestor, puede confirmar operaciones, modificar fórmulas y anular operaciones.</li>
+            <li><strong>Solo lectura:</strong> Acceso de solo lectura a toda la información.</li>
+        </ul>
+    </div>
+</body>
+</html>

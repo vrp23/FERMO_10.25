@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Categoría de seguridad -->
+    <record id="module_category_chequera" model="ir.module.category">
+        <field name="name">Chequera</field>
+        <field name="description">Gestión de compra-venta de cheques</field>
+        <field name="sequence">50</field>
+    </record>
+
+    <!-- Grupo Gestor de Cheques -->
+    <record id="group_chequera_user" model="res.groups">
+        <field name="name">Gestor de cheques</field>
+        <field name="category_id" ref="module_category_chequera"/>
+        <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+        <field name="comment">Permite crear y editar cheques, realizar operaciones de compra/venta.</field>
+    </record>
+
+    <!-- Grupo Supervisor de Cheques -->
+    <record id="group_chequera_supervisor" model="res.groups">
+        <field name="name">Supervisor de cheques</field>
+        <field name="category_id" ref="module_category_chequera"/>
+        <field name="implied_ids" eval="[(4, ref('group_chequera_user'))]"/>
+        <field name="comment">Permite confirmar operaciones, modificar fórmulas y anular operaciones.</field>
+    </record>
+
+    <!-- Grupo Solo Lectura -->
+    <record id="group_chequera_readonly" model="res.groups">
+        <field name="name">Solo lectura</field>
+        <field name="category_id" ref="module_category_chequera"/>
+        <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+        <field name="comment">Acceso solo lectura a toda la información de cheques.</field>
+    </record>
+
+    <!-- Nota: Se han eliminado las reglas de multi-compañía que estaban causando errores -->
+</odoo>

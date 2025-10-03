@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- Categorías de costos principales -->
+        <record id="cost_category_cf" model="commission.cost.category">
+            <field name="name">Costos Fijos</field>
+            <field name="code">CF</field>
+        </record>
+        
+        <record id="cost_category_cv" model="commission.cost.category">
+            <field name="name">Costos Variables</field>
+            <field name="code">CV</field>
+        </record>
+        
+        <record id="cost_category_ci" model="commission.cost.category">
+            <field name="name">Costos de Inversión</field>
+            <field name="code">CI</field>
+        </record>
+        
+        <record id="cost_category_imp" model="commission.cost.category">
+            <field name="name">Impuestos</field>
+            <field name="code">IMP</field>
+        </record>
+        
+        <!-- Subcategorías de Costos Fijos -->
+        <record id="cost_category_cf_alquiler" model="commission.cost.category">
+            <field name="name">Alquiler</field>
+            <field name="code">CF-ALQ</field>
+            <field name="parent_id" ref="cost_category_cf"/>
+        </record>
+        
+        <record id="cost_category_cf_sueldos" model="commission.cost.category">
+            <field name="name">Sueldos y Cargas Sociales</field>
+            <field name="code">CF-SUE</field>
+            <field name="parent_id" ref="cost_category_cf"/>
+        </record>
+        
+        <record id="cost_category_cf_servicios" model="commission.cost.category">
+            <field name="name">Servicios</field>
+            <field name="code">CF-SER</field>
+            <field name="parent_id" ref="cost_category_cf"/>
+        </record>
+        
+        <!-- Subcategorías de Costos Variables -->
+        <record id="cost_category_cv_comisiones" model="commission.cost.category">
+            <field name="name">Comisiones Bancarias</field>
+            <field name="code">CV-COM</field>
+            <field name="parent_id" ref="cost_category_cv"/>
+        </record>
+        
+        <record id="cost_category_cv_transporte" model="commission.cost.category">
+            <field name="name">Transporte y Logística</field>
+            <field name="code">CV-TRA</field>
+            <field name="parent_id" ref="cost_category_cv"/>
+        </record>
+        
+        <!-- Subcategorías de Impuestos -->
+        <record id="cost_category_imp_iibb" model="commission.cost.category">
+            <field name="name">Ingresos Brutos</field>
+            <field name="code">IMP-IIBB</field>
+            <field name="parent_id" ref="cost_category_imp"/>
+        </record>
+        
+        <record id="cost_category_imp_ganancias" model="commission.cost.category">
+            <field name="name">Impuesto a las Ganancias</field>
+            <field name="code">IMP-GAN</field>
+            <field name="parent_id" ref="cost_category_imp"/>
+        </record>
+        
+        <record id="cost_category_imp_otros" model="commission.cost.category">
+            <field name="name">Otros Impuestos</field>
+            <field name="code">IMP-OTR</field>
+            <field name="parent_id" ref="cost_category_imp"/>
+        </record>
+    </data>
+</odoo>

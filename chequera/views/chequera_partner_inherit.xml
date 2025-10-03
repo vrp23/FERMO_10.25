@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Extender la vista de formulario de contactos para funcionalidad de chequera -->
+    <record id="view_partner_form_chequera" model="ir.ui.view">
+        <field name="name">res.partner.form.chequera</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">            
+            <!-- Añadir pestaña para wallet de cheques -->
+            <notebook position="inside">
+                <page string="Wallet ARS" invisible="is_company == False and parent_id != False">
+                    <div class="row mb16">
+                        <div class="col-md-6">
+                            <div style="background-color: #f8f9fa; border-radius: 8px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); border-left: 4px solid #28a745;">
+                                <div style="font-size: 16px; color: #6c757d; margin-bottom: 5px;">Saldo Actual (ARS)</div>
+                                <div class="wallet-balance-amount">
+                                    <field name="wallet_balance" widget="monetary"
+                                           decoration-danger="wallet_balance &lt; 0"
+                                           decoration-success="wallet_balance &gt;= 0"
+                                           style="font-size: 24px; font-weight: bold;"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- MODIFICADO: Vista read-only sin columna cheques -->
+                    <field name="wallet_cheques_ids" context="{'default_partner_id': active_id}" 
+                           readonly="1" create="false" delete="false" edit="false">
+                        <tree decoration-success="tipo=='compra' and state=='confirmado'"
+                              decoration-info="tipo=='venta' and state=='confirmado'"
+                              decoration-muted="state=='anulado'"
+                              create="false" delete="false" edit="false">
+                            <field name="fecha"/>
+                            <field name="tipo"/>
+                            <field name="name" string="Operación"/>
+                            <field name="monto"/>
+                            <field name="state"/>
+                            <button name="action_view_operation" type="object" 
+                                    string="Ver Operación" 
+                                    class="btn-sm btn-link"
+                                    icon="fa-external-link"/>
+                        </tree>
+                    </field>
+                </page>
+            </notebook>
+        </field>
+    </record>
+
+    <!-- Acción para mostrar los movimientos de wallet de un partner específico -->
+    <record id="action_partner_wallet_movements" model="ir.actions.act_window">
+        <field name="name">Wallet ARS</field>
+        <field name="res_model">chequera.wallet.movement</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('partner_id', '=', active_id)]</field>
+        <field name="context">{'default_partner_id': active_id, 'create': False}</field>
+    </record>
+
+    <!-- Añadir enlace a Wallet en la vista de partner -->
+    <record id="view_partner_wallet_button" model="ir.ui.view">
+        <field name="name">res.partner.wallet.button</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            <div name="button_box" position="inside">
+                <button class="oe_stat_button" type="action" 
+                        name="%(action_partner_wallet_movements)d"
+                        icon="fa-money"
+                        invisible="is_company == False and parent_id != False"
+                        context="{'create': False}">
+                    <div class="o_field_widget o_stat_info">
+                        <span class="o_stat_value">
+                            <field name="wallet_balance" widget="monetary"
+                                   decoration-danger="wallet_balance &lt; 0"/>
+                        </span>
+                        <span class="o_stat_text">Wallet ARS</span>
+                    </div>
+                </button>
+                
+                <!-- Botones para cheques -->
+                <button name="action_view_checks_comprados" type="object" 
+                        class="oe_stat_button" icon="fa-shopping-cart">
+                    <field name="check_comprados_count" widget="statinfo"/>
+                    <span class="o_stat_text">Cheques Comprados</span>
+                </button>
+                
+                <button name="action_view_checks_vendidos" type="object" 
+                        class="oe_stat_button" icon="fa-money">
+                    <field name="check_vendidos_count" widget="statinfo"/>
+                    <span class="o_stat_text">Cheques Vendidos</span>
+                </button>
+            </div>
+        </field>
+    </record>
+</odoo>

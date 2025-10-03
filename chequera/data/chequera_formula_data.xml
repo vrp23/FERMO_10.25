@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- Fórmulas predefinidas para cálculos de compra -->
+        <record id="formula_pesificacion_compra" model="chequera.formula_config">
+            <field name="field_name">pesificacion_valor_compra</field>
+            <field name="context_type">compra</field>
+            <field name="code">record.monto * record.tasa_pesificacion_compra / 100</field>
+            <field name="description">Cálculo del valor de pesificación para la compra de cheques. Se calcula como un porcentaje del monto del cheque.</field>
+        </record>
+
+        <record id="formula_interes_compra" model="chequera.formula_config">
+            <field name="field_name">interes_valor_compra</field>
+            <field name="context_type">compra</field>
+            <!-- CAMBIO: interés hasta (fecha_pago + 2 días), con precisión de días -->
+            <field name="code">record.monto * record.interes_mensual_compra / 100 * (((record.dias_para_disponibilidad + 2) if (record.dias_para_disponibilidad + 2) &gt; 0 else 0) / 30.0)</field>
+            <field name="description">Cálculo del interés para la compra de cheques con precisión diaria hasta la fecha de pago + 2 días.</field>
+        </record>
+
+        <record id="formula_precio_compra" model="chequera.formula_config">
+            <field name="field_name">precio_compra</field>
+            <field name="context_type">compra</field>
+            <field name="code">record.monto - record.pesificacion_valor_compra - record.interes_valor_compra</field>
+            <field name="description">Cálculo del precio de compra del cheque. Se calcula como el monto menos el valor de pesificación y el valor de interés.</field>
+        </record>
+
+        <!-- Fórmulas predefinidas para cálculos de venta -->
+        <record id="formula_pesificacion_venta" model="chequera.formula_config">
+            <field name="field_name">pesificacion_valor_venta</field>
+            <field name="context_type">venta</field>
+            <field name="code">record.monto * record.tasa_pesificacion_venta / 100</field>
+            <field name="description">Cálculo del valor de pesificación para la venta de cheques. Se calcula como un porcentaje del monto del cheque.</field>
+        </record>
+
+        <record id="formula_interes_venta" model="chequera.formula_config">
+            <field name="field_name">interes_valor_venta</field>
+            <field name="context_type">venta</field>
+            <!-- CAMBIO: interés hasta (fecha_pago + 2 días), con precisión de días -->
+            <field name="code">record.monto * record.interes_mensual_venta / 100 * (((record.dias_para_disponibilidad + 2) if (record.dias_para_disponibilidad + 2) &gt; 0 else 0) / 30.0)</field>
+            <field name="description">Cálculo del interés para la venta de cheques con precisión diaria hasta la fecha de pago + 2 días.</field>
+        </record>
+
+        <record id="formula_precio_venta" model="chequera.formula_config">
+            <field name="field_name">precio_venta</field>
+            <field name="context_type">venta</field>
+            <field name="code">record.monto - record.pesificacion_valor_venta - record.interes_valor_venta</field>
+            <field name="description">Cálculo del precio de venta del cheque. Se calcula como el monto menos el valor de pesificación y el valor de interés.</field>
+        </record>
+    </data>
+</odoo>

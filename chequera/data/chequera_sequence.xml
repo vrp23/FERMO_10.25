@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- Secuencia para cheques -->
+        <record id="seq_chequera_check" model="ir.sequence">
+            <field name="name">Secuencia de Cheques</field>
+            <field name="code">chequera.check.sequence</field>
+            <field name="prefix">CHEQ#</field>
+            <field name="padding">6</field>
+            <field name="company_id" eval="False"/>
+        </record>
+        
+        <!-- Secuencia para operaciones de compra -->
+        <record id="seq_chequera_purchase" model="ir.sequence">
+            <field name="name">Secuencia de Operaciones de Compra</field>
+            <field name="code">chequera.purchase.sequence</field>
+            <field name="prefix">OPC#</field>
+            <field name="padding">6</field>
+            <field name="company_id" eval="False"/>
+        </record>
+    </data>
+</odoo>

@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="report_commission_liquidation_document">
+        <t t-call="web.external_layout">
+            <t t-set="doc" t-value="doc.with_context(lang=doc.operator_id.lang)"/>
+            <div class="page">
+                <div class="oe_structure"/>
+                
+                <h2 class="text-center">LIQUIDACIÓN DE COMISIONES</h2>
+                <h3 class="text-center"><span t-field="doc.name"/></h3>
+                
+                <!-- Información General -->
+                <div class="row mt-4">
+                    <div class="col-6">
+                        <table class="table table-sm">
+                            <tr>
+                                <td><strong>Operador:</strong></td>
+                                <td><span t-field="doc.operator_id.name"/></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Tipo:</strong></td>
+                                <td><span t-field="doc.liquidation_type"/></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Fecha:</strong></td>
+                                <td><span t-field="doc.date"/></td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="col-6">
+                        <table class="table table-sm">
+                            <tr t-if="doc.liquidation_type == 'divisas'">
+                                <td><strong>Período:</strong></td>
+                                <td>
+                                    <span t-field="doc.period_start"/> - 
+                                    <span t-field="doc.period_end"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><strong>Estado:</strong></td>
+                                <td>
+                                    <span t-if="doc.state == 'draft'" class="badge badge-secondary">Borrador</span>
+                                    <span t-elif="doc.state == 'confirmed'" class="badge badge-warning">Confirmada</span>
+                                    <span t-elif="doc.state == 'paid'" class="badge badge-success">Pagada</span>
+                                    <span t-else="" class="badge badge-danger">Cancelada</span>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+                
+                <!-- Detalle de Líneas -->
+                <h4 class="mt-4">Detalle de Operaciones</h4>
+                <table class="table table-sm table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Descripción</th>
+                            <th>Fecha</th>
+                            <th>Cliente/Proveedor</th>
+                            <th class="text-right">Base</th>
+                            <th class="text-right">%</th>
+                            <th class="text-right">Comisión</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <t t-foreach="doc.line_ids" t-as="line">
+                            <tr>
+                                <td><span t-field="line.description"/></td>
+                                <td><span t-field="line.operation_date"/></td>
+                                <td><span t-field="line.partner_id.name"/></td>
+                                <td class="text-right">
+                                    <span t-field="line.base_amount" 
+                                          t-options='{"widget": "monetary", "display_currency": False}'/>
+                                </td>
+                                <td class="text-right">
+                                    <span t-field="line.commission_rate"/>%
+                                </td>
+                                <td class="text-right">
+                                    <span t-field="line.commission_amount" 
+                                          t-options='{"widget": "monetary", "display_currency": False}'/>
+                                </td>
+                            </tr>
+                        </t>
+                        <tr class="font-weight-bold">
+                            <td colspan="3" class="text-right">TOTALES:</td>
+                            <td class="text-right">
+                                <span t-field="doc.total_base" 
+                                      t-options='{"widget": "monetary", "display_currency": False}'/>
+                            </td>
+                            <td></td>
+                            <td class="text-right">
+                                <span t-field="doc.total_commission" 
+                                      t-options='{"widget": "monetary", "display_currency": False}'/>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <!-- Información de Pago -->
+                <div t-if="doc.state == 'paid'" class="mt-4">
+                    <h4>Información de Pago</h4>
+                    <p>
+                        <strong>Fecha de Pago:</strong> <span t-field="doc.payment_date"/><br/>
+                        <strong>Movimiento de Wallet:</strong> <span t-field="doc.wallet_movement_id.name"/>
+                    </p>
+                </div>
+                
+                <!-- Notas -->
+                <div t-if="doc.notes" class="mt-4">
+                    <h4>Observaciones</h4>
+                    <p t-field="doc.notes"/>
+                </div>
+                
+                <!-- Firmas -->
+                <div class="row mt-5">
+                    <div class="col-6 text-center">
+                        <div style="border-top: 1px solid black; margin-top: 50px;">
+                            <p class="mt-2">
+                                <strong>Operador</strong><br/>
+                                <span t-field="doc.operator_id.name"/>
+                            </p>
+                        </div>
+                    </div>
+                    <div class="col-6 text-center">
+                        <div style="border-top: 1px solid black; margin-top: 50px;">
+                            <p class="mt-2">
+                                <strong>Supervisor</strong><br/>
+                                ____________________________
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="oe_structure"/>
+            </div>
+        </t>
+    </template>
+    
+    <template id="report_commission_liquidation">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="doc">
+                <t t-call="commission_management.report_commission_liquidation_document"/>
+            </t>
+        </t>
+    </template>
+</odoo>

@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Reporte de Liquidación Individual -->
+    <record id="action_report_commission_liquidation" model="ir.actions.report">
+        <field name="name">Liquidación de Comisiones</field>
+        <field name="model">commission.liquidation</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">commission_management.report_commission_liquidation</field>
+        <field name="report_file">commission_management.report_commission_liquidation</field>
+        <field name="print_report_name">'Liquidación - %s' % (object.name)</field>
+        <field name="binding_model_id" ref="model_commission_liquidation"/>
+        <field name="binding_type">report</field>
+    </record>
+    
+    <!-- Reporte de Liquidación de Socios -->
+    <record id="action_report_partner_commission" model="ir.actions.report">
+        <field name="name">Liquidación de Socios</field>
+        <field name="model">commission.partner.liquidation</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">commission_management.report_partner_commission</field>
+        <field name="report_file">commission_management.report_partner_commission</field>
+        <field name="print_report_name">'Liquidación Socios - %s' % (object.period_display)</field>
+        <field name="binding_model_id" ref="model_commission_partner_liquidation"/>
+        <field name="binding_type">report</field>
+    </record>
+    
+    <!-- Acciones para reportes estadísticos (placeholders) -->
+    <record id="action_report_commission_by_operator" model="ir.actions.act_window">
+        <field name="name">Reporte de Comisiones por Operador</field>
+        <field name="res_model">commission.liquidation</field>
+        <field name="view_mode">pivot,graph,tree</field>
+        <field name="context">{'search_default_group_operator': 1, 'search_default_paid': 1}</field>
+    </record>
+    
+    <record id="action_report_profitability" model="ir.actions.act_window">
+        <field name="name">Reporte de Rentabilidad</field>
+        <field name="res_model">commission.partner.liquidation</field>
+        <field name="view_mode">pivot,graph,tree</field>
+        <field name="context">{'search_default_this_year': 1}</field>
+    </record>
+    
+    <!-- Acción para categorías de costos -->
+    <record id="action_commission_cost_category" model="ir.actions.act_window">
+        <field name="name">Categorías de Costos</field>
+        <field name="res_model">commission.cost.category</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+</odoo>

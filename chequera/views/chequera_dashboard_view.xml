@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Vista de Dashboard -->
+    <record id="view_chequera_dashboard" model="ir.ui.view">
+        <field name="name">chequera.dashboard</field>
+        <field name="model">chequera.check</field>
+        <field name="arch" type="xml">
+            <form string="Dashboard de Chequera" create="false" edit="false" delete="false">
+                <sheet>
+                    <div class="oe_title">
+                        <h1>Gestión de Cheques</h1>
+                    </div>
+                    <div class="row mt32 mb32">
+                        <div class="col-6 text-center">
+                            <button string="Comprar Cheques" 
+                                    type="object" 
+                                    name="action_open_check_purchase"
+                                    class="btn-primary btn-lg" 
+                                    icon="fa-shopping-cart"/>
+                        </div>
+                        <div class="col-6 text-center">
+                            <button string="Vender Cheques" 
+                                    type="object" 
+                                    name="action_open_check_sale"
+                                    class="btn-success btn-lg" 
+                                    icon="fa-money"/>
+                        </div>
+                    </div>
+                    <div class="row mt32">
+                        <div class="col-6">
+                            <h3>Últimas Compras</h3>
+                            <field name="latest_purchases" readonly="1" nolabel="1">
+                                <tree>
+                                    <field name="name"/>
+                                    <field name="proveedor_id"/>
+                                    <field name="banco_id"/>
+                                    <field name="monto"/>
+                                    <field name="fecha_emision"/>
+                                    <field name="precio_compra"/>
+                                </tree>
+                            </field>
+                        </div>
+                        <div class="col-6">
+                            <h3>Cheques Disponibles</h3>
+                            <field name="available_checks" readonly="1" nolabel="1">
+                                <tree decoration-danger="alerta_vencimiento=='vencido'" 
+                                     decoration-warning="alerta_vencimiento=='alerta_7'" 
+                                     decoration-info="alerta_vencimiento=='alerta_15'">
+                                    <field name="name"/>
+                                    <field name="banco_id"/>
+                                    <field name="monto"/>
+                                    <field name="fecha_emision"/>
+                                    <field name="fecha_pago"/>
+                                    <field name="dias_para_vencimiento"/>
+                                    <field name="alerta_vencimiento" invisible="1"/>
+                                </tree>
+                            </field>
+                        </div>
+                    </div>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Action para abrir el dashboard -->
+    <record id="action_chequera_dashboard" model="ir.actions.act_window">
+        <field name="name">Dashboard</field>
+        <field name="res_model">chequera.check</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="view_chequera_dashboard"/>
+        <field name="target">main</field>
+        <field name="context">{'form_view_initial_mode': 'readonly'}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Bienvenido al módulo de gestión de cheques
+            </p>
+            <p>
+                Utilice los botones para comprar o vender cheques.
+            </p>
+        </field>
+    </record>
+</odoo>

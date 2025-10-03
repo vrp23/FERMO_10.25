@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- Verificar que exista el tipo SOCIO -->
+        <record id="partner_type_socio_check" model="res.partner.type">
+            <field name="name">SOCIO</field>
+            <field name="code">SOCIO</field>
+            <field name="active">True</field>
+        </record>
+    </data>
+</odoo>

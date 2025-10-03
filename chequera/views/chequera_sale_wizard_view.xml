@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Vista de formulario para el wizard de venta múltiple -->
+    <record id="view_chequera_sale_wizard_form" model="ir.ui.view">
+        <field name="name">chequera.sale.wizard.form</field>
+        <field name="model">chequera.sale.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Venta de Cheques">
+                <header>
+                    <button name="action_confirmar_venta" string="Confirmar Venta" 
+                            type="object" class="btn-primary"
+                            invisible="state != 'borrador'"/>
+                    <!-- NUEVO: Botón de modificar -->
+                    <button name="action_modificar_operacion" string="Modificar Operación" 
+                            type="object" class="btn-info"
+                            invisible="state != 'confirmado'"
+                            groups="chequera.group_chequera_supervisor"
+                            confirm="¿Está seguro de modificar esta operación? Los cheques volverán a estado disponible."/>
+                    <button name="action_revertir_operacion" string="Revertir Operación" 
+                            type="object" class="btn-warning"
+                            invisible="state != 'confirmado'"
+                            confirm="¿Está seguro de revertir esta operación? Los cheques volverán a estado disponible."/>
+                    <button string="Cerrar" special="cancel" class="btn-secondary"/>
+                    <field name="state" widget="statusbar" statusbar_visible="borrador,confirmado,revertido"/>
+                </header>
+                <sheet>
+                    <!-- Mensaje de éxito cuando está confirmado -->
+                    <div class="alert alert-success" role="alert" 
+                         invisible="state != 'confirmado'">
+                        <h4 class="alert-heading">¡Venta Exitosa!</h4>
+                        <p>Se han vendido <strong><field name="cantidad_cheques_confirmado" readonly="1"/></strong> cheques por un total de <strong>$<field name="precio_total_confirmado" readonly="1"/></strong></p>
+                        <hr/>
+                        <p class="mb-0">La operación ha sido registrada y se ha actualizado el saldo del cliente.</p>
+                    </div>
+                    
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="cliente_id" options="{'no_create': True, 'no_create_edit': True}" 
+                                   readonly="state != 'borrador'"/>
+                            <field name="fecha_operacion" readonly="state != 'borrador'"/>
+                        </group>
+                        <group>
+                            <field name="cantidad_cheques"/>
+                            <field name="monto_total" widget="monetary"/>
+                            <field name="precio_total" widget="monetary" class="oe_highlight"/>
+                        </group>
+                    </group>
+                    
+                    <!-- Sección de actualización masiva -->
+                    <group string="Actualización masiva de tasas" invisible="state != 'borrador'">
+                        <div class="alert alert-info" role="alert">
+                            Modifique estos valores y presione "Actualizar Cheques" para aplicar las tasas a todos los cheques seleccionados.
+                        </div>
+                        <group>
+                            <field name="tasa_pesificacion_masiva" readonly="state != 'borrador'"/>
+                            <field name="interes_mensual_masivo" readonly="state != 'borrador'"/>
+                            <field name="vendedor_id_masivo" string="Operador" options="{'no_create': True}" readonly="state != 'borrador'"/>
+                        </group>
+                        <group>
+                            <button name="action_update_tasas_masivas" string="Actualizar Cheques" 
+                                    type="object" class="btn-primary"
+                                    icon="fa-refresh" invisible="state != 'borrador'"/>
+                        </group>
+                    </group>
+                    
+                    <notebook>
+                        <page string="Cheques" invisible="state == 'confirmado'">
+                            <field name="check_ids" nolabel="1" readonly="state != 'borrador'">
+                                <tree>
+                                    <field name="name" readonly="1"/>
+                                    <field name="numero_cheque" readonly="1"/>
+                                    <field name="banco_id" readonly="1"/>
+                                    <field name="emisor_id" readonly="1"/>
+                                    <field name="monto" sum="Total monto" readonly="1"/>
+                                    <field name="fecha_pago" readonly="1"/>
+                                    <field name="dias_para_vencimiento" readonly="1"/>
+                                    <field name="tasa_pesificacion_venta" readonly="1"/>
+                                    <field name="interes_mensual_venta" readonly="1"/>
+                                    <field name="precio_venta" sum="Total precio" readonly="1"/>
+                                    <button name="action_edit_cheque" type="object" 
+                                            string="Editar"
+                                            class="btn-secondary"
+                                            context="{'cheque_id': id, 'sale_wizard_id': parent.id}"
+                                            invisible="parent.state != 'borrador'"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Cheques Vendidos" invisible="state != 'confirmado'">
+                            <field name="confirmed_check_ids" nolabel="1" readonly="1">
+                                <tree>
+                                    <field name="name"/>
+                                    <field name="numero_cheque"/>
+                                    <field name="banco_id"/>
+                                    <field name="emisor_id"/>
+                                    <field name="monto" sum="Total monto"/>
+                                    <field name="precio_venta" sum="Total precio"/>
+                                    <field name="state"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers"/>
+                    <field name="message_ids" widget="mail_thread"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <!-- Acción para abrir el wizard de venta -->
+    <record id="action_chequera_sale_wizard" model="ir.actions.act_window">
+        <field name="name">Venta de Cheques</field>
+        <field name="res_model">chequera.sale.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="context">{'default_state': 'borrador', 'default_tipo_operacion': 'venta'}</field>
+        <field name="target">current</field>
+        <field name="view_id" ref="view_chequera_sale_wizard_form"/>
+    </record>
+</odoo>

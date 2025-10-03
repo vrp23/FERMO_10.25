@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Heredamos la vista de formulario de contactos -->
+    <record id="view_partner_form_inherit" model="ir.ui.view">
+        <field name="name">res.partner.form.inherit</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            <!-- Añadimos el campo de tipos de contacto (MODIFICADO: ahora es many2many) -->
+            <xpath expr="//field[@name='category_id']" position="after">
+                <field name="partner_type_ids" widget="many2many_tags" options="{'no_create': true}" placeholder="Tipos de contacto"/>
+            </xpath>
+            
+            <!-- Añadimos una página para tasas y comisiones -->
+            <notebook position="inside">
+                <page string="Tasas y Comisiones" name="custom_fields">
+                    <group string="Configuración de Tasas">
+                        <group string="Tasas de Compra">
+                            <field name="tasa_pesificacion_compra" 
+                                   help="Tasa de pesificación aplicada cuando este contacto es proveedor (nos vende cheques)"/>
+                            <field name="interes_mensual_compra" 
+                                   help="Interés mensual aplicado cuando este contacto es proveedor (nos vende cheques)"/>
+                        </group>
+                        <group string="Tasas de Venta">
+                            <field name="tasa_pesificacion_venta" 
+                                   help="Tasa de pesificación aplicada cuando este contacto es cliente (nos compra cheques)"/>
+                            <field name="interes_mensual_venta" 
+                                   help="Interés mensual aplicado cuando este contacto es cliente (nos compra cheques)"/>
+                        </group>
+                    </group>
+                    
+                    <group>
+                        <group string="Configuración General">
+                            <field name="assigned_seller_id" 
+                                   domain="[('share', '=', False)]"
+                                   help="Operador asignado para las operaciones con este contacto"/>
+                        </group>
+                        <group string="Tasas Legacy (Obsoletas)" 
+                               invisible="1">
+                            <field name="pesification_rate" 
+                                   help="Campo obsoleto - usar tasas de compra/venta"/>
+                            <field name="monthly_interest" 
+                                   help="Campo obsoleto - usar tasas de compra/venta"/>
+                        </group>
+                    </group>
+                    
+                    <group string="Configuración de Comisiones" name="commission_settings">
+                        <group>
+                            <field name="commission_checks"/>
+                            <field name="commission_dollars"/>
+                            <field name="commission_crypto"/>
+                        </group>
+                        <group>
+                            <field name="commission_transfers"/>
+                            <field name="commission_cables"/>
+                        </group>
+                    </group>
+                </page>
+            </notebook>
+        </field>
+    </record>
+</odoo>

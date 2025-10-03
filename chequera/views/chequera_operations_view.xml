@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Vista de árbol para operaciones de COMPRA -->
+    <record id="view_chequera_purchase_operations_tree" model="ir.ui.view">
+        <field name="name">chequera.purchase.operations.tree</field>
+        <field name="model">chequera.purchase.wizard</field>
+        <field name="arch" type="xml">
+            <tree decoration-success="state == 'confirmado'" 
+                  decoration-danger="state == 'revertido'"
+                  decoration-muted="state == 'borrador'"
+                  create="false">
+                <field name="name"/>
+                <field name="tipo_operacion"/>
+                <field name="fecha_operacion"/>
+                <field name="proveedor_id"/>
+                <field name="cantidad_cheques"/>
+                <field name="monto_total" sum="Total monto"/>
+                <field name="precio_total" sum="Total precio"/>
+                <field name="state"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Vista de árbol para operaciones de VENTA -->
+    <record id="view_chequera_sale_operations_tree" model="ir.ui.view">
+        <field name="name">chequera.sale.operations.tree</field>
+        <field name="model">chequera.sale.wizard</field>
+        <field name="arch" type="xml">
+            <tree decoration-success="state == 'confirmado'" 
+                  decoration-danger="state == 'revertido'"
+                  decoration-muted="state == 'borrador'"
+                  create="false">
+                <field name="name"/>
+                <field name="tipo_operacion"/>
+                <field name="fecha_operacion"/>
+                <field name="cliente_id"/>
+                <field name="cantidad_cheques"/>
+                <field name="monto_total" sum="Total monto"/>
+                <field name="precio_total" sum="Total precio"/>
+                <field name="state"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Vista de búsqueda para operaciones de compra -->
+    <record id="view_chequera_purchase_operations_search" model="ir.ui.view">
+        <field name="name">chequera.purchase.operations.search</field>
+        <field name="model">chequera.purchase.wizard</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="proveedor_id"/>
+                <separator/>
+                <filter string="Confirmadas" name="confirmed" domain="[('state','=','confirmado')]"/>
+                <filter string="Revertidas" name="reverted" domain="[('state','=','revertido')]"/>
+                <filter string="Borradores" name="draft" domain="[('state','=','borrador')]"/>
+                <group expand="0" string="Agrupar por">
+                    <filter string="Estado" name="groupby_state" context="{'group_by': 'state'}"/>
+                    <filter string="Fecha" name="groupby_date" context="{'group_by': 'fecha_operacion'}"/>
+                    <filter string="Proveedor" name="groupby_provider" context="{'group_by': 'proveedor_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Vista de búsqueda para operaciones de venta -->
+    <record id="view_chequera_sale_operations_search" model="ir.ui.view">
+        <field name="name">chequera.sale.operations.search</field>
+        <field name="model">chequera.sale.wizard</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="cliente_id"/>
+                <separator/>
+                <filter string="Confirmadas" name="confirmed" domain="[('state','=','confirmado')]"/>
+                <filter string="Revertidas" name="reverted" domain="[('state','=','revertido')]"/>
+                <filter string="Borradores" name="draft" domain="[('state','=','borrador')]"/>
+                <group expand="0" string="Agrupar por">
+                    <filter string="Estado" name="groupby_state" context="{'group_by': 'state'}"/>
+                    <filter string="Fecha" name="groupby_date" context="{'group_by': 'fecha_operacion'}"/>
+                    <filter string="Cliente" name="groupby_customer" context="{'group_by': 'cliente_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Acción para operaciones de COMPRA -->
+    <record id="action_chequera_purchase_operations" model="ir.actions.act_window">
+        <field name="name">Operaciones de Compra</field>
+        <field name="res_model">chequera.purchase.wizard</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_id" ref="view_chequera_purchase_operations_tree"/>
+        <field name="search_view_id" ref="view_chequera_purchase_operations_search"/>
+        <field name="context">{'search_default_confirmed': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No hay operaciones de compra registradas
+            </p>
+            <p>
+                Use el menú "Comprar Cheques" para crear nuevas operaciones de compra.
+            </p>
+        </field>
+    </record>
+
+    <!-- Acción para operaciones de VENTA -->
+    <record id="action_chequera_sale_operations" model="ir.actions.act_window">
+        <field name="name">Operaciones de Venta</field>
+        <field name="res_model">chequera.sale.wizard</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_id" ref="view_chequera_sale_operations_tree"/>
+        <field name="search_view_id" ref="view_chequera_sale_operations_search"/>
+        <field name="context">{'search_default_confirmed': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No hay operaciones de venta registradas
+            </p>
+            <p>
+                Use el menú "Vender Cheques" para crear nuevas operaciones de venta.
+            </p>
+        </field>
+    </record>
+
+    <!-- Acción del servidor para combinar ambas vistas -->
+    <record id="action_chequera_all_operations" model="ir.actions.act_window">
+        <field name="name">Todas las Operaciones</field>
+        <field name="res_model">chequera.purchase.wizard</field>
+        <field name="view_mode">tree,form</field>
+        <field name="binding_model_id" eval="False"/>
+        <field name="domain">[]</field>
+        <field name="context">{
+            'search_default_confirmed': 1,
+            'create': False
+        }</field>
+    </record>
+</odoo>

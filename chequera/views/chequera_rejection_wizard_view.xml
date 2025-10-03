@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Vista de formulario para el wizard de rechazo de cheques -->
+    <record id="view_chequera_rejection_wizard_form" model="ir.ui.view">
+        <field name="name">chequera.rejection.wizard.form</field>
+        <field name="model">chequera.rejection.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Rechazar Cheque">
+                <sheet>
+                    <div class="alert alert-warning" role="alert">
+                        <strong>¡Atención!</strong> Esta acción marcará el cheque como rechazado y generará movimientos de compensación.
+                    </div>
+                    <group>
+                        <group>
+                            <field name="cheque_id" readonly="1"/>
+                            <field name="numero_cheque" readonly="1"/>
+                            <field name="banco_id" readonly="1"/>
+                            <field name="monto" readonly="1"/>
+                            <field name="state" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="motivo_rechazo" required="1"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Operación de Compra" invisible="not proveedor_id">
+                            <group>
+                                <group>
+                                    <field name="proveedor_id" readonly="1"/>
+                                    <field name="precio_compra" readonly="1"/>
+                                </group>
+                                <group>
+                                    <field name="revertir_compra"/>
+                                    <field name="monto_reversion_compra" invisible="not revertir_compra"/>
+                                </group>
+                            </group>
+                        </page>
+                        <page string="Operación de Venta" invisible="not cliente_id">
+                            <group>
+                                <group>
+                                    <field name="cliente_id" readonly="1"/>
+                                    <field name="precio_venta" readonly="1"/>
+                                </group>
+                                <group>
+                                    <field name="revertir_venta"/>
+                                    <field name="monto_reversion_venta" invisible="not revertir_venta"/>
+                                </group>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+                <footer>
+                    <button name="action_rechazar_cheque" string="Confirmar Rechazo" type="object" class="btn-primary"/>
+                    <button special="cancel" string="Cancelar" class="btn-secondary"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <!-- Acción para abrir el wizard de rechazo -->
+    <record id="action_chequera_rejection_wizard" model="ir.actions.act_window">
+        <field name="name">Rechazar Cheque</field>
+        <field name="res_model">chequera.rejection.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="view_chequera_rejection_wizard_form"/>
+        <field name="target">new</field>
+        <field name="binding_model_id" ref="model_chequera_check"/>
+        <field name="binding_view_types">form</field>
+    </record>
+</odoo>

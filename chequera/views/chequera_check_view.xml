@@ -1,0 +1,414 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Vista de árbol para cheques - MODIFICADA -->
+    <record id="view_chequera_check_tree" model="ir.ui.view">
+        <field name="name">chequera.check.tree</field>
+        <field name="model">chequera.check</field>
+        <field name="arch" type="xml">
+            <tree decoration-danger="alerta_vencimiento == 'vencido'" 
+                 decoration-warning="alerta_vencimiento == 'alerta_7'" 
+                 decoration-info="alerta_vencimiento == 'alerta_15'">
+                <field name="name"/>
+                <field name="numero_cheque"/>
+                <field name="banco_id"/>
+                <field name="emisor_id"/>
+                <field name="monto"/>
+                <field name="fecha_pago"/>
+                <field name="dias_para_disponibilidad"/>
+                <field name="dias_para_vencimiento"/>
+                <field name="state"/>
+                <field name="devuelto" invisible="state != 'rechazado'"/>
+                <field name="alerta_vencimiento" invisible="1"/>
+                <field name="ganancia" invisible="state != 'vendido'"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Vista de formulario para cheques - SIMPLIFICADA -->
+    <record id="view_chequera_check_form" model="ir.ui.view">
+        <field name="name">chequera.check.form</field>
+        <field name="model">chequera.check</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <!-- SIMPLIFICADO: Solo botones esenciales -->
+                    <button name="action_comprar" type="object" string="Comprar" 
+                            class="oe_highlight" 
+                            groups="chequera.group_chequera_user"
+                            invisible="state != 'borrador' or is_in_purchase_wizard or is_in_sale_wizard or context.get('wizard_id') or context.get('sale_wizard_id')"/>
+                    
+                    <button name="action_vender" type="object" string="Vender" 
+                            class="oe_highlight" 
+                            groups="chequera.group_chequera_user"
+                            invisible="state != 'disponible' or is_in_sale_wizard or context.get('sale_wizard_id')"/>
+                    
+                    <!-- ELIMINADOS: action_anular y action_reset_to_draft -->
+                    
+                    <button name="action_rechazar" type="object" string="Rechazar" 
+                            groups="chequera.group_chequera_supervisor"
+                            class="btn-danger"
+                            invisible="state in ('borrador', 'anulado', 'rechazado')"/>
+                    
+                    <field name="state" widget="statusbar" 
+                           statusbar_visible="borrador,disponible,vendido,rechazado"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" readonly="1"/>
+                        </h1>
+                    </div>
+                    
+                    <!-- Banner de alertas de vencimiento -->
+                    <div class="alert alert-danger" role="alert" 
+                         invisible="alerta_vencimiento != 'vencido'">
+                        <strong>¡Cheque vencido!</strong> Este cheque ya ha pasado su fecha de vencimiento.
+                    </div>
+                    
+                    <div class="alert alert-warning" role="alert" 
+                         invisible="alerta_vencimiento != 'alerta_7'">
+                        <strong>¡Alerta!</strong> Este cheque vencerá en menos de 7 días.
+                    </div>
+                    
+                    <div class="alert alert-info" role="alert" 
+                         invisible="alerta_vencimiento != 'alerta_15'">
+                        <strong>Información:</strong> Este cheque vencerá en menos de 15 días.
+                    </div>
+                    
+                    <div class="alert alert-info" role="alert" 
+                         invisible="alerta_vencimiento != 'alerta_30'">
+                        <strong>Información:</strong> Este cheque vencerá en menos de 30 días.
+                    </div>
+                    
+                    <!-- Banner de alerta de disponibilidad -->
+                    <div class="alert alert-warning" role="alert" 
+                         invisible="dias_para_disponibilidad &lt;= 0">
+                        <strong>¡Información importante!</strong> Este cheque estará disponible para su cobro en <field name="dias_para_disponibilidad" readonly="1"/> días.
+                    </div>
+                    
+                    <!-- Banner de motivo de rechazo -->
+                    <div class="alert alert-danger" role="alert" 
+                        invisible="state != 'rechazado'">
+                        <strong>¡Cheque rechazado!</strong> Motivo: <field name="motivo_rechazo" readonly="1"/>
+                        <div>Fecha de rechazo: <field name="fecha_rechazo" readonly="1"/></div>
+                        <div invisible="not devuelto">
+                            <strong>Cheque devuelto</strong> el <field name="fecha_devolucion" readonly="1"/>
+                        </div>
+                    </div>
+
+                    <group>
+                        <group>
+                            <field name="numero_cheque"/>
+                            <field name="banco_id" 
+                                   options="{'no_create': True, 'no_open': True}"
+                                   readonly="state != 'borrador'"/>
+                            <field name="emisor_id" 
+                                   options="{'no_create': False, 'create_edit': True}"
+                                   readonly="state != 'borrador'"/>
+                            <field name="monto" 
+                                   readonly="state != 'borrador'"/>
+                            <field name="fecha_pago" 
+                                   readonly="state != 'borrador'"/>
+                            <field name="fecha_vencimiento" readonly="1"/>
+                            <field name="dias_para_vencimiento" readonly="1"/>
+                            <field name="dias_para_disponibilidad" invisible="1"/>
+                            <field name="alerta_vencimiento" invisible="1"/>
+                            <field name="is_in_purchase_wizard" invisible="1"/>
+                            <field name="is_in_sale_wizard" invisible="1"/>
+                        </group>
+                        <group>
+                            <!-- Sección para checklist (solo en estado borrador) -->
+                            <field name="checklist_emisor" 
+                                   readonly="state != 'borrador'"/>
+                            <field name="checklist_irregularidades" 
+                                   readonly="state != 'borrador'"/>
+                            <field name="checklist_firma" 
+                                   readonly="state != 'borrador'"/>
+                            <!-- Campos de devolución para cheques rechazados -->
+                            <field name="devuelto" 
+                                   invisible="state != 'rechazado'"/>
+                            <field name="fecha_devolucion" 
+                                   invisible="state != 'rechazado' or not devuelto"
+                                   readonly="not devuelto"/>
+                            <!-- NUEVO: Mostrar operaciones asociadas -->
+                            <field name="operation_id" 
+                                   readonly="1" 
+                                   invisible="not operation_id"
+                                   string="Operación de Compra"/>
+                            <field name="sale_operation_id" 
+                                   readonly="1" 
+                                   invisible="not sale_operation_id"
+                                   string="Operación de Venta"/>
+                        </group>
+                    </group>
+                    
+                    <notebook>
+                        <!-- CORREGIDO: Mostrar pestaña si hay información, no basarse en estado -->
+                        <page string="Compra" invisible="not proveedor_id">
+                            <group>
+                                <group>
+                                    <field name="proveedor_id" 
+                                           readonly="state != 'borrador' or is_in_purchase_wizard"
+                                           options="{'no_create': True, 'no_create_edit': True}"/>
+                                    <field name="tasa_pesificacion_compra" 
+                                           readonly="state != 'borrador'"/>
+                                    <field name="interes_mensual_compra" 
+                                           readonly="state != 'borrador'"/>
+                                    <field name="vendedor_id_compra" 
+                                           string="Operador Compra"
+                                           readonly="state != 'borrador'"/>
+                                </group>
+                                <group>
+                                    <field name="pesificacion_valor_compra" readonly="1"/>
+                                    <field name="interes_valor_compra" readonly="1"/>
+                                    <field name="precio_compra" readonly="1" 
+                                           class="oe_highlight oe_inline"/>
+                                </group>
+                            </group>
+                        </page>
+                        
+                        <!-- MODIFICADO: Pestaña de venta con análisis de ganancia -->
+                        <page string="Venta" invisible="not cliente_id">
+                            <group>
+                                <group>
+                                    <field name="cliente_id" 
+                                           readonly="state in ('vendido', 'rechazado')"
+                                           options="{'no_create': True, 'no_create_edit': True}"/>
+                                    <field name="tasa_pesificacion_venta" 
+                                           readonly="state in ('vendido', 'rechazado')"/>
+                                    <field name="interes_mensual_venta" 
+                                           readonly="state in ('vendido', 'rechazado')"/>
+                                    <field name="vendedor_id_venta" 
+                                           string="Operador Venta"
+                                           readonly="state in ('vendido', 'rechazado')"/>
+                                </group>
+                                <group>
+                                    <field name="pesificacion_valor_venta" readonly="1"/>
+                                    <field name="interes_valor_venta" readonly="1"/>
+                                    <field name="precio_venta" readonly="1" 
+                                           class="oe_highlight oe_inline"/>
+                                </group>
+                            </group>
+                            <!-- NUEVO: Sección de análisis de ganancia -->
+                            <group invisible="state != 'vendido' or not precio_compra" string="Análisis de Ganancia">
+                                <group>
+                                    <field name="ganancia" widget="monetary" readonly="1"/>
+                                </group>
+                                <group>
+                                    <field name="ganancia_porcentaje" readonly="1"/>
+                                    <span>%</span>
+                                </group>
+                            </group>
+                        </page>
+                        
+                        <!-- Pestaña de Imágenes -->
+                        <page string="Imágenes">
+                            <group>
+                                <field name="image_frente" widget="image" class="oe_avatar"/>
+                                <field name="image_dorso" widget="image" class="oe_avatar"/>
+                            </group>
+                        </page>
+                    </notebook>
+                    
+                    <!-- Botón para volver al wizard, al final del formulario -->
+                    <footer invisible="not (is_in_purchase_wizard or is_in_sale_wizard or context.get('wizard_id') or context.get('sale_wizard_id') or context.get('is_in_sale_wizard'))">
+                        <button name="action_save_and_return" type="object" 
+                                string="Guardar y Volver" 
+                                class="btn-primary"/>
+                    </footer>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers"/>
+                    <field name="message_ids" widget="mail_thread"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <!-- Vista de búsqueda para cheques -->
+    <record id="view_chequera_check_search" model="ir.ui.view">
+        <field name="name">chequera.check.search</field>
+        <field name="model">chequera.check</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="numero_cheque"/>
+                <field name="banco_id"/>
+                <field name="emisor_id"/>
+                <field name="proveedor_id"/>
+                <field name="cliente_id"/>
+                <separator/>
+                <filter string="Borradores" name="draft" domain="[('state','=','borrador')]"/>
+                <filter string="Disponibles" name="available" domain="[('state','=','disponible')]"/>
+                <filter string="Vendidos" name="sold" domain="[('state','=','vendido')]"/>
+                <filter string="Anulados" name="canceled" domain="[('state','=','anulado')]"/>
+                <filter string="Rechazados" name="rejected" domain="[('state','=','rechazado')]"/>
+                <separator/>
+                <filter string="Rechazados sin devolver" name="rejected_not_returned" 
+                        domain="[('state','=','rechazado'),('devuelto','=',False)]"/>
+                <filter string="Rechazados devueltos" name="rejected_returned" 
+                        domain="[('state','=','rechazado'),('devuelto','=',True)]"/>
+                <separator/>
+                <filter string="Vencidos" name="expired" domain="[('dias_para_vencimiento','&lt;=',0)]"/>
+                <filter string="Próximos a vencer (7 días)" name="soon_7" domain="[('dias_para_vencimiento','&gt;',0),('dias_para_vencimiento','&lt;=',7)]"/>
+                <filter string="Próximos a vencer (15 días)" name="soon_15" domain="[('dias_para_vencimiento','&gt;',0),('dias_para_vencimiento','&lt;=',15)]"/>
+                <filter string="Próximos a vencer (30 días)" name="soon_30" domain="[('dias_para_vencimiento','&gt;',0),('dias_para_vencimiento','&lt;=',30)]"/>
+                <filter string="Disponibles en 7 días" name="available_soon" domain="[('dias_para_disponibilidad','&gt;',0),('dias_para_disponibilidad','&lt;=',7)]"/>
+                <group expand="0" string="Agrupar por">
+                    <filter string="Estado" name="groupby_state" context="{'group_by': 'state'}"/>
+                    <filter string="Banco" name="groupby_bank" context="{'group_by': 'banco_id'}"/>
+                    <filter string="Emisor" name="groupby_emisor" context="{'group_by': 'emisor_id'}"/>
+                    <filter string="Proveedor" name="groupby_vendor" context="{'group_by': 'proveedor_id'}"/>
+                    <filter string="Cliente" name="groupby_customer" context="{'group_by': 'cliente_id'}"/>
+                    <filter string="Fecha de pago" name="groupby_payment_date" context="{'group_by': 'fecha_pago'}"/>
+                    <filter string="Devuelto" name="groupby_returned" context="{'group_by': 'devuelto'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Vista kanban para cheques - MODIFICADA -->
+    <record id="view_chequera_check_kanban" model="ir.ui.view">
+        <field name="name">chequera.check.kanban</field>
+        <field name="model">chequera.check</field>
+        <field name="arch" type="xml">
+            <kanban>
+                <field name="id"/>
+                <field name="name"/>
+                <field name="numero_cheque"/>
+                <field name="banco_id"/>
+                <field name="emisor_id"/>
+                <field name="monto"/>
+                <field name="fecha_pago"/>
+                <field name="state"/>
+                <field name="alerta_vencimiento"/>
+                <field name="dias_para_vencimiento"/>
+                <field name="dias_para_disponibilidad"/>
+                <field name="devuelto"/>
+                <field name="ganancia"/>
+                <field name="precio_compra"/>
+                <field name="precio_venta"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div t-attf-class="oe_kanban_global_click o_kanban_record_has_image_fill">
+                            <div class="o_kanban_record_top">
+                                <div class="o_kanban_record_headings">
+                                    <strong class="o_kanban_record_title">
+                                        <span><field name="name"/></span>
+                                    </strong>
+                                    <span class="o_kanban_record_subtitle">
+                                        <field name="numero_cheque"/>
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="o_kanban_record_body">
+                                <!-- CAMBIO: Estado siempre visible -->
+                                <div>
+                                    <span t-if="record.state.raw_value == 'borrador'" 
+                                          class="badge badge-secondary">Borrador</span>
+                                    <span t-if="record.state.raw_value == 'disponible'" 
+                                          class="badge badge-success">Disponible</span>
+                                    <span t-if="record.state.raw_value == 'vendido'" 
+                                          class="badge badge-primary">Vendido</span>
+                                    <span t-if="record.state.raw_value == 'anulado'" 
+                                          class="badge badge-danger">Anulado</span>
+                                    <span t-if="record.state.raw_value == 'rechazado'" 
+                                          class="badge badge-danger">
+                                        Rechazado
+                                        <t t-if="record.devuelto.raw_value"> (Devuelto)</t>
+                                    </span>
+                                </div>
+                                <div>
+                                    <strong>Banco:</strong> <field name="banco_id"/>
+                                </div>
+                                <div>
+                                    <strong>Emisor:</strong> <field name="emisor_id"/>
+                                </div>
+                                <div>
+                                    <strong>Monto:</strong> $<field name="monto"/>
+                                </div>
+                                <div>
+                                    <strong>Pago:</strong> <field name="fecha_pago"/>
+                                </div>
+                                <!-- NUEVO: Mostrar ganancia si está vendido -->
+                                <div t-if="record.state.raw_value == 'vendido' and record.ganancia.raw_value">
+                                    <span class="badge badge-success">
+                                        Ganancia: $<field name="ganancia"/>
+                                    </span>
+                                </div>
+                                <div t-if="record.dias_para_disponibilidad.raw_value > 0">
+                                    <span class="badge badge-warning">
+                                        Disponible en <field name="dias_para_disponibilidad"/> días
+                                    </span>
+                                </div>
+                                <div t-if="record.dias_para_vencimiento.raw_value !== undefined">
+                                    <t t-if="record.dias_para_vencimiento.raw_value > 0">
+                                        <span t-attf-class="badge badge-#{record.dias_para_vencimiento.raw_value &lt;= 7 ? 'danger' : (record.dias_para_vencimiento.raw_value &lt;= 15 ? 'warning' : (record.dias_para_vencimiento.raw_value &lt;= 30 ? 'info' : 'secondary'))}">
+                                            <field name="dias_para_vencimiento"/> días para vencer
+                                        </span>
+                                    </t>
+                                    <t t-else="">
+                                        <span class="badge badge-danger">Vencido</span>
+                                    </t>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- IMPORTANTE: MANTENER TODAS LAS ACCIONES -->
+    
+    <!-- Acción para cheques -->
+    <record id="action_chequera_check" model="ir.actions.act_window">
+        <field name="name">Cheques</field>
+        <field name="res_model">chequera.check</field>
+        <field name="view_mode">kanban,tree,form</field>
+        <field name="context">{'search_default_available': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No hay cheques registrados
+            </p>
+            <p>
+                Cree un nuevo cheque para comenzar con el proceso de compra.
+            </p>
+        </field>
+    </record>
+
+    <!-- Acción para compra de cheques -->
+    <record id="action_chequera_check_purchase" model="ir.actions.act_window">
+        <field name="name">Compra de Cheques</field>
+        <field name="res_model">chequera.check</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('state', '=', 'borrador')]</field>
+        <field name="context">{'default_state': 'borrador'}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No hay cheques en borrador
+            </p>
+            <p>
+                Cree un nuevo cheque para comenzar con el proceso de compra.
+            </p>
+        </field>
+    </record>
+
+    <!-- Acción para venta de cheques - Actualizada para usar el wizard -->
+    <record id="action_chequera_check_sale" model="ir.actions.act_window">
+        <field name="name">Venta de Cheques</field>
+        <field name="res_model">chequera.sale.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="view_chequera_sale_wizard_form"/>
+        <field name="context">{'default_state': 'borrador'}</field>
+        <field name="target">new</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No hay operaciones de venta iniciadas
+            </p>
+            <p>
+                Seleccione los cheques disponibles para vender.
+            </p>
+        </field>
+    </record>
+</odoo>

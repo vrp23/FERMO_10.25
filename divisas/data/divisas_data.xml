@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- Secuencias -->
+        <record id="seq_divisas_currency" model="ir.sequence">
+            <field name="name">Operación de Divisa</field>
+            <field name="code">divisas.currency</field>
+            <field name="prefix">#</field>
+            <field name="padding">5</field>
+            <field name="company_id" eval="False"/>
+        </record>
+        
+        <!-- Secuencia para posiciones abiertas -->
+        <record id="seq_divisas_open_position" model="ir.sequence">
+            <field name="name">Posición Abierta</field>
+            <field name="code">divisas.open.position</field>
+            <field name="prefix">POS#</field>
+            <field name="padding">5</field>
+            <field name="company_id" eval="False"/>
+        </record>
+
+        <record id="seq_divisas_wallet_movement" model="ir.sequence">
+            <field name="name">Movimiento de Wallet</field>
+            <field name="code">divisas.wallet.movement</field>
+            <field name="prefix">MOV#</field>
+            <field name="padding">5</field>
+            <field name="company_id" eval="False"/>
+        </record>
+        
+        <!-- NUEVO: Secuencia para lotes de inventario -->
+        <record id="seq_divisas_inventory_lot" model="ir.sequence">
+            <field name="name">Lote de Inventario FIFO</field>
+            <field name="code">divisas.inventory.lot</field>
+            <field name="prefix">LOT#</field>
+            <field name="padding">5</field>
+            <field name="company_id" eval="False"/>
+        </record>
+        
+        <!-- Tipos de cambio iniciales -->
+        <record id="exchange_rate_usd_ars" model="divisas.exchange.rate">
+            <field name="from_currency_type">USD</field>
+            <field name="to_currency_type">ARS</field>
+            <field name="rate">1200.00</field>
+            <field name="sell_rate">1180.00</field>
+            <field name="date" eval="time.strftime('%Y-%m-%d')"/>
+            <field name="notes">Tipo de cambio inicial USD-ARS</field>
+        </record>
+        
+        <record id="exchange_rate_usdt_ars" model="divisas.exchange.rate">
+            <field name="from_currency_type">USDT</field>
+            <field name="to_currency_type">ARS</field>
+            <field name="rate">1205.00</field>
+            <field name="sell_rate">1175.00</field>
+            <field name="date" eval="time.strftime('%Y-%m-%d')"/>
+            <field name="notes">Tipo de cambio inicial USDT-ARS</field>
+        </record>
+        
+        <record id="exchange_rate_usdt_usd" model="divisas.exchange.rate">
+            <field name="from_currency_type">USDT</field>
+            <field name="to_currency_type">USD</field>
+            <field name="rate">1.005</field>
+            <field name="sell_rate">0.995</field>
+            <field name="date" eval="time.strftime('%Y-%m-%d')"/>
+            <field name="notes">Tipo de cambio inicial USDT-USD</field>
+        </record>
+        
+        <!-- Tipos de cambio inversos para todas las combinaciones -->
+        <record id="exchange_rate_ars_usd" model="divisas.exchange.rate">
+            <field name="from_currency_type">ARS</field>
+            <field name="to_currency_type">USD</field>
+            <field name="rate">0.000833</field>
+            <field name="sell_rate">0.000847</field>
+            <field name="date" eval="time.strftime('%Y-%m-%d')"/>
+            <field name="notes">Tipo de cambio inicial ARS-USD</field>
+        </record>
+        
+        <record id="exchange_rate_ars_usdt" model="divisas.exchange.rate">
+            <field name="from_currency_type">ARS</field>
+            <field name="to_currency_type">USDT</field>
+            <field name="rate">0.000830</field>
+            <field name="sell_rate">0.000851</field>
+            <field name="date" eval="time.strftime('%Y-%m-%d')"/>
+            <field name="notes">Tipo de cambio inicial ARS-USDT</field>
+        </record>
+        
+        <record id="exchange_rate_usd_usdt" model="divisas.exchange.rate">
+            <field name="from_currency_type">USD</field>
+            <field name="to_currency_type">USDT</field>
+            <field name="rate">0.995</field>
+            <field name="sell_rate">0.990</field>
+            <field name="date" eval="time.strftime('%Y-%m-%d')"/>
+            <field name="notes">Tipo de cambio inicial USD-USDT</field>
+        </record>
+    </data>
+</odoo>

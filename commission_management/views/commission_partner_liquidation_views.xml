@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Vista Form -->
+    <record id="view_commission_partner_liquidation_form" model="ir.ui.view">
+        <field name="name">commission.partner.liquidation.form</field>
+        <field name="model">commission.partner.liquidation</field>
+        <field name="arch" type="xml">
+            <form string="Liquidación de Socios">
+                <header>
+                    <button name="action_calculate" 
+                            string="Calcular Distribución" 
+                            type="object" 
+                            class="btn-primary"
+                            invisible="state not in ('draft', 'calculated')"/>
+                    <button name="action_confirm" 
+                            string="Confirmar" 
+                            type="object" 
+                            class="btn-primary"
+                            invisible="state != 'calculated'"
+                            confirm="¿Está seguro de confirmar esta liquidación?"/>
+                    <button name="action_pay" 
+                            string="Registrar Pagos" 
+                            type="object" 
+                            class="btn-success"
+                            invisible="state != 'confirmed'"
+                            confirm="¿Confirmar el pago a todos los socios? Se crearán movimientos en sus wallets."/>
+                    <button name="action_cancel" 
+                            string="Cancelar" 
+                            type="object"
+                            invisible="state == 'paid'"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,calculated,confirmed,paid"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_operator_liquidations" 
+                                type="object" 
+                                class="oe_stat_button" 
+                                icon="fa-money">
+                            <field name="total_operator_commissions" widget="statinfo" string="Com. Operadores"/>
+                        </button>
+                        <button name="action_view_costs" 
+                                type="object" 
+                                class="oe_stat_button" 
+                                icon="fa-file-text-o">
+                            <field name="total_costs" widget="statinfo" string="Costos"/>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" readonly="1"/>
+                        </h1>
+                        <h2>
+                            <field name="period_display"/>
+                        </h2>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="date" readonly="state != 'draft'"/>
+                            <field name="period_year" readonly="state != 'draft'"/>
+                            <field name="period_month" readonly="state != 'draft'"/>
+                        </group>
+                        <group>
+                            <field name="gross_profit" widget="monetary"/>
+                            <field name="net_profit" widget="monetary" class="oe_highlight"/>
+                            <field name="total_commission" widget="monetary"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Cálculo de Ganancia" name="profit_calculation">
+                            <group>
+                                <group string="Ingresos y Egresos">
+                                    <field name="gross_income" widget="monetary"/>
+                                    <field name="gross_expenses" widget="monetary"/>
+                                    <separator/>
+                                    <label for="gross_profit" string="Ganancia Bruta"/>
+                                    <div>
+                                        <field name="gross_profit" widget="monetary" class="oe_inline"/>
+                                        <span> (Ingresos - Egresos)</span>
+                                    </div>
+                                </group>
+                                <group string="Deducciones">
+                                    <field name="total_operator_commissions" widget="monetary"/>
+                                    <field name="total_costs" widget="monetary"/>
+                                    <separator/>
+                                    <label for="net_profit" string="Ganancia Neta"/>
+                                    <div>
+                                        <field name="net_profit" widget="monetary" class="oe_inline oe_highlight"/>
+                                        <span> (Ganancia Bruta - Comisiones - Costos)</span>
+                                    </div>
+                                </group>
+                            </group>
+                            <group string="Detalle de Costos">
+                                <group>
+                                    <field name="cost_cf" string="Costos Fijos" widget="monetary"/>
+                                    <field name="cost_cv" string="Costos Variables" widget="monetary"/>
+                                </group>
+                                <group>
+                                    <field name="cost_ci" string="Inversiones" widget="monetary"/>
+                                    <field name="cost_imp" string="Impuestos" widget="monetary"/>
+                                    <field name="reinvestment_amount" string="Reinversión" widget="monetary"/>
+                                </group>
+                            </group>
+                        </page>
+                        <page string="Distribución entre Socios" name="partner_distribution">
+                            <field name="line_ids" readonly="state in ('confirmed', 'paid')">
+                                <tree editable="bottom" create="0">
+                                    <field name="partner_id"/>
+                                    <field name="commission_rate" widget="percentage"/>
+                                    <field name="base_amount" widget="monetary"/>
+                                    <field name="commission_amount" widget="monetary" sum="Total"/>
+                                    <field name="wallet_movement_id" readonly="1"/>
+                                    <field name="notes"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Operaciones Incluidas" name="included_operations">
+                            <group>
+                                <field name="operator_liquidation_ids" widget="many2many_tags"/>
+                                <field name="cost_ids" widget="many2many_tags"/>
+                            </group>
+                        </page>
+                        <page string="Notas" name="notes">
+                            <field name="notes" placeholder="Observaciones..."/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers"/>
+                    <field name="activity_ids" widget="mail_activity"/>
+                    <field name="message_ids" widget="mail_thread"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <!-- Vista Tree -->
+    <record id="view_commission_partner_liquidation_tree" model="ir.ui.view">
+        <field name="name">commission.partner.liquidation.tree</field>
+        <field name="model">commission.partner.liquidation</field>
+        <field name="arch" type="xml">
+            <tree string="Liquidaciones de Socios" 
+                  decoration-success="state == 'paid'"
+                  decoration-warning="state == 'confirmed'"
+                  decoration-info="state == 'calculated'">
+                <field name="name"/>
+                <field name="period_display"/>
+                <field name="date"/>
+                <field name="gross_profit" widget="monetary"/>
+                <field name="net_profit" widget="monetary"/>
+                <field name="total_commission" widget="monetary" sum="Total"/>
+                <field name="state" widget="badge"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Vista Search -->
+    <record id="view_commission_partner_liquidation_search" model="ir.ui.view">
+        <field name="name">commission.partner.liquidation.search</field>
+        <field name="model">commission.partner.liquidation</field>
+        <field name="arch" type="xml">
+            <search string="Buscar Liquidaciones de Socios">
+                <field name="name"/>
+                <field name="period_year"/>
+                <field name="period_month"/>
+                <separator/>
+                <filter string="Borrador" name="draft" domain="[('state', '=', 'draft')]"/>
+                <filter string="Calculadas" name="calculated" domain="[('state', '=', 'calculated')]"/>
+                <filter string="Confirmadas" name="confirmed" domain="[('state', '=', 'confirmed')]"/>
+                <filter string="Pagadas" name="paid" domain="[('state', '=', 'paid')]"/>
+                <separator/>
+                <filter string="Este Año" name="this_year" 
+                        domain="[('period_year', '=', datetime.datetime.now().year)]"/>
+                <group expand="0" string="Agrupar Por">
+                    <filter string="Estado" name="group_state" context="{'group_by': 'state'}"/>
+                    <filter string="Año" name="group_year" context="{'group_by': 'period_year'}"/>
+                    <filter string="Mes" name="group_month" context="{'group_by': 'period_month'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Acción -->
+    <record id="action_commission_partner_liquidation" model="ir.actions.act_window">
+        <field name="name">Liquidaciones de Socios</field>
+        <field name="res_model">commission.partner.liquidation</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_commission_partner_liquidation_search"/>
+        <field name="context">{'search_default_this_year': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Crear liquidación mensual de socios
+            </p>
+            <p>
+                Las liquidaciones de socios calculan la distribución de la ganancia neta
+                entre los socios según sus porcentajes de participación.
+            </p>
+        </field>
+    </record>
+</odoo>

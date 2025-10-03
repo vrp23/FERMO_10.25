@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Heredar vista tree de cheques para agregar indicador de liquidación -->
+    <record id="view_chequera_check_tree_inherit_commission" model="ir.ui.view">
+        <field name="name">chequera.check.tree.inherit.commission</field>
+        <field name="model">chequera.check</field>
+        <field name="inherit_id" ref="chequera.view_chequera_check_tree"/>
+        <field name="arch" type="xml">
+            <field name="state" position="after">
+                <field name="commission_liquidated" widget="boolean_toggle" optional="show"/>
+            </field>
+        </field>
+    </record>
+
+    <!-- Heredar vista form de cheques para agregar información de comisión -->
+    <record id="view_chequera_check_form_inherit_commission" model="ir.ui.view">
+        <field name="name">chequera.check.form.inherit.commission</field>
+        <field name="model">chequera.check</field>
+        <field name="inherit_id" ref="chequera.view_chequera_check_form"/>
+        <field name="arch" type="xml">
+            <!-- Agregar pestaña de comisiones en el notebook -->
+            <notebook position="inside">
+                <page string="Comisiones" name="commission_info" 
+                      invisible="state not in ('vendido', 'rechazado')">
+                    <group>
+                        <group string="Estado de Liquidación">
+                            <field name="is_commission_liquidable"/>
+                            <field name="commission_liquidated"/>
+                            <field name="commission_liquidation_id" 
+                                   invisible="not commission_liquidated"/>
+                        </group>
+                        <group string="Información de Ganancia" 
+                               invisible="not is_commission_liquidable and not commission_liquidated">
+                            <field name="precio_compra" readonly="1"/>
+                            <field name="precio_venta" readonly="1"/>
+                            <field name="ganancia_calculada" readonly="1" class="oe_highlight"/>
+                        </group>
+                    </group>
+                </page>
+            </notebook>
+        </field>
+    </record>
+
+    <!-- Heredar vista search para agregar filtros de comisión -->
+    <record id="view_chequera_check_search_inherit_commission" model="ir.ui.view">
+        <field name="name">chequera.check.search.inherit.commission</field>
+        <field name="model">chequera.check</field>
+        <field name="inherit_id" ref="chequera.view_chequera_check_search"/>
+        <field name="arch" type="xml">
+            <filter name="sold" position="after">
+                <separator/>
+                <filter string="Liquidables para Comisión" 
+                        name="commission_liquidable" 
+                        domain="[('is_commission_liquidable', '=', True)]"/>
+                <filter string="Comisión Liquidada" 
+                        name="commission_liquidated" 
+                        domain="[('commission_liquidated', '=', True)]"/>
+                <filter string="Comisión Pendiente" 
+                        name="commission_pending" 
+                        domain="[('is_commission_liquidable', '=', True), ('commission_liquidated', '=', False)]"/>
+            </filter>
+        </field>
+    </record>
+</odoo>

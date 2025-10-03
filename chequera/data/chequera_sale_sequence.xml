@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- Secuencia para operaciones de venta -->
+        <record id="seq_chequera_sale" model="ir.sequence">
+            <field name="name">Operación de Venta</field>
+            <field name="code">chequera.sale.sequence</field>
+            <field name="prefix">OPV#</field>
+            <field name="padding">6</field>
+            <field name="company_id" eval="False"/>
+        </record>
+    </data>
+</odoo>

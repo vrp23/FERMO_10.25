@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_chequera_reversion_confirmation_form" model="ir.ui.view">
+        <field name="name">chequera.reversion.confirmation.form</field>
+        <field name="model">chequera.reversion.confirmation</field>
+        <field name="arch" type="xml">
+            <form string="Confirmación de Reversión">
+                <div class="alert alert-warning" role="alert">
+                    <field name="warning_message" readonly="1" nolabel="1"/>
+                </div>
+                
+                <group>
+                    <group>
+                        <field name="operation_name" readonly="1"/>
+                        <field name="partner_name" readonly="1"/>
+                        <field name="total_amount" readonly="1" widget="monetary"/>
+                    </group>
+                    <group>
+                        <field name="operation_type" invisible="1"/>
+                        <field name="purchase_operation_id" invisible="1"/>
+                        <field name="sale_operation_id" invisible="1"/>
+                    </group>
+                </group>
+                
+                <notebook>
+                    <page string="Cheques con Conflictos" invisible="not conflicted_check_ids">
+                        <field name="conflicted_check_ids" readonly="1">
+                            <tree>
+                                <field name="name"/>
+                                <field name="numero_cheque"/>
+                                <field name="banco_id"/>
+                                <field name="monto"/>
+                                <field name="state"/>
+                                <field name="cliente_id"/>
+                            </tree>
+                        </field>
+                    </page>
+                    <page string="Operaciones de Venta Relacionadas" invisible="not related_sale_ids">
+                        <field name="related_sale_ids" readonly="1">
+                            <tree>
+                                <field name="name"/>
+                                <field name="cliente_id"/>
+                                <field name="fecha_operacion"/>
+                                <field name="cantidad_cheques_confirmado"/>
+                                <field name="precio_total_confirmado"/>
+                            </tree>
+                        </field>
+                    </page>
+                </notebook>
+                
+                <group>
+                    <field name="reversion_mode" widget="radio"/>
+                </group>
+                
+                <footer>
+                    <button name="action_confirm_reversion" 
+                            string="Confirmar" 
+                            type="object" 
+                            class="btn-primary"
+                            groups="chequera.group_chequera_supervisor"/>
+                    <button string="Cancelar" special="cancel" class="btn-secondary"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>

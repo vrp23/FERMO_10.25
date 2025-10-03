@@ -1,0 +1,53 @@
+/* Estilos personalizados para el módulo Chequera */
+
+/* Botones grandes para el dashboard */
+.btn-lg.btn-primary, .btn-lg.btn-success {
+    height: 120px;
+    font-size: 18px;
+    margin: 15px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 80%;
+    margin: 0 auto;
+    transition: transform 0.2s, box-shadow 0.2s;
+    border-radius: 10px;
+}
+
+.btn-lg.btn-primary:hover, .btn-lg.btn-success:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+}
+
+.btn-lg.btn-primary i, .btn-lg.btn-success i {
+    font-size: 40px;
+    margin-bottom: 10px;
+}
+
+/* Estilos para la wallet */
+.wallet-balance-amount {
+    font-size: 32px !important;
+    font-weight: bold !important;
+    color: #28a745 !important;
+    line-height: 1.2 !important;
+}
+
+/* Resaltar montos positivos y negativos */
+.o_field_monetary.o_field_number[data-value^="-"] {
+    color: #dc3545 !important;
+}
+
+.o_field_monetary.o_field_number:not([data-value^="-"]) {
+    color: #28a745 !important;
+}
+
+/* Campos destacados */
+.oe_highlight.oe_inline {
+    font-size: 22px !important;
+    font-weight: bold !important;
+    padding: 8px 16px !important;
+    border-radius: 4px !important;
+    background-color: #f8f9fa !important;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1) !important;
+}

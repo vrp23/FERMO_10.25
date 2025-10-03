@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Vista Form -->
+    <record id="view_commission_cost_form" model="ir.ui.view">
+        <field name="name">commission.cost.form</field>
+        <field name="model">commission.cost</field>
+        <field name="arch" type="xml">
+            <form string="Costo/Gasto">
+                <header>
+                    <button name="action_confirm" 
+                            string="Confirmar" 
+                            type="object" 
+                            class="btn-primary"
+                            invisible="state != 'draft'"/>
+                    <button name="action_reset_draft" 
+                            string="Volver a Borrador" 
+                            type="object"
+                            invisible="state not in ('confirmed', 'cancelled')"/>
+                    <button name="action_cancel" 
+                            string="Cancelar" 
+                            type="object"
+                            invisible="state in ('applied', 'cancelled')"/>
+                    <button name="action_create_cashbox_operation" 
+                            string="Crear Salida de Caja" 
+                            type="object"
+                            class="btn-info"
+                            invisible="state != 'confirmed' or cashbox_operation_id"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,confirmed,applied"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_attachments" 
+                                type="object" 
+                                class="oe_stat_button" 
+                                icon="fa-file-o">
+                            <field name="attachment_count" widget="statinfo" string="Adjuntos"/>
+                        </button>
+                    </div>
+                    <widget name="web_ribbon" 
+                            title="Aplicado" 
+                            bg_color="bg-success" 
+                            invisible="state != 'applied'"/>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1>
+                            <field name="name" placeholder="Descripción del costo..." 
+                                   readonly="state != 'draft'"/>
+                        </h1>
+                        <h2>
+                            <field name="code" readonly="1"/>
+                        </h2>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="cost_type" readonly="state != 'draft'"/>
+                            <field name="cost_subtype" readonly="state != 'draft'"/>
+                            <field name="category_id" 
+                                   readonly="state != 'draft'"
+                                   options="{'no_create': True}"/>
+                            <field name="is_reinvestment" readonly="state != 'draft'"/>
+                        </group>
+                        <group>
+                            <field name="date" readonly="state != 'draft'"/>
+                            <field name="liquidation_date" readonly="state == 'applied'"/>
+                            <field name="partner_id" 
+                                   readonly="state != 'draft'"
+                                   options="{'no_create': True}"/>
+                            <field name="reference" readonly="state != 'draft'"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group string="Montos">
+                            <field name="currency" readonly="state != 'draft'"/>
+                            <field name="amount" 
+                                   widget="monetary" 
+                                   options="{'currency_field': 'currency'}"
+                                   readonly="state != 'draft'"/>
+                            <field name="exchange_rate" 
+                                   invisible="currency == 'ARS'"
+                                   readonly="state != 'draft'"/>
+                            <field name="amount_ars" 
+                                   widget="monetary" 
+                                   readonly="1"/>
+                        </group>
+                        <group string="Relaciones">
+                            <field name="cashbox_operation_id" readonly="1"/>
+                            <field name="partner_liquidation_id" readonly="1"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="notes" 
+                               placeholder="Observaciones adicionales..."
+                               readonly="state == 'applied'"/>
+                    </group>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers"/>
+                    <field name="activity_ids" widget="mail_activity"/>
+                    <field name="message_ids" widget="mail_thread"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <!-- Vista Tree -->
+    <record id="view_commission_cost_tree" model="ir.ui.view">
+        <field name="name">commission.cost.tree</field>
+        <field name="model">commission.cost</field>
+        <field name="arch" type="xml">
+            <tree string="Costos y Gastos" 
+                  decoration-success="state == 'applied'"
+                  decoration-info="state == 'confirmed'"
+                  decoration-muted="state == 'cancelled'">
+                <field name="code"/>
+                <field name="name"/>
+                <field name="date"/>
+                <field name="cost_type"/>
+                <field name="cost_subtype"/>
+                <field name="partner_id" optional="show"/>
+                <field name="amount_ars" widget="monetary" sum="Total"/>
+                <field name="is_reinvestment" widget="boolean_toggle"/>
+                <field name="state" widget="badge"/>
+                <field name="company_id" groups="base.group_multi_company" optional="hide"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Vista Search -->
+    <record id="view_commission_cost_search" model="ir.ui.view">
+        <field name="name">commission.cost.search</field>
+        <field name="model">commission.cost</field>
+        <field name="arch" type="xml">
+            <search string="Buscar Costos">
+                <field name="name"/>
+                <field name="code"/>
+                <field name="partner_id"/>
+                <field name="reference"/>
+                <separator/>
+                <filter string="Borrador" name="draft" domain="[('state', '=', 'draft')]"/>
+                <filter string="Confirmados" name="confirmed" domain="[('state', '=', 'confirmed')]"/>
+                <filter string="Aplicados" name="applied" domain="[('state', '=', 'applied')]"/>
+                <separator/>
+                <filter string="Costos Fijos" name="cf" domain="[('cost_type', '=', 'CF')]"/>
+                <filter string="Costos Variables" name="cv" domain="[('cost_type', '=', 'CV')]"/>
+                <filter string="Inversiones" name="ci" domain="[('cost_type', '=', 'CI')]"/>
+                <filter string="Impuestos" name="imp" domain="[('cost_type', '=', 'IMP')]"/>
+                <separator/>
+                <filter string="Es Reinversión" name="reinvestment" domain="[('is_reinvestment', '=', True)]"/>
+                <filter string="Con Salida de Caja" name="with_cashbox" domain="[('cashbox_operation_id', '!=', False)]"/>
+                <separator/>
+                <filter string="Este Mes" name="this_month" 
+                        domain="[('date', '&gt;=', datetime.datetime.now().strftime('%Y-%m-01')),
+                                ('date', '&lt;', (datetime.datetime.now() + relativedelta(months=1)).strftime('%Y-%m-01'))]"/>
+                <group expand="0" string="Agrupar Por">
+                    <filter string="Tipo" name="group_type" context="{'group_by': 'cost_type'}"/>
+                    <filter string="Subtipo" name="group_subtype" context="{'group_by': 'cost_subtype'}"/>
+                    <filter string="Estado" name="group_state" context="{'group_by': 'state'}"/>
+                    <filter string="Mes" name="group_month" context="{'group_by': 'date:month'}"/>
+                    <filter string="Proveedor" name="group_partner" context="{'group_by': 'partner_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Acción -->
+    <record id="action_commission_cost" model="ir.actions.act_window">
+        <field name="name">Costos y Gastos</field>
+        <field name="res_model">commission.cost</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_commission_cost_search"/>
+        <field name="context">{'search_default_this_month': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Registrar un nuevo costo o gasto
+            </p>
+            <p>
+                Los costos y gastos se deducen de la ganancia bruta
+                para calcular la ganancia neta sobre la cual comisionan los socios.
+            </p>
+        </field>
+    </record>
+</odoo>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Dashboard simplificado que no causa errores -->
+    <record id="action_commission_dashboard" model="ir.actions.act_window">
+        <field name="name">Dashboard de Comisiones</field>
+        <field name="res_model">commission.liquidation</field>
+        <field name="view_mode">kanban,tree,form</field>
+        <field name="context">{'create': False}</field>
+        <field name="domain">[]</field>
+        <field name="help" type="html">
+            <div class="o_view_nocontent_smiling_face">
+                <h2>Bienvenido al módulo de Comisiones</h2>
+                <p>
+                    Use los menús para:
+                </p>
+                <ul>
+                    <li>Crear nuevas liquidaciones</li>
+                    <li>Gestionar costos y gastos</li>
+                    <li>Ver reportes de comisiones</li>
+                </ul>
+            </div>
+        </field>
+    </record>
+</odoo>

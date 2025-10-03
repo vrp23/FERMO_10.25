@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_commission_reversal_wizard_form" model="ir.ui.view">
+        <field name="name">commission.reversal.wizard.form</field>
+        <field name="model">commission.reversal.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Revertir Liquidación">
+                <group>
+                    <field name="liquidation_id" invisible="1"/>
+                    <field name="liquidation_info" nolabel="1" colspan="2"/>
+                </group>
+                <group>
+                    <field name="reversal_reason" required="1" nolabel="1" 
+                           placeholder="Ingrese el motivo de la reversión..."/>
+                </group>
+                <group string="Opciones de Reversión">
+                    <field name="create_reversal_entry"/>
+                    <field name="revert_wallet_movement"/>
+                    <field name="unlock_operations"/>
+                </group>
+                <footer>
+                    <button name="action_confirm_reversal" 
+                            string="Confirmar Reversión" 
+                            type="object" 
+                            class="btn-danger"
+                            confirm="¿Está seguro de revertir esta liquidación? Esta acción no se puede deshacer."/>
+                    <button string="Cancelar" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>

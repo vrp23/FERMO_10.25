@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Heredar vista form de partner para agregar campo de comisión de socio -->
+    <record id="view_partner_form_inherit_commission" model="ir.ui.view">
+        <field name="name">res.partner.form.inherit.commission</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="custom_contact_types.view_partner_form_inherit"/>
+        <field name="arch" type="xml">
+            <!-- Agregar campo de porcentaje de comisión para socios después del grupo de comisiones -->
+            <xpath expr="//group[@name='commission_settings']" position="after">
+                <group string="Comisión como Socio" invisible="not is_commission_partner">
+                    <group>
+                        <field name="is_commission_partner" invisible="1"/>
+                        <field name="commission_percentage" 
+                               invisible="not is_commission_partner"
+                               widget="percentage"/>
+                    </group>
+                </group>
+            </xpath>
+            
+            <!-- Agregar botones en el button box -->
+            <div name="button_box" position="inside">
+                <button name="action_view_operator_liquidations" 
+                        type="object" 
+                        class="oe_stat_button" 
+                        icon="fa-money"
+                        invisible="operator_commission_count == 0">
+                    <div class="o_field_widget o_stat_info">
+                        <span class="o_stat_value">
+                            <field name="operator_commission_count"/>
+                        </span>
+                        <span class="o_stat_text">Liq. Operador</span>
+                    </div>
+                </button>
+                <button name="action_view_partner_liquidations" 
+                        type="object" 
+                        class="oe_stat_button" 
+                        icon="fa-handshake-o"
+                        invisible="partner_commission_count == 0">
+                    <div class="o_field_widget o_stat_info">
+                        <span class="o_stat_value">
+                            <field name="partner_commission_count"/>
+                        </span>
+                        <span class="o_stat_text">Liq. Socio</span>
+                    </div>
+                </button>
+            </div>
+        </field>
+    </record>
+</odoo>

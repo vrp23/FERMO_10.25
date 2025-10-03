@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Heredar vista tree de operaciones de caja -->
+    <record id="view_sucursales_cajas_operation_tree_inherit_commission" model="ir.ui.view">
+        <field name="name">sucursales_cajas.operation.tree.inherit.commission</field>
+        <field name="model">sucursales_cajas.operation</field>
+        <field name="inherit_id" ref="sucursales_cajas.view_sucursales_cajas_operation_tree"/>
+        <field name="arch" type="xml">
+            <field name="state" position="after">
+                <field name="has_commission" widget="boolean_toggle" optional="show"/>
+                <field name="commission_operator_id" optional="show"/>
+                <field name="commission_amount" widget="monetary" optional="show"/>
+                <field name="commission_liquidated" widget="boolean_toggle" optional="show"/>
+            </field>
+        </field>
+    </record>
+
+    <!-- Heredar vista form de operaciones de caja -->
+    <record id="view_sucursales_cajas_operation_form_inherit_commission" model="ir.ui.view">
+        <field name="name">sucursales_cajas.operation.form.inherit.commission</field>
+        <field name="model">sucursales_cajas.operation</field>
+        <field name="inherit_id" ref="sucursales_cajas.view_sucursales_cajas_operation_form"/>
+        <field name="arch" type="xml">
+            <!-- Agregar botón para ver liquidación en el header si existe -->
+            <button name="action_complete" position="after">
+                <button name="action_view_commission_liquidation" 
+                        string="Ver Liquidación" 
+                        type="object"
+                        class="btn-info"
+                        invisible="not commission_liquidation_id"/>
+            </button>
+            
+            <!-- Agregar grupo de comisiones antes del notebook -->
+            <xpath expr="//notebook" position="before">
+                <group string="Información de Comisiones" name="commission_info" 
+                       invisible="operation_type not in ('deposit', 'withdrawal', 'transfer_in', 'transfer_out')">
+                    <group>
+                        <field name="has_commission" 
+                               readonly="state != 'pending'"/>
+                        <field name="commission_operator_id" 
+                               required="has_commission"
+                               invisible="not has_commission"
+                               readonly="state != 'pending'"
+                               options="{'no_create': True}"/>
+                        <field name="commission_rate" 
+                               required="has_commission"
+                               invisible="not has_commission"
+                               readonly="state != 'pending'"
+                               widget="percentage"/>
+                        <field name="commission_included" 
+                               invisible="not has_commission"
+                               readonly="state != 'pending'"/>
+                    </group>
+                    <group>
+                        <field name="commission_amount" 
+                               widget="monetary"
+                               invisible="not has_commission"/>
+                        <field name="commission_liquidated" 
+                               invisible="not has_commission"/>
+                        <field name="commission_liquidation_id" 
+                               invisible="not commission_liquidated"/>
+                    </group>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Heredar vista search para agregar filtros de comisión -->
+    <record id="view_sucursales_cajas_operation_search_inherit_commission" model="ir.ui.view">
+        <field name="name">sucursales_cajas.operation.search.inherit.commission</field>
+        <field name="model">sucursales_cajas.operation</field>
+        <field name="inherit_id" ref="sucursales_cajas.view_sucursales_cajas_operation_search"/>
+        <field name="arch" type="xml">
+            <filter name="done" position="after">
+                <separator/>
+                <filter string="Con Comisión" 
+                        name="with_commission" 
+                        domain="[('has_commission', '=', True)]"/>
+                <filter string="Comisión Liquidada" 
+                        name="commission_liquidated" 
+                        domain="[('commission_liquidated', '=', True)]"/>
+                <filter string="Comisión Pendiente" 
+                        name="commission_pending" 
+                        domain="[('has_commission', '=', True), ('commission_liquidated', '=', False), ('state', '=', 'done')]"/>
+            </filter>
+            <filter name="state" position="after">
+                <filter string="Operador Comisión" 
+                        name="group_by_commission_operator" 
+                        context="{'group_by': 'commission_operator_id'}"/>
+            </filter>
+        </field>
+    </record>
+
+    <!-- Vista kanban heredada (si existe) -->
+    <record id="view_sucursales_cajas_operation_kanban_inherit_commission" model="ir.ui.view">
+        <field name="name">sucursales_cajas.operation.kanban.inherit.commission</field>
+        <field name="model">sucursales_cajas.operation</field>
+        <field name="inherit_id" ref="sucursales_cajas.view_sucursales_cajas_operation_kanban"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@class='o_kanban_record_bottom']" position="inside">
+                <div t-if="record.has_commission.raw_value" class="text-muted">
+                    <i class="fa fa-money" title="Con comisión"/> 
+                    <field name="commission_amount" widget="monetary"/>
+                    <span t-if="record.commission_liquidated.raw_value" class="badge badge-success ml-2">
+                        <i class="fa fa-check"/> Liquidada
+                    </span>
+                </div>
+            </xpath>
+        </field>
+    </record>
+</odoo>

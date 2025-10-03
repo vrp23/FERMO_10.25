@@ -1,0 +1,166 @@
+Documentación Técnica del Módulo Chequera
+Esta documentación proporciona detalles técnicos para desarrolladores que desean extender o integrar con el módulo Chequera.
+
+Modelos disponibles para heredar/extender
+chequera.check
+Modelo principal que representa un cheque en el sistema.
+pythonclass ChequeraCheck(models.Model):
+    _name = 'chequera.check'
+    _inherit = ['mail.thread', 'mail.activity.mixin']
+
+chequera.wallet.movement
+Modelo que gestiona los movimientos en las wallets de contactos.
+pythonclass ChequeraWalletMovement(models.Model):
+    _name = 'chequera.wallet.movement'
+
+chequera.bank
+Modelo para gestionar los bancos asociados a los cheques.
+pythonclass ChequeraBank(models.Model):
+    _name = 'chequera.bank'
+
+chequera.formula_config
+Modelo para configurar fórmulas de cálculo personalizadas.
+pythonclass ChequeraFormulaConfig(models.Model):
+    _name = 'chequera.formula_config'
+
+chequera.purchase.wizard
+Modelo para la compra múltiple de cheques.
+pythonclass ChequeraPurchaseWizard(models.Model):
+    _name = 'chequera.purchase.wizard'
+
+chequera.sale.wizard
+Modelo para la venta múltiple de cheques.
+pythonclass ChequeraSaleWizard(models.Model):
+    _name = 'chequera.sale.wizard'
+
+chequera.rejection.wizard
+Modelo transitorio para procesar rechazos de cheques.
+pythonclass ChequeraRejectionWizard(models.TransientModel):
+    _name = 'chequera.rejection.wizard'
+
+Extensiones de modelos estándar
+pythonclass ResPartner(models.Model):
+    _inherit = 'res.partner'
+
+Campos importantes que pueden ser reutilizados
+En chequera.check
+
+name: Código único del cheque (CHEQ#xxxxxx)
+state: Estado del cheque (borrador, disponible, vendido, anulado, rechazado)
+monto: Valor nominal del cheque
+fecha_emision: Fecha de emisión del cheque
+fecha_pago: Fecha de pago o cobro del cheque
+fecha_vencimiento: Fecha de vencimiento calculada (30 días después de fecha_pago)
+dias_para_vencimiento: Días restantes hasta el vencimiento
+dias_para_disponibilidad: Días restantes hasta que el cheque esté disponible para cobro
+proveedor_id: Proveedor que vendió el cheque
+cliente_id: Cliente que compró el cheque
+precio_compra: Precio al que se compró el cheque
+precio_venta: Precio al que se vendió el cheque
+alerta_vencimiento: Estado de alerta según el vencimiento (normal, alerta_30, alerta_15, alerta_7, vencido)
+motivo_rechazo: Motivo del rechazo del cheque
+fecha_rechazo: Fecha en que se registró el rechazo
+
+En chequera.wallet.movement
+
+partner_id: Contacto relacionado con el movimiento
+cheque_id: Cheque relacionado (individual)
+check_ids: Cheques relacionados (múltiples)
+tipo: Tipo de movimiento (compra, venta, anulacion)
+monto: Importe del movimiento
+multiple_checks: Indicador de operación múltiple
+es_compensacion: Indicador de movimiento de compensación por rechazo
+movement_origin_id: Referencia al movimiento original que se está compensando
+
+En res.partner (extensión)
+
+wallet_balance: Saldo de la wallet del contacto
+pesification_rate: Tasa de pesificación predeterminada
+monthly_interest: Interés mensual predeterminado
+
+Métodos clave que podrían ser sobrescritos o extendidos
+
+Operaciones de compra/venta
+pythondef action_comprar(self)            # Inicia proceso de compra 
+def action_vender(self)             # Procesa venta de un cheque
+def action_anular(self)             # Anula un cheque
+def action_rechazar(self)           # Rechaza un cheque 
+def action_reset_to_draft(self)     # Devuelve un cheque a estado borrador
+
+Cálculos de valores
+pythondef _compute_valores_compra(self)     # Calcula pesificación, interés y precio de compra
+def _compute_valores_venta(self)      # Calcula pesificación, interés y precio de venta
+def _compute_fecha_vencimiento(self)  # Calcula la fecha de vencimiento
+def _compute_dias_para_vencimiento(self) # Calcula días para vencimiento
+def _compute_dias_para_disponibilidad(self) # Calcula días para disponibilidad
+def _compute_meses_hasta_vencimiento(self) # Calcula meses hasta vencimiento
+
+Puntos de extensión de los wizards
+pythondef action_confirmar_compra(self)      # Confirma una compra múltiple
+def action_confirmar_venta(self)      # Confirma una venta múltiple
+def action_update_tasas_masivas(self)  # Actualiza tasas masivamente
+def action_rechazar_cheque(self)      # Procesa el rechazo de un cheque
+
+Operaciones de wallet
+pythondef _compute_wallet_balance(self)      # Calcula el saldo de la wallet para un contacto
+def action_confirm(self)               # Confirma un movimiento de wallet
+def action_cancel(self)                # Anula un movimiento de wallet
+
+Puntos de extensión previstos (hooks)
+En creación de cheques
+python@api.model_create_multi
+def create(self, vals_list)
+Se pueden añadir valores predeterminados o validaciones adicionales.
+
+En transiciones de estado
+Los métodos de acción como action_comprar, action_vender, action_rechazar contienen la lógica de 
+transición de estado y pueden ser extendidos.
+
+En cálculos financieros
+Las fórmulas en _compute_valores_compra y _compute_valores_venta se pueden personalizar 
+usando el modelo chequera.formula_config.
+
+En validaciones
+python@api.onchange('fecha_emision')
+def _onchange_fecha_emision(self)
+Se pueden añadir validaciones adicionales en métodos onchange.
+
+Convenciones de nomenclatura
+Modelos
+
+Singular: chequera.check, chequera.bank
+Prefijo "chequera." para todos los modelos del módulo
+
+Campos
+
+Separados por guion bajo: fecha_emision, dias_para_vencimiento
+Sufijo _id para campos Many2one: proveedor_id, cliente_id
+Prefijo is_ para campos booleanos: is_in_purchase_wizard
+
+Métodos
+
+Públicos (para ser llamados desde fuera): action_comprar, action_vender
+Privados (para uso interno): _compute_valores_compra, _onchange_fecha_emision
+Decoradores para métodos computados: @api.depends, @api.onchange
+
+Vistas
+
+Prefijo view_chequera_ para vistas
+Nombres descriptivos: view_chequera_check_form, view_chequera_wallet_tree
+
+Eventos y señales
+El módulo utiliza los siguientes eventos que pueden ser útiles para integraciones:
+
+Creación de un nuevo cheque
+Cambio de estado de un cheque (borrador → disponible → vendido/anulado/rechazado)
+Creación de un movimiento en la wallet
+Modificación de tasas de pesificación o interés
+Rechazo de un cheque con posibles compensaciones
+
+Consideraciones para extensiones
+
+Al extender chequera.check, asegúrate de manejar correctamente los estados, incluyendo el estado 'rechazado'
+Si añades campos relacionados con valores monetarios, considera actualizar los cálculos en _compute_valores_compra y _compute_valores_venta
+Para integraciones contables, los momentos clave para generar asientos contables son los métodos action_comprar, action_vender y action_rechazar_cheque
+La relación entre cheques y movimientos de wallet es esencial; mantén la integridad de estas relaciones en tus extensiones
+Los movimientos de compensación por rechazos requieren atención especial al extender la funcionalidad

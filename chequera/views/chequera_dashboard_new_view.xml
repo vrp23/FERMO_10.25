@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Vista de Dashboard Simple -->
+    <record id="view_chequera_dashboard_simple_form" model="ir.ui.view">
+        <field name="name">chequera.dashboard.simple.form</field>
+        <field name="model">chequera.dashboard</field>
+        <field name="arch" type="xml">
+            <form string="Dashboard de Chequera" create="false" edit="false" delete="false">
+                <sheet>
+                    <group col="4">
+                        <group colspan="2" string="📊 Operaciones de Hoy">
+                            <field name="compras_hoy" widget="integer"/>
+                            <field name="total_compras_hoy" widget="monetary"/>
+                            <field name="ventas_hoy" widget="integer"/>
+                            <field name="total_ventas_hoy" widget="monetary"/>
+                        </group>
+                        <group colspan="2" string="📈 Resumen Semanal">
+                            <field name="total_compras_semana" widget="monetary"/>
+                            <field name="total_ventas_semana" widget="monetary"/>
+                        </group>
+                    </group>
+                    
+                    <group string="💰 Cheques Disponibles">
+                        <group>
+                            <field name="cant_cheques_disponibles" widget="integer"/>
+                        </group>
+                        <group>
+                            <field name="monto_cheques_disponibles" widget="monetary"/>
+                        </group>
+                    </group>
+                    
+                    <notebook>
+                        <page string="⚠️ Próximos a Vencer (15 días)">
+                            <field name="proximos_vencer_ids" readonly="1">
+                                <tree create="false" delete="false" edit="false">
+                                    <field name="numero_cheque"/>
+                                    <field name="banco_id"/>
+                                    <field name="monto" sum="Total"/>
+                                    <field name="fecha_vencimiento"/>
+                                    <field name="dias_para_vencimiento" widget="integer"/>
+                                    <field name="state"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="📅 Próximos a Cobrar (7 días)">
+                            <field name="proximos_pago_ids" readonly="1">
+                                <tree create="false" delete="false" edit="false">
+                                    <field name="numero_cheque"/>
+                                    <field name="banco_id"/>
+                                    <field name="monto" sum="Total"/>
+                                    <field name="fecha_pago"/>
+                                    <field name="state"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                    
+                    <footer>
+                        <button name="%(chequera.action_chequera_purchase_wizard)d" 
+                                type="action" 
+                                string="Comprar Cheques"
+                                class="btn-primary"/>
+                        <button name="%(chequera.action_chequera_sale_wizard)d" 
+                                type="action" 
+                                string="Vender Cheques"
+                                class="btn-success"/>
+                    </footer>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    
+    <!-- Acción para el Dashboard Nuevo -->
+    <record id="action_chequera_dashboard_new" model="ir.actions.act_window">
+        <field name="name">Dashboard</field>
+        <field name="res_model">chequera.dashboard</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="view_chequera_dashboard_simple_form"/>
+        <field name="target">inline</field>
+    </record>
+</odoo>

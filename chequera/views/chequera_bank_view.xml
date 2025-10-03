@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Vista de árbol para bancos -->
+    <record id="view_chequera_bank_tree" model="ir.ui.view">
+        <field name="name">chequera.bank.tree</field>
+        <field name="model">chequera.bank</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="code"/>
+                <field name="active"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Vista de formulario para bancos -->
+    <record id="view_chequera_bank_form" model="ir.ui.view">
+        <field name="name">chequera.bank.form</field>
+        <field name="model">chequera.bank</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="code"/>
+                        <field name="active" widget="boolean_toggle"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Vista de búsqueda para bancos -->
+    <record id="view_chequera_bank_search" model="ir.ui.view">
+        <field name="name">chequera.bank.search</field>
+        <field name="model">chequera.bank</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="code"/>
+                <separator/>
+                <filter string="Activos" name="active" domain="[('active','=',True)]"/>
+                <filter string="Archivados" name="inactive" domain="[('active','=',False)]"/>
+            </search>
+        </field>
+    </record>
+
+    <!-- Acción para bancos -->
+    <record id="action_chequera_bank" model="ir.actions.act_window">
+        <field name="name">Bancos</field>
+        <field name="res_model">chequera.bank</field>
+        <field name="view_mode">tree,form</field>
+        <field name="context">{'search_default_active': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No hay bancos registrados
+            </p>
+            <p>
+                Cree un nuevo banco para comenzar.
+            </p>
+        </field>
+    </record>
+</odoo>

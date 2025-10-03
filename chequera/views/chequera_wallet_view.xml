@@ -1,0 +1,246 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Vista de árbol para movimientos de wallet - COMPLETAMENTE READ-ONLY -->
+    <record id="view_chequera_wallet_tree" model="ir.ui.view">
+        <field name="name">chequera.wallet.movement.tree</field>
+        <field name="model">chequera.wallet.movement</field>
+        <field name="arch" type="xml">
+            <tree decoration-success="tipo=='compra' and state=='confirmado'"
+                  decoration-info="tipo=='venta' and state=='confirmado'"
+                  decoration-danger="es_compensacion and state=='confirmado'"
+                  decoration-muted="state=='anulado' or active==False"
+                  create="false" delete="false" edit="false">
+                <field name="fecha"/>
+                <field name="name" string="Descripción"/>
+                <field name="partner_id"/>
+                <field name="tipo"/>
+                <field name="monto"/>
+                <field name="state"/>
+                <field name="active" invisible="1"/>
+                <field name="es_compensacion" invisible="1"/>
+                <button name="action_view_operation" type="object" 
+                        string="Ver Operación" 
+                        class="btn-sm btn-link"
+                        icon="fa-external-link"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Vista de formulario para movimientos de wallet - COMPLETAMENTE READ-ONLY -->
+    <record id="view_chequera_wallet_form" model="ir.ui.view">
+        <field name="name">chequera.wallet.movement.form</field>
+        <field name="model">chequera.wallet.movement</field>
+        <field name="arch" type="xml">
+            <form create="false" delete="false" edit="false">
+                <header>
+                    <!-- Solo mostrar estado, sin botones de acción -->
+                    <field name="state" widget="statusbar" readonly="1"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    
+                    <div class="alert alert-warning" role="alert" invisible="not es_compensacion">
+                        <strong>¡Atención!</strong> Este es un movimiento de compensación por rechazo de cheque.
+                    </div>                    
+                   
+                    <group>
+                        <group>
+                            <field name="partner_id" readonly="1"/>
+                            <field name="cheque_id" readonly="1" invisible="multiple_checks"/>
+                            <field name="tipo" readonly="1"/>
+                            <field name="multiple_checks" readonly="1"/>
+                            <field name="es_compensacion" readonly="1"/>
+                            <field name="movement_origin_id" readonly="1" invisible="not es_compensacion"/>
+                        </group>
+                        <group>
+                            <field name="fecha" readonly="1"/>
+                            <field name="monto" readonly="1"/>
+                            <field name="active" readonly="1"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Cheques relacionados" invisible="not multiple_checks">
+                            <field name="check_ids" readonly="1" nolabel="1">
+                                <tree create="false" delete="false" edit="false">
+                                    <field name="name"/>
+                                    <field name="numero_cheque"/>
+                                    <field name="banco_id"/>
+                                    <field name="monto"/>
+                                    <field name="fecha_pago"/>
+                                    <field name="fecha_vencimiento"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Notas" invisible="not notes">
+                            <field name="notes" readonly="1"/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Vista de búsqueda para movimientos de wallet -->
+    <record id="view_chequera_wallet_search" model="ir.ui.view">
+        <field name="name">chequera.wallet.movement.search</field>
+        <field name="model">chequera.wallet.movement</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="partner_id"/>
+                <field name="name" string="Referencia" filter_domain="[('name', 'ilike', self)]"/>
+                <field name="cheque_id" string="Número de cheque" 
+                       filter_domain="['|', 
+                                      '|', ('cheque_id.numero_cheque', 'ilike', self),
+                                           ('cheque_id.name', 'ilike', self),
+                                      '|', ('check_ids.numero_cheque', 'ilike', self),
+                                           ('check_ids.name', 'ilike', self)]"/>
+                <separator/>
+                <filter string="Compras" name="purchase" domain="[('tipo','=','compra')]"/>
+                <filter string="Ventas" name="sale" domain="[('tipo','=','venta')]"/>
+                <filter string="Anulaciones" name="cancellation" domain="[('tipo','=','anulacion')]"/>
+                <separator/>
+                <filter string="Compensaciones" name="compensation" domain="[('es_compensacion','=',True)]"/>
+                <filter string="Sin Compensación" name="no_compensation" domain="[('es_compensacion','=',False)]"/>
+                <separator/>
+                <filter string="Confirmados" name="confirmed" domain="[('state','=','confirmado')]"/>
+                <filter string="Borradores" name="draft" domain="[('state','=','borrador')]"/>
+                <filter string="Anulados" name="canceled" domain="[('state','=','anulado')]"/>
+                <separator/>
+                <!-- NUEVOS FILTROS PARA ACTIVOS/INACTIVOS -->
+                <filter string="Solo Activos" name="only_active" domain="[('active','=',True)]"/>
+                <filter string="Todos (incluye anulados)" name="all_records" domain="['|',('active','=',True),('active','=',False)]"/>
+                <separator/>
+                <filter string="Operaciones múltiples" name="multiple" domain="[('multiple_checks','=',True)]"/>
+                <filter string="Operaciones individuales" name="individual" domain="[('multiple_checks','=',False)]"/>
+                <separator/>
+                <filter string="Hoy" name="today" domain="[('fecha','=',context_today())]"/>
+                <filter string="Esta Semana" name="week" 
+                        domain="[('fecha','&gt;=',(context_today()-datetime.timedelta(days=7)).strftime('%Y-%m-%d')),
+                                ('fecha','&lt;=',context_today().strftime('%Y-%m-%d'))]"/>
+                <filter string="Este Mes" name="month" 
+                        domain="[('fecha','&gt;=',(context_today()-datetime.timedelta(days=30)).strftime('%Y-%m-%d')),
+                                ('fecha','&lt;=',context_today().strftime('%Y-%m-%d'))]"/>
+                <group expand="0" string="Agrupar Por">
+                    <filter string="Contacto" name="groupby_partner" context="{'group_by': 'partner_id'}"/>
+                    <filter string="Cheque" name="groupby_check" context="{'group_by': 'cheque_id'}"/>
+                    <filter string="Tipo" name="groupby_type" context="{'group_by': 'tipo'}"/>
+                    <filter string="Estado" name="groupby_state" context="{'group_by': 'state'}"/>
+                    <filter string="Fecha" name="groupby_date" context="{'group_by': 'fecha'}"/>
+                    <filter string="Mes" name="groupby_month" context="{'group_by': 'fecha:month'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Vista kanban para movimientos de wallet - OPCIONAL pero READ-ONLY -->
+    <record id="view_chequera_wallet_kanban" model="ir.ui.view">
+        <field name="name">chequera.wallet.movement.kanban</field>
+        <field name="model">chequera.wallet.movement</field>
+        <field name="arch" type="xml">
+            <kanban create="false" delete="false" edit="false">
+                <field name="id"/>
+                <field name="name"/>
+                <field name="partner_id"/>
+                <field name="tipo"/>
+                <field name="monto"/>
+                <field name="fecha"/>
+                <field name="state"/>
+                <field name="active"/>
+                <field name="es_compensacion"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div t-attf-class="oe_kanban_global_click">
+                            <div class="o_kanban_record_top">
+                                <div class="o_kanban_record_headings">
+                                    <strong class="o_kanban_record_title">
+                                        <span><field name="name"/></span>
+                                    </strong>
+                                </div>
+                            </div>
+                            <div class="o_kanban_record_body">
+                                <div>
+                                    <span t-if="record.tipo.raw_value == 'compra'" 
+                                          class="badge badge-success">Compra</span>
+                                    <span t-if="record.tipo.raw_value == 'venta'" 
+                                          class="badge badge-info">Venta</span>
+                                    <span t-if="record.tipo.raw_value == 'anulacion'" 
+                                          class="badge badge-danger">Anulación</span>
+                                </div>
+                                <div>
+                                    <strong>Contacto:</strong> <field name="partner_id"/>
+                                </div>
+                                <div>
+                                    <strong>Monto:</strong> $<field name="monto"/>
+                                </div>
+                                <div>
+                                    <strong>Fecha:</strong> <field name="fecha"/>
+                                </div>
+                                <div t-if="record.es_compensacion.raw_value">
+                                    <span class="badge badge-warning">Compensación</span>
+                                </div>
+                                <div t-if="record.active.raw_value == false">
+                                    <span class="badge badge-secondary">Inactivo</span>
+                                </div>
+                            </div>
+                            <div class="o_kanban_record_bottom">
+                                <button name="action_view_operation" type="object" 
+                                        string="Ver Operación" 
+                                        class="btn btn-sm btn-link"/>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- Acción principal para movimientos de wallet - MODIFICADA PARA MOSTRAR TODOS -->
+    <record id="action_chequera_wallet" model="ir.actions.act_window">
+        <field name="name">Historial de Movimientos</field>
+        <field name="res_model">chequera.wallet.movement</field>
+        <field name="view_mode">tree,kanban,form</field>
+        <field name="domain">['|',('active','=',True),('active','=',False)]</field>
+        <field name="context">{
+            'search_default_confirmed': 1,
+            'create': False,
+            'edit': False,
+            'delete': False
+        }</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No hay movimientos de wallet registrados
+            </p>
+            <p>
+                Los movimientos se crean automáticamente al realizar operaciones de compra y venta de cheques.
+            </p>
+            <p>
+                Para modificar o eliminar movimientos, debe hacerlo desde las operaciones correspondientes.
+            </p>
+        </field>
+    </record>
+
+    <!-- Acción específica para ver movimientos desde partner - COMPLETAMENTE READ-ONLY -->
+    <record id="action_partner_wallet_movements" model="ir.actions.act_window">
+        <field name="name">Movimientos de Wallet</field>
+        <field name="res_model">chequera.wallet.movement</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('partner_id', '=', active_id)]</field>
+        <field name="context">{
+            'default_partner_id': active_id,
+            'create': False,
+            'edit': False,
+            'delete': False,
+            'search_default_confirmed': 1
+        }</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No hay movimientos registrados para este contacto
+            </p>
+            <p>
+                Los movimientos se generan automáticamente desde las operaciones de compra y venta.
+            </p>
+        </field>
+    </record>
+</odoo>

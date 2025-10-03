@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Vista tree heredada para divisas (necesitamos buscar el id correcto) -->
+    <record id="view_divisas_currency_tree_inherit_commission" model="ir.ui.view">
+        <field name="name">divisas.currency.tree.inherit.commission</field>
+        <field name="model">divisas.currency</field>
+        <field name="inherit_id" ref="divisas.view_divisas_currency_tree"/>
+        <field name="arch" type="xml">
+            <field name="state" position="after">
+                <field name="commission_operator_id" optional="show"/>
+                <field name="commission_liquidated" widget="boolean_toggle" optional="show"/>
+            </field>
+        </field>
+    </record>
+
+    <!-- Vista form heredada para divisas -->
+    <record id="view_divisas_currency_form_inherit_commission" model="ir.ui.view">
+        <field name="name">divisas.currency.form.inherit.commission</field>
+        <field name="model">divisas.currency</field>
+        <field name="inherit_id" ref="divisas.view_divisas_currency_form"/>
+        <field name="arch" type="xml">
+            <!-- Agregar grupo de comisiones después de las notas o en el lugar apropiado -->
+            <field name="notes" position="after">
+                <group string="Información de Comisiones" name="commission_info">
+                    <group>
+                        <field name="commission_operator_id"/>
+                        <field name="commission_liquidated"/>
+                    </group>
+                    <group>
+                        <field name="commission_liquidation_id" 
+                               invisible="not commission_liquidated"/>
+                        <field name="commission_period" 
+                               invisible="not commission_liquidated"/>
+                    </group>
+                </group>
+            </field>
+        </field>
+    </record>
+</odoo>

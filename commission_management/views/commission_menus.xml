@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Menú principal del módulo -->
+    <menuitem id="menu_commission_root"
+              name="Comisiones"
+              sequence="50"
+              groups="commission_management.group_commission_user"
+              web_icon="commission_management,static/description/icon.png"/>
+    
+    <!-- Dashboard -->
+    <menuitem id="menu_commission_dashboard"
+              name="Dashboard"
+              parent="menu_commission_root"
+              action="action_commission_dashboard"
+              sequence="1"/>
+    
+    <!-- Menú de Liquidaciones -->
+    <menuitem id="menu_commission_liquidations"
+              name="Liquidaciones"
+              parent="menu_commission_root"
+              sequence="10"/>
+    
+    <menuitem id="menu_commission_liquidation_new"
+              name="Nueva Liquidación"
+              parent="menu_commission_liquidations"
+              action="action_commission_liquidation_wizard"
+              sequence="1"/>
+    
+    <menuitem id="menu_commission_liquidation_operator"
+              name="Liquidaciones de Operadores"
+              parent="menu_commission_liquidations"
+              action="action_commission_liquidation"
+              sequence="2"/>
+    
+    <menuitem id="menu_commission_liquidation_partner"
+              name="Liquidaciones de Socios"
+              parent="menu_commission_liquidations"
+              action="action_commission_partner_liquidation"
+              sequence="3"
+              groups="commission_management.group_commission_manager"/>
+    
+    <!-- Menú de Costos -->
+    <menuitem id="menu_commission_costs"
+              name="Costos y Gastos"
+              parent="menu_commission_root"
+              sequence="20"
+              groups="commission_management.group_commission_manager"/>
+    
+    <menuitem id="menu_commission_cost_list"
+              name="Listado de Costos"
+              parent="menu_commission_costs"
+              action="action_commission_cost"
+              sequence="1"/>
+    
+    <!-- Menú de Reportes -->
+    <menuitem id="menu_commission_reports"
+              name="Reportes"
+              parent="menu_commission_root"
+              sequence="30"/>
+    
+    <menuitem id="menu_commission_report_operator"
+              name="Reporte de Comisiones por Operador"
+              parent="menu_commission_reports"
+              action="action_report_commission_by_operator"
+              sequence="1"/>
+    
+    <menuitem id="menu_commission_report_profitability"
+              name="Reporte de Rentabilidad"
+              parent="menu_commission_reports"
+              action="action_report_profitability"
+              sequence="2"
+              groups="commission_management.group_commission_manager"/>
+    
+    <!-- Menú de Configuración -->
+    <menuitem id="menu_commission_config"
+              name="Configuración"
+              parent="menu_commission_root"
+              sequence="90"
+              groups="commission_management.group_commission_admin"/>
+    
+    <menuitem id="menu_commission_config_categories"
+              name="Categorías de Costos"
+              parent="menu_commission_config"
+              action="action_commission_cost_category"
+              sequence="1"/>
+</odoo>

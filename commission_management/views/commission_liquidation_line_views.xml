@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Vista Form para líneas (generalmente se usa desde el padre) -->
+    <record id="view_commission_liquidation_line_form" model="ir.ui.view">
+        <field name="name">commission.liquidation.line.form</field>
+        <field name="model">commission.liquidation.line</field>
+        <field name="arch" type="xml">
+            <form string="Línea de Liquidación">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="liquidation_id" invisible="context.get('hide_liquidation')"/>
+                            <field name="description"/>
+                            <field name="source_reference"/>
+                            <field name="operation_date"/>
+                            <field name="partner_id"/>
+                            <field name="source_model" invisible="1"/>  <!-- AGREGAR ESTA LÍNEA -->
+                        </group>
+                        <group>
+                            <field name="base_amount" widget="monetary"/>
+                            <field name="commission_rate" widget="percentage"/>
+                            <field name="commission_amount" widget="monetary"/>
+                        </group>
+                    </group>
+                    <group string="Detalles según Tipo" invisible="not source_model">
+                        <group invisible="source_model != 'chequera.check'">
+                            <field name="check_id" readonly="1"/>
+                            <field name="purchase_price" widget="monetary"/>
+                            <field name="sale_price" widget="monetary"/>
+                        </group>
+                        <group invisible="source_model != 'divisas.currency'">
+                            <field name="currency_operation_id" readonly="1"/>
+                            <field name="operation_type"/>
+                        </group>
+                        <group invisible="source_model != 'sucursales_cajas.operation'">
+                            <field name="cashbox_operation_id" readonly="1"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Vista Tree para líneas -->
+    <record id="view_commission_liquidation_line_tree" model="ir.ui.view">
+        <field name="name">commission.liquidation.line.tree</field>
+        <field name="model">commission.liquidation.line</field>
+        <field name="arch" type="xml">
+            <tree string="Líneas de Liquidación" editable="bottom" create="0">
+                <field name="sequence" widget="handle"/>
+                <field name="description"/>
+                <field name="operation_date"/>
+                <field name="partner_id" optional="show"/>
+                <field name="base_amount" sum="Total Base"/>
+                <field name="commission_rate" widget="percentage"/>
+                <field name="commission_amount" sum="Total Comisión"/>
+                <button name="action_view_source" 
+                        string="Ver Origen" 
+                        type="object" 
+                        icon="fa-external-link"
+                        class="btn-sm"/>
+            </tree>
+        </field>
+    </record>
+</odoo>
